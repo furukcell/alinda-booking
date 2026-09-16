@@ -33,23 +33,21 @@ ALINDA helps businesses create a professional booking page, manage services and 
 
 - [x] Phase 0 — Project foundation
 - [x] Phase 1 — ALINDA design system + first public booking prototype
-- [ ] Phase 2 — Multi-tenant core
-- [ ] Phase 3 — Business panel
-- [ ] Phase 4 — Services & working hours
-- [ ] Phase 5 — Customer booking flow
+- [x] Phase 2 — Multi-tenant core scaffold + Firestore integration layer
+- [x] Phase 3 — Business panel UI
+- [ ] Phase 4 — Services & working hours persistence
+- [ ] Phase 5 — Customer booking flow persistence
 - [ ] Phase 6 — Booking conflict engine
 - [ ] Phase 7 — Security rules
 - [ ] Phase 8 — Demo, landing page & sales preparation
 
-## Phase 2 Progress
+## Current Implementation
 
-- Business domain types added
-- Seed business data added for development
-- Dynamic `/{slug}` public business route added
-- Unknown business slugs return `404`
-- Public booking UI now consumes tenant-specific business data
-- Root page now acts as a demo/business selector
-- Firebase persistence and authentication remain for the next Phase 2 steps
+- `/{slug}` resolves a business tenant and renders a tenant-specific public booking page.
+- Public business data is sanitized before it reaches the booking UI; internal owner/subscription fields are excluded.
+- Firestore lookup is prepared for the `businesses/{businessId}` collection, with mock data retained for local development until Firebase environment variables are configured.
+- `/panel` contains the first business dashboard with today's appointment overview and quick actions.
+- `/panel/appointments`, `/panel/services`, `/panel/hours` and `/panel/settings` provide the initial management surfaces.
 
 ## Development Principles
 
@@ -61,4 +59,4 @@ ALINDA helps businesses create a professional booking page, manage services and 
 
 ## Status
 
-🚧 In development — Phase 2 / Multi-tenant core
+🚧 In development — Phase 3 / Business Panel
