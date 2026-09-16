@@ -1,0 +1,78 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(businessId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid;
+    }
+
+    function validBookingCreate(businessId) {
+      return request.resource.data.businessId == businessId
+        && request.resource.data.serviceId is string
+        && request.resource.data.serviceName is string
+        && request.resource.data.serviceDurationMinutes is int
+        && request.resource.data.servicePrice is number
+        && request.resource.data.customerName is string
+        && request.resource.data.customerPhone is string
+        && request.resource.data.date is string
+        && request.resource.data.time is string
+        && request.resource.data.status == 'pending'
+        && request.resource.data.slotId is string
+        && request.resource.data.createdAt == request.time;
+    }
+
+    function validSlotCreate(businessId, slotId) {
+      return request.resource.data.bookingId is string
+        && request.resource.data.date is string
+        && request.resource.data.time is string
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.bookingId == request.resource.data.bookingId;
+    }
+
+    match /businesses/{businessId} {
+      // Public booking pages need the business profile.
+      // Keep sensitive/internal fields out of this document in production.
+      allow get: if true;
+      allow list: if false;
+
+      allow update: if isOwner(businessId)
+        && request.resource.data.ownerId == resource.data.ownerId;
+      allow delete: if isOwner(businessId);
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid;
+
+      match /services/{serviceId} {
+        allow get, list: if true;
+        allow create, update, delete: if isOwner(businessId);
+      }
+
+      match /hours/{dayId} {
+        allow get, list: if true;
+        allow create, update, delete: if isOwner(businessId);
+      }
+
+      match /bookings/{bookingId} {
+        // Customers may create a pending booking, but cannot read bookings.
+        allow create: if validBookingCreate(businessId);
+        allow get, list: if isOwner(businessId);
+        allow update, delete: if isOwner(businessId);
+      }
+
+      match /slots/{slotId} {
+        // Public clients create the lock and booking in one Firestore transaction.
+        // Existing pending/confirmed slots cannot be overwritten by a customer.
+        allow create: if validSlotCreate(businessId, slotId)
+          && !exists(/databases/$(database)/documents/businesses/$(businessId)/slots/$(slotId));
+        allow get: if isOwner(businessId);
+        allow list: if false;
+        allow update, delete: if isOwner(businessId);
+      }
+    }
+  }
+}
