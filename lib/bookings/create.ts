@@ -34,32 +34,37 @@ export async function createBooking(input: CreateBookingInput) {
   const slotId = getSlotId(input.date, input.time);
   const slotRef = doc(db, "businesses", input.businessId, "slots", slotId);
 
-  await runTransaction(db, async (transaction) => {
-    // Create-only writes are intentional: Firestore rejects the transaction if
-    // another customer has already created this deterministic slot document.
-    transaction.create(slotRef, {
-      slotId,
-      date: input.date,
-      time: input.time,
-      status: "pending",
-      createdAt: serverTimestamp()
-    });
+  try {
+    await runTransaction(db, async (transaction) => {
+      transaction.create(slotRef, {
+        slotId,
+        date: input.date,
+        time: input.time,
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
 
-    transaction.set(bookingRef, {
-      businessId: input.businessId,
-      serviceId: input.service.id,
-      serviceName: input.service.name,
-      serviceDurationMinutes: input.service.durationMinutes,
-      servicePrice: input.service.price,
-      customerName,
-      customerPhone,
-      date: input.date,
-      time: input.time,
-      status: "pending",
-      slotId,
-      createdAt: serverTimestamp()
+      transaction.set(bookingRef, {
+        businessId: input.businessId,
+        serviceId: input.service.id,
+        serviceName: input.service.name,
+        serviceDurationMinutes: input.service.durationMinutes,
+        servicePrice: input.service.price,
+        customerName,
+        customerPhone,
+        date: input.date,
+        time: input.time,
+        status: "pending",
+        slotId,
+        createdAt: serverTimestamp()
+      });
     });
-  });
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "code" in error && error.code === "already-exists") {
+      throw new Error("SLOT_TAKEN");
+    }
+    throw error;
+  }
 
   return bookingRef;
 }
