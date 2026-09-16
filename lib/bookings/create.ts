@@ -31,17 +31,12 @@ export async function createBooking(input: CreateBookingInput) {
   const slotRef = doc(db, "businesses", input.businessId, "slots", slotId);
 
   await runTransaction(db, async (transaction) => {
-    const slotSnapshot = await transaction.get(slotRef);
-
-    if (slotSnapshot.exists()) {
-      const slotStatus = slotSnapshot.data().status;
-      if (slotStatus === "pending" || slotStatus === "confirmed") {
-        throw new Error("SLOT_TAKEN");
-      }
-    }
-
-    transaction.set(slotRef, {
+    // Create-only writes are intentional: Firestore rejects the transaction if
+    // another customer has already created this deterministic slot document.
+    // This avoids exposing slot/booking data to unauthenticated customers.
+    transaction.create(slotRef, {
       bookingId: bookingRef.id,
+      slotId,
       date: input.date,
       time: input.time,
       status: "pending",
