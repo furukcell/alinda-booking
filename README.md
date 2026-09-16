@@ -31,8 +31,8 @@ ALINDA helps businesses create a professional booking page, manage services and 
 
 ## Project Phases
 
-- [ ] Phase 0 — Project foundation
-- [ ] Phase 1 — ALINDA design system
+- [x] Phase 0 — Project foundation
+- [x] Phase 1 — ALINDA design system + first public booking prototype
 - [ ] Phase 2 — Multi-tenant core
 - [ ] Phase 3 — Business panel
 - [ ] Phase 4 — Services & working hours
@@ -40,6 +40,16 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - [ ] Phase 6 — Booking conflict engine
 - [ ] Phase 7 — Security rules
 - [ ] Phase 8 — Demo, landing page & sales preparation
+
+## Phase 2 Progress
+
+- Business domain types added
+- Seed business data added for development
+- Dynamic `/{slug}` public business route added
+- Unknown business slugs return `404`
+- Public booking UI now consumes tenant-specific business data
+- Root page now acts as a demo/business selector
+- Firebase persistence and authentication remain for the next Phase 2 steps
 
 ## Development Principles
 
@@ -51,4 +61,4 @@ ALINDA helps businesses create a professional booking page, manage services and 
 
 ## Status
 
-🚧 In development — Phase 0 / Phase 1
+🚧 In development — Phase 2 / Multi-tenant core
