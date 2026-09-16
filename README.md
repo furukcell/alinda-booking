@@ -40,6 +40,7 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - [x] Phase 6 — Booking conflict engine
 - [x] Phase 7 — Firestore security rules
 - [x] Phase 8 — Demo, landing page & sales preparation
+- [x] Phase 9 — Dynamic availability generation
 
 ## Current Implementation
 
@@ -54,7 +55,12 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - Business ownership is resolved through the `ownerId` field on the `businesses` collection.
 - Public booking requests are persisted under `businesses/{businessId}/bookings`.
 - Booking creation atomically reserves `businesses/{businessId}/slots/{date_time}` before creating the booking, preventing two clients from taking the same slot concurrently.
-- Occupied-slot conflicts are surfaced to the customer as a specific message.
+- The public booking page generates the next 14 dates from the visitor's local calendar.
+- Available times are generated from the business's persisted working hours and the selected service duration in 30-minute intervals.
+- Past time slots are hidden for the current day.
+- Occupied deterministic slot documents are checked individually and removed from the public availability list without allowing slot enumeration.
+- If a service is longer than the remaining working window, late start times are not offered.
+- A final create-only transaction still protects the booking at submission time if another customer takes the slot between availability loading and confirmation.
 - `/panel/appointments` reads persisted bookings for the signed-in owner's business.
 - `firestore.rules` provides authenticated owner checks for tenant management and restricts booking/slot creation to the expected pending shapes.
 - `firebase.json` points Firebase CLI deployments at `firestore.rules`.
@@ -108,16 +114,14 @@ businesses/{businessId}/bookings/{bookingId}
 └── createdAt
 
 businesses/{businessId}/slots/{date_time}
-├── bookingId
+├── slotId
 ├── date
 ├── time
 ├── status
 └── createdAt
 ```
 
-> The public booking flow currently reads the tenant document directly, so sensitive fields such as billing/subscription secrets must not be stored in `businesses/{businessId}`. A future hardening step can split public business data into a dedicated public collection.
-
-> The public demo date/time choices are currently static. Persisted working hours are not yet converted into dynamically generated available slots.
+> The public booking flow reads the tenant document directly, so sensitive fields such as billing/subscription secrets must not be stored in `businesses/{businessId}`. A future hardening step can split public business data into a dedicated public collection.
 
 ## Development Principles
 
@@ -129,4 +133,4 @@ businesses/{businessId}/slots/{date_time}
 
 ## Status
 
-✅ MVP phases 0–8 implemented. Next work should focus on production hardening and dynamic availability generation.
+🚧 MVP implemented through dynamic availability. Next work: production hardening, end-to-end Firebase verification, and final sales/demo polish.
