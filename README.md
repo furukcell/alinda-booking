@@ -39,11 +39,12 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - [x] Phase 5 — Customer booking flow persistence
 - [x] Phase 6 — Booking conflict engine
 - [x] Phase 7 — Firestore security rules
-- [ ] Phase 8 — Demo, landing page & sales preparation
+- [x] Phase 8 — Demo, landing page & sales preparation
 
 ## Current Implementation
 
 - `/{slug}` resolves a business tenant and renders a tenant-specific public booking page.
+- `/` provides the ALINDA sales/demo landing page with example businesses and clear navigation into the booking flow.
 - Public business data is sanitized before it reaches the booking UI; internal owner/subscription fields are excluded by the application layer.
 - Public services are loaded from `businesses/{businessId}/services` when Firestore is configured, with mock data retained for development fallback.
 - `/login` provides Firebase Email/Password authentication.
@@ -57,6 +58,7 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - `/panel/appointments` reads persisted bookings for the signed-in owner's business.
 - `firestore.rules` provides authenticated owner checks for tenant management and restricts booking/slot creation to the expected pending shapes.
 - `firebase.json` points Firebase CLI deployments at `firestore.rules`.
+- `docs/sales.md` contains the demo flow, pre-demo checklist, MVP boundaries and sales notes.
 
 ## Firestore MVP Shape
 
@@ -115,6 +117,8 @@ businesses/{businessId}/slots/{date_time}
 
 > The public booking flow currently reads the tenant document directly, so sensitive fields such as billing/subscription secrets must not be stored in `businesses/{businessId}`. A future hardening step can split public business data into a dedicated public collection.
 
+> The public demo date/time choices are currently static. Persisted working hours are not yet converted into dynamically generated available slots.
+
 ## Development Principles
 
 1. Finish and verify each phase before moving to the next.
@@ -125,4 +129,4 @@ businesses/{businessId}/slots/{date_time}
 
 ## Status
 
-🚧 In development — Phase 7 / Firestore Security Rules
+✅ MVP phases 0–8 implemented. Next work should focus on production hardening and dynamic availability generation.
