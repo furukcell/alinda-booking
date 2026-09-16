@@ -16,6 +16,10 @@ export type CreateBookingInput = {
   time: string;
 };
 
+function getSlotId(date: string, time: string) {
+  return `${date}_${time}`.replace(/[^a-zA-Z0-9_-]/g, "-");
+}
+
 export async function createBooking(input: CreateBookingInput) {
   const customerName = input.customerName.trim();
   const customerPhone = input.customerPhone.trim();
@@ -27,15 +31,13 @@ export async function createBooking(input: CreateBookingInput) {
 
   const db = getFirebaseDb();
   const bookingRef = doc(collection(db, "businesses", input.businessId, "bookings"));
-  const slotId = `${input.date}_${input.time}`.replace(/[^a-zA-Z0-9_-]/g, "-");
+  const slotId = getSlotId(input.date, input.time);
   const slotRef = doc(db, "businesses", input.businessId, "slots", slotId);
 
   await runTransaction(db, async (transaction) => {
     // Create-only writes are intentional: Firestore rejects the transaction if
     // another customer has already created this deterministic slot document.
-    // This avoids exposing slot/booking data to unauthenticated customers.
     transaction.create(slotRef, {
-      bookingId: bookingRef.id,
       slotId,
       date: input.date,
       time: input.time,
