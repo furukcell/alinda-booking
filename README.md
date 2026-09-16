@@ -34,7 +34,7 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - [x] Phase 0 — Project foundation
 - [x] Phase 1 — ALINDA design system + first public booking prototype
 - [x] Phase 2 — Multi-tenant core scaffold + Firestore integration layer
-- [x] Phase 3 — Business panel UI
+- [x] Phase 3 — Business panel UI + Firebase Authentication guard
 - [ ] Phase 4 — Services & working hours persistence
 - [ ] Phase 5 — Customer booking flow persistence
 - [ ] Phase 6 — Booking conflict engine
@@ -48,6 +48,12 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - Firestore lookup is prepared for the `businesses/{businessId}` collection, with mock data retained for local development until Firebase environment variables are configured.
 - `/panel` contains the first business dashboard with today's appointment overview and quick actions.
 - `/panel/appointments`, `/panel/services`, `/panel/hours` and `/panel/settings` provide the initial management surfaces.
+- `/login` signs businesses in with Firebase Email/Password authentication.
+- `/panel` and all nested `/panel/*` routes are protected by a client-side Firebase auth guard and redirect unauthenticated users to `/login`.
+
+## Firebase Setup
+
+Copy `.env.example` to `.env.local`, add the Firebase web app configuration, and enable Email/Password under Firebase Authentication before testing the login flow.
 
 ## Development Principles
 
@@ -59,4 +65,4 @@ ALINDA helps businesses create a professional booking page, manage services and 
 
 ## Status
 
-🚧 In development — Phase 3 / Business Panel
+🚧 In development — Phase 3 / Authentication + Business Panel
