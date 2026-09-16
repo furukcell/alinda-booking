@@ -38,13 +38,13 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - [x] Phase 4 — Services & working hours persistence
 - [x] Phase 5 — Customer booking flow persistence
 - [x] Phase 6 — Booking conflict engine
-- [ ] Phase 7 — Security rules
+- [x] Phase 7 — Firestore security rules
 - [ ] Phase 8 — Demo, landing page & sales preparation
 
 ## Current Implementation
 
 - `/{slug}` resolves a business tenant and renders a tenant-specific public booking page.
-- Public business data is sanitized before it reaches the booking UI; internal owner/subscription fields are excluded.
+- Public business data is sanitized before it reaches the booking UI; internal owner/subscription fields are excluded by the application layer.
 - Public services are loaded from `businesses/{businessId}/services` when Firestore is configured, with mock data retained for development fallback.
 - `/login` provides Firebase Email/Password authentication.
 - `/panel` and `/panel/*` are protected by an authentication guard.
@@ -53,8 +53,10 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - Business ownership is resolved through the `ownerId` field on the `businesses` collection.
 - Public booking requests are persisted under `businesses/{businessId}/bookings`.
 - Booking creation atomically reserves `businesses/{businessId}/slots/{date_time}` before creating the booking, preventing two clients from taking the same slot concurrently.
-- Occupied-slot conflicts are surfaced to the customer as a specific "başka bir müşteri tarafından alındı" message.
+- Occupied-slot conflicts are surfaced to the customer as a specific message.
 - `/panel/appointments` reads persisted bookings for the signed-in owner's business.
+- `firestore.rules` provides authenticated owner checks for tenant management and restricts booking/slot creation to the expected pending shapes.
+- `firebase.json` points Firebase CLI deployments at `firestore.rules`.
 
 ## Firestore MVP Shape
 
@@ -111,7 +113,7 @@ businesses/{businessId}/slots/{date_time}
 └── createdAt
 ```
 
-> Firestore security rules are intentionally deferred to Phase 7. Until those rules are configured, the client-side owner lookup is an application-layer guard, not the final tenant-isolation boundary. Public booking writes also need the Phase 7 rules before production use.
+> The public booking flow currently reads the tenant document directly, so sensitive fields such as billing/subscription secrets must not be stored in `businesses/{businessId}`. A future hardening step can split public business data into a dedicated public collection.
 
 ## Development Principles
 
@@ -123,4 +125,4 @@ businesses/{businessId}/slots/{date_time}
 
 ## Status
 
-🚧 In development — Phase 6 / Booking Conflict Engine
+🚧 In development — Phase 7 / Firestore Security Rules
