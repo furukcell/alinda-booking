@@ -26,15 +26,23 @@ This roadmap is the working implementation plan for taking ALINDA from the curre
 
 **Goal:** Make the business panel reliable enough for real businesses.
 
-- [ ] Review dashboard structure and navigation
-- [ ] Business profile editing
-- [ ] Business contact/address/category editing
+- [x] Review dashboard structure and navigation
+- [x] Business profile editing
+- [x] Business contact/address/category editing
 - [ ] Service create/edit/delete UX polish
 - [ ] Working hours UX polish
-- [ ] Loading, empty and error states
-- [ ] Toast/feedback states
-- [ ] Owner-only access verification across every panel route
+- [x] Loading, empty and error states
+- [x] Toast/feedback states
+- [x] Owner-only access verification across every panel route
 - [ ] Mobile responsive panel review
+
+### Phase 10 — First implementation
+
+- Added `/panel/settings` for editing the signed-in owner's business profile.
+- Added business name, slug, category, description, city, district, address, phone and initials editing.
+- Added primary and soft brand color editing.
+- Added loading, save, success and error feedback states.
+- Writes are protected by the existing Firestore owner rule on `businesses/{businessId}`.
 
 ## Phase 11 — Appointment Management
 
@@ -164,6 +172,6 @@ This roadmap is the working implementation plan for taking ALINDA from the curre
 
 We will work **one phase at a time** and only mark an item complete after it has been implemented and verified.
 
-**Current next phase:** Phase 10 — Panel Hardening & Business Management
+**Current next step:** Phase 10 — Service/working-hours UX polish and mobile panel review.
 
 **Deployment policy:** Production deployment is intentionally postponed until the core product, security, UX and end-to-end Firebase flow have been verified.
