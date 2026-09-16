@@ -1,15 +1,15 @@
 "use client";
 
+import { onAuthStateChanged } from "firebase/auth";
 import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp, updateDoc } from "firebase/firestore";
 import { ArrowLeft, Pencil, Plus, Scissors, Trash2, X } from "@lucide/react";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
-import { getFirebaseDb } from "@/lib/firebase/client";
+import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 import { getOwnedBusinessId } from "@/lib/businesses/owner";
 import type { Service } from "@/types/business";
 
 const emptyForm = { name: "", description: "", durationMinutes: "30", price: "" };
-
 type FormState = typeof emptyForm;
 
 export default function ServicesPage() {
@@ -52,19 +52,17 @@ export default function ServicesPage() {
   }
 
   useEffect(() => {
-    import("firebase/auth").then(({ onAuthStateChanged }) => {
-      import("@/lib/firebase/client").then(({ getFirebaseAuth }) => {
-        try {
-          return onAuthStateChanged(getFirebaseAuth(), (user) => {
-            if (user) void loadServices(user.uid);
-            else setLoading(false);
-          });
-        } catch {
-          setError("Firebase yapılandırılmamış.");
-          setLoading(false);
-        }
+    let unsubscribe = () => {};
+    try {
+      unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
+        if (user) void loadServices(user.uid);
+        else setLoading(false);
       });
-    });
+    } catch {
+      setError("Firebase yapılandırılmamış.");
+      setLoading(false);
+    }
+    return () => unsubscribe();
   }, []);
 
   function resetForm() {
@@ -91,8 +89,7 @@ export default function ServicesPage() {
       if (editingId) await updateDoc(doc(servicesRef, editingId), payload);
       else await addDoc(servicesRef, { ...payload, createdAt: serverTimestamp() });
       resetForm();
-      const auth = (await import("@/lib/firebase/client")).getFirebaseAuth();
-      if (auth.currentUser) await loadServices(auth.currentUser.uid);
+      if (getFirebaseAuth().currentUser) await loadServices(getFirebaseAuth().currentUser!.uid);
     } catch {
       setError("Hizmet kaydedilemedi. Firestore kurallarını ve bağlantıyı kontrol edin.");
     } finally {
@@ -120,13 +117,8 @@ export default function ServicesPage() {
     <main className="min-h-screen bg-alinda-cream">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:py-10">
         <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-alinda-muted hover:text-alinda-ink"><ArrowLeft size={16} /> Dashboard</Link>
-        <header className="mt-8 flex items-start justify-between gap-4">
-          <div><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-alinda-ink text-white"><Scissors size={19} /></div><h1 className="text-3xl font-semibold tracking-tight">Hizmetler</h1></div><p className="mt-3 text-sm text-alinda-muted">Hizmetlerinizi, sürelerini ve fiyatlarını gerçek zamanlı yönetin.</p></div>
-          {!editingId && <a href="#service-form" className="hidden items-center gap-2 rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white sm:inline-flex"><Plus size={16} /> Yeni hizmet</a>}
-        </header>
-
+        <header className="mt-8 flex items-start justify-between gap-4"><div><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-alinda-ink text-white"><Scissors size={19} /></div><h1 className="text-3xl font-semibold tracking-tight">Hizmetler</h1></div><p className="mt-3 text-sm text-alinda-muted">Hizmetlerinizi, sürelerini ve fiyatlarını gerçek zamanlı yönetin.</p></div>{!editingId && <a href="#service-form" className="hidden items-center gap-2 rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white sm:inline-flex"><Plus size={16} /> Yeni hizmet</a>}</header>
         {error && <div role="alert" className="mt-6 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-sm text-alinda-danger">{error}</div>}
-
         <section id="service-form" className="mt-8 rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
           <div className="flex items-center justify-between"><div><h2 className="font-semibold">{editingId ? "Hizmeti düzenle" : "Yeni hizmet"}</h2><p className="mt-1 text-xs text-alinda-muted">Müşterinin göreceği hizmet bilgilerini girin.</p></div>{editingId && <button onClick={resetForm} className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-alinda-cream" aria-label="Düzenlemeyi iptal et"><X size={18} /></button>}</div>
           <form onSubmit={handleSubmit} className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -137,7 +129,6 @@ export default function ServicesPage() {
             <div className="flex gap-2 sm:col-span-2"><button disabled={saving || !businessId} className="inline-flex h-11 items-center justify-center rounded-xl bg-alinda-ink px-5 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Kaydediliyor…" : editingId ? "Değişiklikleri kaydet" : "Hizmeti ekle"}</button>{editingId && <button type="button" onClick={resetForm} className="h-11 rounded-xl border border-alinda-line px-5 text-sm font-semibold">İptal</button>}</div>
           </form>
         </section>
-
         <section className="mt-5 overflow-hidden rounded-[24px] border border-alinda-line bg-white shadow-card">
           {loading ? <div className="p-6 text-sm text-alinda-muted">Hizmetler yükleniyor…</div> : services.length === 0 ? <div className="p-8 text-center"><p className="font-semibold">Henüz hizmet yok</p><p className="mt-1 text-sm text-alinda-muted">İlk hizmetinizi yukarıdaki formdan ekleyin.</p></div> : services.map((service, index) => <div key={service.id} className={`flex items-center gap-4 px-5 py-4 sm:px-6 ${index ? "border-t border-alinda-line" : ""}`}><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{service.name}</p><p className="mt-1 truncate text-xs text-alinda-muted">{service.description || "Açıklama eklenmemiş"}</p></div><div className="hidden text-right sm:block"><p className="text-sm font-medium">{service.durationMinutes} dk</p><p className="text-xs text-alinda-muted">Süre</p></div><div className="text-right"><p className="text-sm font-semibold">₺{service.price.toLocaleString("tr-TR")}</p><p className="text-xs text-alinda-muted">TRY</p></div><button onClick={() => editService(service)} className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-alinda-cream" aria-label={`${service.name} düzenle`}><Pencil size={16} /></button><button onClick={() => void removeService(service.id)} className="flex h-9 w-9 items-center justify-center rounded-lg text-alinda-danger hover:bg-[#FBEEEE]" aria-label={`${service.name} sil`}><Trash2 size={16} /></button></div>)}
         </section>
