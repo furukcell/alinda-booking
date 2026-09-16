@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --alinda-ink: #181614;
+  --alinda-ink-soft: #3a3733;
+  --alinda-cream: #faf8f5;
+  --alinda-surface: #ffffff;
+  --alinda-line: #e8e2da;
+  --alinda-muted: #8a847c;
+  --alinda-accent: #b86f61;
+  --alinda-accent-soft: #f3e4e0;
+  --alinda-success: #3e7a5c;
+  --alinda-danger: #b64c4c;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--alinda-cream);
+  color: var(--alinda-ink);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+
+::selection {
+  background: var(--alinda-accent-soft);
+  color: var(--alinda-ink);
+}
+
+:focus-visible {
+  outline: 3px solid rgba(184, 111, 97, 0.35);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
