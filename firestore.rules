@@ -27,8 +27,7 @@ service cloud.firestore {
     }
 
     function validSlotCreate(businessId, slotId) {
-      return request.resource.data.bookingId is string
-        && request.resource.data.slotId == slotId
+      return request.resource.data.slotId == slotId
         && request.resource.data.date is string
         && request.resource.data.time is string
         && request.resource.data.status == 'pending'
@@ -58,18 +57,17 @@ service cloud.firestore {
       }
 
       match /bookings/{bookingId} {
-        // Customers may create a pending booking, but cannot read bookings.
         allow create: if validBookingCreate(businessId);
         allow get, list: if isOwner(businessId);
         allow update, delete: if isOwner(businessId);
       }
 
       match /slots/{slotId} {
-        // Customers can only create a new pending lock. Existing locks cannot be overwritten.
-        // The booking flow uses a deterministic slot document ID and a create-only transaction.
+        // Availability checks need to read a single deterministic slot.
+        // Listing slots remains blocked, so the public client cannot enumerate bookings.
         allow create: if validSlotCreate(businessId, slotId)
           && !exists(/databases/$(database)/documents/businesses/$(businessId)/slots/$(slotId));
-        allow get: if isOwner(businessId);
+        allow get: if true;
         allow list: if false;
         allow update, delete: if isOwner(businessId);
       }
