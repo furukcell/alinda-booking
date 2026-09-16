@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, CalendarDays, Clock3, Scissors, Settings2, Store, Users } from "@lucide/react";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 const stats = [
   { label: "Bugünkü randevu", value: "8", detail: "+2 dünden", icon: CalendarDays },
@@ -44,12 +45,16 @@ export default function PanelPage() {
             })}
           </nav>
           <Link href="/meltem-guzellik" className="mt-8 flex items-center justify-between rounded-xl border border-alinda-line px-3 py-3 text-sm font-medium hover:border-alinda-ink"><span>Randevu sayfası</span><ArrowUpRight size={16} /></Link>
+          <div className="mt-3"><LogoutButton /></div>
         </aside>
 
         <section className="min-w-0 flex-1 px-4 py-5 sm:px-6 lg:px-10 lg:py-8">
           <header className="flex items-center justify-between gap-4">
             <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-alinda-accent">Genel Bakış</p><h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Günaydın 👋</h1><p className="mt-1 text-sm text-alinda-muted">Bugünkü randevularınıza hızlıca göz atın.</p></div>
-            <Link href="/meltem-guzellik" className="hidden items-center gap-2 rounded-xl border border-alinda-line bg-white px-4 py-2.5 text-sm font-medium sm:flex">Sayfayı görüntüle <ArrowUpRight size={16} /></Link>
+            <div className="flex items-center gap-2">
+              <LogoutButton />
+              <Link href="/meltem-guzellik" className="hidden items-center gap-2 rounded-xl border border-alinda-line bg-white px-4 py-2.5 text-sm font-medium sm:flex">Sayfayı görüntüle <ArrowUpRight size={16} /></Link>
+            </div>
           </header>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
