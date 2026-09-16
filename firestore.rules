@@ -28,11 +28,11 @@ service cloud.firestore {
 
     function validSlotCreate(businessId, slotId) {
       return request.resource.data.bookingId is string
+        && request.resource.data.slotId == slotId
         && request.resource.data.date is string
         && request.resource.data.time is string
         && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.bookingId == request.resource.data.bookingId;
+        && request.resource.data.createdAt == request.time;
     }
 
     match /businesses/{businessId} {
@@ -65,8 +65,8 @@ service cloud.firestore {
       }
 
       match /slots/{slotId} {
-        // Public clients create the lock and booking in one Firestore transaction.
-        // Existing pending/confirmed slots cannot be overwritten by a customer.
+        // Customers can only create a new pending lock. Existing locks cannot be overwritten.
+        // The booking flow uses a deterministic slot document ID and a create-only transaction.
         allow create: if validSlotCreate(businessId, slotId)
           && !exists(/databases/$(database)/documents/businesses/$(businessId)/slots/$(slotId));
         allow get: if isOwner(businessId);
