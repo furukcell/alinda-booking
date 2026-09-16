@@ -1,11 +1,11 @@
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import type { Business, Service } from "@/types/business";
 import { getFirebaseDb } from "@/lib/firebase/client";
 import { getBusinessBySlug } from "@/lib/mock/businesses";
 
-function toPublicBusiness(id: string, data: Record<string, unknown>): Business {
-  const rawServices = Array.isArray(data.services) ? data.services : [];
-  const services: Service[] = rawServices.flatMap((raw) => {
+function parseServices(rawServices: unknown): Service[] {
+  if (!Array.isArray(rawServices)) return [];
+  return rawServices.flatMap((raw) => {
     if (!raw || typeof raw !== "object") return [];
     const item = raw as Record<string, unknown>;
     if (typeof item.id !== "string" || typeof item.name !== "string") return [];
@@ -18,22 +18,18 @@ function toPublicBusiness(id: string, data: Record<string, unknown>): Business {
       currency: "TRY" as const
     }];
   });
+}
 
-  return {
-    id,
-    name: typeof data.name === "string" ? data.name : "",
-    slug: typeof data.slug === "string" ? data.slug : "",
-    category: typeof data.category === "string" ? data.category : "Hizmet",
-    description: typeof data.description === "string" ? data.description : "",
-    city: typeof data.city === "string" ? data.city : "",
-    district: typeof data.district === "string" ? data.district : "",
-    address: typeof data.address === "string" ? data.address : "",
-    phone: typeof data.phone === "string" ? data.phone : "",
-    initials: typeof data.initials === "string" ? data.initials : "AL",
-    primaryColor: typeof data.primaryColor === "string" ? data.primaryColor : "#B86F61",
-    primaryColorSoft: typeof data.primaryColorSoft === "string" ? data.primaryColorSoft : "#F3E4E0",
-    services
-  };
+async function getBusinessServices(businessId: string, embedded: unknown): Promise<Service[]> {
+  try {
+    const snapshot = await getDocs(collection(getFirebaseDb(), "businesses", businessId, "services"));
+    if (!snapshot.empty) {
+      return snapshot.docs.flatMap((item) => parseServices([{ id: item.id, ...item.data() }]));
+    }
+  } catch {
+    // If the subcollection is not available yet, use embedded/mock-compatible data.
+  }
+  return parseServices(embedded);
 }
 
 export async function getPublicBusiness(slug: string): Promise<Business | undefined> {
@@ -42,9 +38,25 @@ export async function getPublicBusiness(slug: string): Promise<Business | undefi
   try {
     const snapshot = await getDoc(doc(getFirebaseDb(), "businesses", slug));
     if (!snapshot.exists()) return undefined;
-    return toPublicBusiness(snapshot.id, snapshot.data());
+    const data = snapshot.data();
+    const services = await getBusinessServices(snapshot.id, data.services);
+
+    return {
+      id: snapshot.id,
+      name: typeof data.name === "string" ? data.name : "",
+      slug: typeof data.slug === "string" ? data.slug : slug,
+      category: typeof data.category === "string" ? data.category : "Hizmet",
+      description: typeof data.description === "string" ? data.description : "",
+      city: typeof data.city === "string" ? data.city : "",
+      district: typeof data.district === "string" ? data.district : "",
+      address: typeof data.address === "string" ? data.address : "",
+      phone: typeof data.phone === "string" ? data.phone : "",
+      initials: typeof data.initials === "string" ? data.initials : "AL",
+      primaryColor: typeof data.primaryColor === "string" ? data.primaryColor : "#B86F61",
+      primaryColorSoft: typeof data.primaryColorSoft === "string" ? data.primaryColorSoft : "#F3E4E0",
+      services
+    };
   } catch {
-    // Keep local development usable until Firebase credentials/rules are configured.
     return getBusinessBySlug(slug);
   }
 }
