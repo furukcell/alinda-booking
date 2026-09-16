@@ -36,8 +36,8 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - [x] Phase 2 — Multi-tenant core scaffold + Firestore integration layer
 - [x] Phase 3 — Business panel UI + Firebase Authentication
 - [x] Phase 4 — Services & working hours persistence
-- [ ] Phase 5 — Customer booking flow persistence
-- [ ] Phase 6 — Booking conflict engine
+- [x] Phase 5 — Customer booking flow persistence
+- [x] Phase 6 — Booking conflict engine
 - [ ] Phase 7 — Security rules
 - [ ] Phase 8 — Demo, landing page & sales preparation
 
@@ -51,6 +51,10 @@ ALINDA helps businesses create a professional booking page, manage services and 
 - `/panel/services` supports real Firestore service listing, creation, editing and deletion for the signed-in owner's business.
 - `/panel/hours` supports real Firestore working-hour loading and saving for all seven days.
 - Business ownership is resolved through the `ownerId` field on the `businesses` collection.
+- Public booking requests are persisted under `businesses/{businessId}/bookings`.
+- Booking creation atomically reserves `businesses/{businessId}/slots/{date_time}` before creating the booking, preventing two clients from taking the same slot concurrently.
+- Occupied-slot conflicts are surfaced to the customer as a specific "başka bir müşteri tarafından alındı" message.
+- `/panel/appointments` reads persisted bookings for the signed-in owner's business.
 
 ## Firestore MVP Shape
 
@@ -84,9 +88,30 @@ businesses/{businessId}/hours/{dayId}
 ├── open
 ├── close
 └── updatedAt
+
+businesses/{businessId}/bookings/{bookingId}
+├── businessId
+├── serviceId
+├── serviceName
+├── serviceDurationMinutes
+├── servicePrice
+├── customerName
+├── customerPhone
+├── date
+├── time
+├── status
+├── slotId
+└── createdAt
+
+businesses/{businessId}/slots/{date_time}
+├── bookingId
+├── date
+├── time
+├── status
+└── createdAt
 ```
 
-> Firestore security rules are intentionally deferred to Phase 7. Until those rules are configured, the client-side owner lookup is an application-layer guard, not the final tenant-isolation boundary.
+> Firestore security rules are intentionally deferred to Phase 7. Until those rules are configured, the client-side owner lookup is an application-layer guard, not the final tenant-isolation boundary. Public booking writes also need the Phase 7 rules before production use.
 
 ## Development Principles
 
@@ -98,4 +123,4 @@ businesses/{businessId}/hours/{dayId}
 
 ## Status
 
-🚧 In development — Phase 4 / Services & Working Hours
+🚧 In development — Phase 6 / Booking Conflict Engine
