@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /businesses/{businessId}/{allPaths=**} {
+      // Public booking pages can display business images.
+      allow read: if true;
+
+      // Only the business owner can upload or update images.
+      // Limit uploads to image files smaller than 5 MB.
+      allow create, update: if request.auth != null
+        && firestore.get(
+          /databases/(default)/documents/businesses/$(businessId)
+        ).data.ownerId == request.auth.uid
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      // Only the business owner can delete images.
+      allow delete: if request.auth != null
+        && firestore.get(
+          /databases/(default)/documents/businesses/$(businessId)
+        ).data.ownerId == request.auth.uid;
+    }
+
+    // All other Storage paths are denied.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
