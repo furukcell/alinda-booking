@@ -670,5 +670,6 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 ### WhatsApp Randevu İşlemleri
 - Müşteri WhatsApp üzerinden 5 karakterli referans ile randevusunu sorgulayabilir.
 - Referans işlemlerinde müşterinin WhatsApp telefon numarası doğrulanır.
-- `iptal ABC12` formatıyla randevu iptal edilebilir.
+- `iptal ABC12` ile randevu iptal talebi başlatılır; sistem randevuyu gösterip `Evet` onayı ister.
+- İptal onayı 5 dakika geçerlidir ve yalnızca aynı WhatsApp numarası için çalışır.
 - İptalde hizmet süresine ait tüm slot segmentleri transaction içinde serbest bırakılır.
