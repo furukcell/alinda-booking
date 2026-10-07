@@ -1,10 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, Check, Clock3, MapPin, Phone, Sparkles } from "lucide-react";
-import type { Business } from "@/types/business";
+import {
+  CalendarDays,
+  Check,
+  ChevronRight,
+  Clock3,
+  MapPin,
+  Phone,
+  Sparkles,
+  UserRound
+} from "lucide-react";
+import type { Business, Specialist } from "@/types/business";
 import { createBooking } from "@/lib/bookings/create";
-import { getAvailableSlots, getNextDates, type AvailableDate } from "@/lib/bookings/availability";
+import { getDailySlots, getNextDates, type AvailableDate, type BookingSlot } from "@/lib/bookings/availability";
 
 const rose = "#D88982";
 const roseDark = "#B96862";
@@ -15,36 +24,75 @@ const muted = "#8F817E";
 const line = "#F0DFDC";
 
 export function BusinessBooking({ business }: { business: Business }) {
-  const dates = useMemo(() => getNextDates(14), []);
-  const [step, setStep] = useState(1);
+  const dates = useMemo(() => getNextDates(30), []);
   const [selectedService, setSelectedService] = useState(business.services[0]?.id ?? "");
+  const [selectedSpecialist, setSelectedSpecialist] = useState("");
   const [selectedDate, setSelectedDate] = useState(dates[0]?.id ?? "");
-  const [selectedTime, setSelectedTime] = useState("");
-  const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+  const [slots, setSlots] = useState<BookingSlot[]>([]);
+  const [working, setWorking] = useState(true);
+  const [openTime, setOpenTime] = useState("");
+  const [closeTime, setCloseTime] = useState("");
   const [loadingSlots, setLoadingSlots] = useState(true);
+  const [selectedTime, setSelectedTime] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
 
   const service = useMemo(
     () => business.services.find((item) => item.id === selectedService),
     [business.services, selectedService]
   );
+
+  const specialists = useMemo(
+    () => business.specialists.filter((item) => item.serviceIds.includes(selectedService)),
+    [business.specialists, selectedService]
+  );
+
+  const specialist = useMemo(
+    () => specialists.find((item) => item.id === selectedSpecialist) ?? specialists[0],
+    [specialists, selectedSpecialist]
+  );
+
   const selectedDateInfo = useMemo<AvailableDate | undefined>(
     () => dates.find((item) => item.id === selectedDate),
     [dates, selectedDate]
   );
 
+  const monthGroups = useMemo(() => {
+    const groups: { key: string; label: string; dates: AvailableDate[] }[] = [];
+    for (const date of dates) {
+      const key = date.id.slice(0, 7);
+      let group = groups.find((item) => item.key === key);
+      if (!group) {
+        const parsed = new Date(date.id + "T12:00:00");
+        group = {
+          key,
+          label: parsed.toLocaleDateString("tr-TR", { month: "long", year: "numeric" }),
+          dates: []
+        };
+        groups.push(group);
+      }
+      group.dates.push(date);
+    }
+    return groups;
+  }, [dates]);
+
+  useEffect(() => {
+    setSelectedSpecialist(specialists[0]?.id ?? "");
+    setSelectedTime("");
+  }, [selectedService, specialists]);
+
   useEffect(() => {
     let cancelled = false;
 
     async function loadSlots() {
-      if (!service || !selectedDateInfo) {
-        setAvailableTimes([]);
-        setSelectedTime("");
+      if (!service || !specialist || !selectedDateInfo) {
+        setSlots([]);
         setLoadingSlots(false);
+        setWorking(false);
+        setSelectedTime("");
         return;
       }
 
@@ -53,18 +101,22 @@ export function BusinessBooking({ business }: { business: Business }) {
       setError("");
 
       try {
-        const slots = await getAvailableSlots(
+        const result = await getDailySlots(
           business.id,
           selectedDateInfo.id,
           selectedDateInfo.dayId,
+          specialist.id,
           service.durationMinutes
         );
         if (cancelled) return;
-        setAvailableTimes(slots);
-        setSelectedTime(slots[0] ?? "");
+        setSlots(result.slots);
+        setWorking(result.working);
+        setOpenTime(result.open);
+        setCloseTime(result.close);
       } catch {
         if (cancelled) return;
-        setAvailableTimes([]);
+        setSlots([]);
+        setWorking(false);
         setSelectedTime("");
         setError("Uygun saatler yüklenemedi. Lütfen tekrar deneyin.");
       } finally {
@@ -76,10 +128,10 @@ export function BusinessBooking({ business }: { business: Business }) {
     return () => {
       cancelled = true;
     };
-  }, [business.id, selectedDateInfo, service]);
+  }, [business.id, selectedDateInfo, service, specialist]);
 
   async function confirmBooking() {
-    if (!service || !selectedDateInfo || !selectedTime || !name.trim() || !phone.trim() || saving) {
+    if (!service || !specialist || !selectedDateInfo || !selectedTime || !name.trim() || !phone.trim() || saving) {
       return;
     }
 
@@ -90,15 +142,17 @@ export function BusinessBooking({ business }: { business: Business }) {
       await createBooking({
         businessId: business.id,
         service,
+        specialistId: specialist.id,
+        specialistName: specialist.name,
         customerName: name,
         customerPhone: phone,
         date: selectedDateInfo.id,
-        time: selectedTime,
+        time: selectedTime
       });
       setConfirmed(true);
     } catch (bookingError) {
       if (bookingError instanceof Error && bookingError.message === "SLOT_TAKEN") {
-        setAvailableTimes((current) => current.filter((time) => time !== selectedTime));
+        setSlots((current) => current.map((slot) => slot.time === selectedTime ? { ...slot, status: "booked" } : slot));
         setSelectedTime("");
         setError("Bu saat az önce başka bir müşteri tarafından alındı. Lütfen başka bir saat seçin.");
       } else {
@@ -109,16 +163,21 @@ export function BusinessBooking({ business }: { business: Business }) {
     }
   }
 
-  function goNext() {
-    if (step === 1 && service) setStep(2);
-    else if (step === 2 && selectedTime) setStep(3);
+  function chooseService(id: string) {
+    setSelectedService(id);
+    setError("");
+    const first = business.specialists.find((item) => item.serviceIds.includes(id));
+    setSelectedSpecialist(first?.id ?? "");
   }
 
-  function goBack() {
-    if (step > 1) setStep((current) => current - 1);
+  function chooseDate(id: string) {
+    setSelectedDate(id);
+    setSelectedTime("");
+    setError("");
+    document.getElementById("alinda-hours")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  if (confirmed && service && selectedDateInfo) {
+  if (confirmed && service && specialist && selectedDateInfo) {
     return (
       <main className="min-h-screen px-4 py-8" style={{ background: rosePale, color: text }}>
         <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-xl items-center justify-center">
@@ -126,17 +185,17 @@ export function BusinessBooking({ business }: { business: Business }) {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full" style={{ background: roseSoft, color: roseDark }}>
               <Check size={30} />
             </div>
-            <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: muted }}>
-              Randevu talebi alındı
-            </p>
+            <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: muted }}>Randevu talebi alındı</p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight">Görüşmek üzere, {name.split(" ")[0]}.</h1>
-            <p className="mx-auto mt-3 max-w-sm text-sm leading-6" style={{ color: muted }}>
-              {business.name} için randevu talebiniz oluşturuldu. İşletme onayından sonra randevunuz kesinleşecektir.
-            </p>
+            <p className="mx-auto mt-3 max-w-sm text-sm leading-6" style={{ color: muted }}>{business.name} için randevu talebiniz oluşturuldu.</p>
             <div className="mt-7 rounded-[22px] p-5 text-left" style={{ background: rosePale }}>
               <div className="flex items-center justify-between gap-4 border-b pb-4" style={{ borderColor: line }}>
                 <span className="text-sm" style={{ color: muted }}>Hizmet</span>
                 <span className="text-right text-sm font-bold">{service.name}</span>
+              </div>
+              <div className="flex items-center justify-between gap-4 border-b py-4" style={{ borderColor: line }}>
+                <span className="text-sm" style={{ color: muted }}>Uzman</span>
+                <span className="text-right text-sm font-bold">{specialist.name}</span>
               </div>
               <div className="flex items-center justify-between gap-4 border-b py-4" style={{ borderColor: line }}>
                 <span className="text-sm" style={{ color: muted }}>Tarih</span>
@@ -147,14 +206,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <span className="text-sm font-bold">{selectedTime}</span>
               </div>
             </div>
-            <button
-              onClick={() => {
-                setConfirmed(false);
-                setStep(1);
-              }}
-              className="mt-6 text-sm font-bold underline underline-offset-4"
-              style={{ color: roseDark }}
-            >
+            <button onClick={() => { setConfirmed(false); setSelectedTime(""); setName(""); setPhone(""); }} className="mt-6 text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>
               Yeni randevu oluştur
             </button>
           </section>
@@ -165,221 +217,212 @@ export function BusinessBooking({ business }: { business: Business }) {
 
   return (
     <main className="min-h-screen" style={{ background: "#F8F2F1", color: text }}>
-      <div className="mx-auto min-h-screen w-full max-w-[440px] bg-[#FFFDFC] shadow-[0_0_70px_rgba(45,38,37,0.08)]">
-        <header className="sticky top-0 z-30 border-b bg-[#FFFDFC]/95 px-5 py-4 backdrop-blur-xl" style={{ borderColor: line }}>
-          <div className="flex items-center justify-between">
+      <div className="mx-auto min-h-screen w-full max-w-[920px] bg-[#FFFDFC] shadow-[0_0_70px_rgba(45,38,37,0.08)]">
+        <header className="sticky top-0 z-30 border-b bg-[#FFFDFC]/95 px-5 py-4 backdrop-blur-xl sm:px-8" style={{ borderColor: line }}>
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              {step > 1 ? (
-                <button onClick={goBack} className="flex h-10 w-10 items-center justify-center rounded-full border" style={{ borderColor: line }} aria-label="Geri">
-                  <ArrowRight size={17} className="rotate-180" />
-                </button>
-              ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-bold text-white" style={{ background: rose }}>
-                  A
-                </div>
-              )}
+              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-bold text-white" style={{ background: rose }}>A</div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: muted }}>ALINDA</p>
                 <p className="text-xs font-semibold">{business.name}</p>
               </div>
             </div>
-            <span className="rounded-full px-3 py-1.5 text-[11px] font-bold" style={{ background: roseSoft, color: roseDark }}>
-              {step}/3
-            </span>
-          </div>
-          <div className="mt-4 flex gap-1.5">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="h-1 flex-1 rounded-full" style={{ background: item <= step ? rose : "#F0E7E5" }} />
-            ))}
+            <span className="rounded-full px-3 py-1.5 text-[11px] font-bold" style={{ background: roseSoft, color: roseDark }}>Online Randevu</span>
           </div>
         </header>
 
-        <div className="px-5 pb-32 pt-7">
-          <div className="mb-7">
-            <p className="text-sm font-medium" style={{ color: roseDark }}>
-              {step === 1 ? "Merhaba 👋" : step === 2 ? "Neredeyse hazır ✨" : "Son bir adım"}
-            </p>
-            <h1 className="mt-1 text-[30px] font-bold leading-[1.08] tracking-[-0.04em]">
-              {step === 1 ? "Randevunuzu oluşturalım." : step === 2 ? "Gün ve saatinizi seçin." : "Bilgilerinizi bırakın."}
-            </h1>
-            <p className="mt-2 text-sm leading-6" style={{ color: muted }}>
-              {step === 1 ? "Size uygun hizmeti seçerek başlayın." : step === 2 ? "Size en uygun zamanı seçin." : "Randevunuzu oluşturmak için son bilgileri girin."}
-            </p>
-          </div>
-
-          <div className="mb-7 flex items-center gap-3 rounded-[22px] border p-4" style={{ borderColor: line, background: rosePale }}>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[17px] text-sm font-bold" style={{ background: roseSoft, color: roseDark }}>
-              {business.initials}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-bold">{business.name}</p>
-              <p className="mt-0.5 truncate text-xs" style={{ color: muted }}>{business.category} · {business.district}, {business.city}</p>
-            </div>
-          </div>
-
-          {step === 1 && (
-            <section>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>01 / HİZMET</p>
-              <h2 className="mt-1 text-xl font-bold">Ne yaptırmak istersiniz?</h2>
-              <div className="mt-4 space-y-3">
-                {business.services.map((item) => {
-                  const active = item.id === selectedService;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setSelectedService(item.id);
-                        setError("");
-                      }}
-                      className="flex w-full items-center gap-4 rounded-[24px] border p-4 text-left transition active:scale-[0.99]"
-                      style={{
-                        borderColor: active ? rose : line,
-                        background: active ? roseSoft : "#fff",
-                        boxShadow: active ? "0 10px 30px rgba(216,137,130,0.12)" : "0 3px 14px rgba(45,38,37,0.035)",
-                      }}
-                    >
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px]" style={{ background: active ? "#fff" : rosePale, color: roseDark }}>
-                        <Sparkles size={18} />
-                      </div>
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-bold">{item.name}</span>
-                        <span className="mt-1 block text-xs leading-5" style={{ color: muted }}>
-                          {item.durationMinutes} dk · ₺{item.price.toLocaleString("tr-TR")}
-                        </span>
-                      </span>
-                      {active && <Check size={19} style={{ color: roseDark }} />}
-                    </button>
-                  );
-                })}
+        <div className="px-5 pb-20 pt-7 sm:px-8">
+          <section className="rounded-[28px] border p-6 sm:p-8" style={{ borderColor: line, background: rosePale }}>
+            <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-sm font-medium" style={{ color: roseDark }}>Merhaba 👋</p>
+                <h1 className="mt-1 text-[30px] font-bold leading-tight tracking-[-0.04em] sm:text-4xl">Randevunuzu seçin.</h1>
+                <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: muted }}>Önce hizmeti, ardından o hizmeti yapan uzmanı seçin. Sonra takvimden boş bir saate dokunarak randevunuzu oluşturun.</p>
               </div>
-            </section>
-          )}
-
-          {step === 2 && (
-            <section>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>02 / TARİH & SAAT</p>
-              <h2 className="mt-1 text-xl font-bold">Size uygun zamanı seçin</h2>
-
-              <div className="mt-5 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {dates.map((item) => {
-                  const active = item.id === selectedDate;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setSelectedDate(item.id);
-                        setError("");
-                      }}
-                      className="min-w-[68px] shrink-0 rounded-[19px] border px-3 py-3 text-center"
-                      style={{
-                        borderColor: active ? rose : line,
-                        background: active ? rose : "#fff",
-                        color: active ? "#fff" : text,
-                      }}
-                    >
-                      <span className="block text-[10px] font-semibold uppercase" style={{ color: active ? "rgba(255,255,255,.75)" : muted }}>
-                        {item.label}
-                      </span>
-                      <span className="mt-1 block text-xl font-bold">{item.id.slice(8)}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-7">
-                <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-bold">Uygun saatler</h3>
-                  <span className="text-xs" style={{ color: muted }}>{selectedDateInfo?.dateLabel}</span>
+              <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-[15px]" style={{ background: roseSoft, color: roseDark }}>{business.initials}</div>
+                <div>
+                  <p className="text-sm font-bold">{business.name}</p>
+                  <p className="mt-0.5 text-xs" style={{ color: muted }}>{business.district}, {business.city}</p>
                 </div>
+              </div>
+            </div>
+          </section>
 
-                {loadingSlots ? (
-                  <div className="rounded-[22px] border px-4 py-6 text-center text-sm" style={{ borderColor: line, background: rosePale, color: muted }}>
-                    Uygun saatler kontrol ediliyor…
+          <section className="mt-8">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>01 / HİZMET</p>
+                <h2 className="mt-1 text-xl font-bold">Hizmet seçin</h2>
+              </div>
+              <span className="text-xs" style={{ color: muted }}>{business.services.length} hizmet</span>
+            </div>
+            <div className="mt-4 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {business.services.map((item) => {
+                const active = item.id === selectedService;
+                return (
+                  <button key={item.id} onClick={() => chooseService(item.id)} className="min-w-[220px] rounded-[22px] border p-4 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff", boxShadow: active ? "0 10px 30px rgba(216,137,130,0.12)" : "0 3px 14px rgba(45,38,37,0.035)" }}>
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-[14px]" style={{ background: active ? "#fff" : rosePale, color: roseDark }}><Sparkles size={17} /></span>
+                      {active && <Check size={18} style={{ color: roseDark }} />}
+                    </div>
+                    <p className="mt-4 text-sm font-bold">{item.name}</p>
+                    <p className="mt-1 text-xs" style={{ color: muted }}>{item.durationMinutes} dk · ₺{item.price.toLocaleString("tr-TR")}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="mt-9">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>02 / UZMAN</p>
+                <h2 className="mt-1 text-xl font-bold">Bu hizmeti kim yapsın?</h2>
+              </div>
+              <span className="text-xs" style={{ color: muted }}>{specialists.length} uzman</span>
+            </div>
+
+            {specialists.length > 0 ? (
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {specialists.map((item: Specialist) => {
+                  const active = item.id === specialist?.id;
+                  return (
+                    <button key={item.id} onClick={() => { setSelectedSpecialist(item.id); setSelectedTime(""); }} className="flex items-center gap-3 rounded-[22px] border p-3 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff" }}>
+                      {item.photoUrl ? (
+                        <img src={item.photoUrl} alt={item.name} className="h-16 w-16 shrink-0 rounded-[18px] object-cover" />
+                      ) : (
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] text-sm font-bold" style={{ background: roseSoft, color: roseDark }}>{item.name.slice(0, 1).toUpperCase()}</div>
+                      )}
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-bold">{item.name}</span>
+                        <span className="mt-1 block truncate text-xs" style={{ color: muted }}>{item.title}</span>
+                      </span>
+                      {active && <Check size={18} style={{ color: roseDark }} />}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-4 rounded-[22px] border p-6 text-center text-sm" style={{ borderColor: line, background: rosePale, color: muted }}>Bu hizmet için henüz uzman tanımlanmamış.</div>
+            )}
+          </section>
+
+          <section className="mt-9" id="alinda-calendar">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>03 / TAKVİM</p>
+                <h2 className="mt-1 text-xl font-bold">Gün seçin</h2>
+              </div>
+              <div className="hidden items-center gap-4 text-[11px] sm:flex">
+                <span className="flex items-center gap-1.5" style={{ color: muted }}><span className="h-2.5 w-2.5 rounded-full border" style={{ borderColor: rose }} /> Müsait</span>
+                <span className="flex items-center gap-1.5" style={{ color: muted }}><span className="h-2.5 w-2.5 rounded-full bg-[#EEE8E7]" /> Dolu</span>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-5">
+              {monthGroups.map((group) => (
+                <div key={group.key} className="rounded-[24px] border p-4 sm:p-5" style={{ borderColor: line }}>
+                  <div className="mb-4 flex items-center gap-2">
+                    <CalendarDays size={16} style={{ color: roseDark }} />
+                    <p className="text-sm font-bold capitalize">{group.label}</p>
                   </div>
-                ) : availableTimes.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-2">
-                    {availableTimes.map((time) => {
-                      const active = time === selectedTime;
+                  <div className="grid grid-cols-7 gap-1.5">
+                    {["P", "S", "Ç", "P", "C", "C", "P"].map((day, index) => (
+                      <span key={group.key + "-day-" + index} className="pb-1 text-center text-[10px] font-bold" style={{ color: muted }}>{day}</span>
+                    ))}
+                    {Array.from({ length: (new Date(group.dates[0].id + "T12:00:00").getDay() + 6) % 7 }, (_, index) => (
+                      <span key={"empty-" + group.key + "-" + index} />
+                    ))}
+                    {group.dates.map((date) => {
+                      const active = date.id === selectedDate;
                       return (
-                        <button
-                          key={time}
-                          onClick={() => {
-                            setSelectedTime(time);
-                            setError("");
-                          }}
-                          className="flex items-center justify-center gap-2 rounded-[17px] border px-2 py-3.5 text-sm font-bold"
-                          style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff", color: active ? roseDark : text }}
-                        >
-                          <Clock3 size={15} />
-                          {time}
+                        <button key={date.id} onClick={() => chooseDate(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
+                          <span className="block text-[9px] font-semibold uppercase" style={{ color: active ? "rgba(255,255,255,.72)" : muted }}>{date.label}</span>
+                          <span className="mt-0.5 block text-sm font-bold">{Number(date.id.slice(8))}</span>
                         </button>
                       );
                     })}
                   </div>
-                ) : (
-                  <div className="rounded-[22px] border px-4 py-6 text-center text-sm" style={{ borderColor: line, background: rosePale, color: muted }}>
-                    Bu gün için uygun saat bulunmuyor.
-                  </div>
-                )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-9" id="alinda-hours">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>04 / SAAT</p>
+                <h2 className="mt-1 text-xl font-bold">{selectedDateInfo?.dateLabel}</h2>
               </div>
-            </section>
-          )}
+              {working && <span className="text-xs" style={{ color: muted }}>{openTime} – {closeTime}</span>}
+            </div>
 
-          {step === 3 && (
-            <section>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>03 / BİLGİLER</p>
-              <h2 className="mt-1 text-xl font-bold">Randevunuzu tamamlayın</h2>
+            {loadingSlots ? (
+              <div className="mt-4 rounded-[22px] border p-7 text-center text-sm" style={{ borderColor: line, background: rosePale, color: muted }}>Saatler kontrol ediliyor…</div>
+            ) : !specialist ? (
+              <div className="mt-4 rounded-[22px] border p-7 text-center text-sm" style={{ borderColor: line, background: rosePale, color: muted }}>Önce bu hizmet için bir uzman seçin.</div>
+            ) : !working ? (
+              <div className="mt-4 rounded-[22px] border p-7 text-center" style={{ borderColor: line, background: "#F7F4F3" }}>
+                <p className="font-bold">Mesai dışı</p>
+                <p className="mt-1 text-sm" style={{ color: muted }}>{specialist.name} bu gün çalışmıyor.</p>
+              </div>
+            ) : slots.length === 0 ? (
+              <div className="mt-4 rounded-[22px] border p-7 text-center text-sm" style={{ borderColor: line, background: rosePale, color: muted }}>Bu gün için uygun saat bulunmuyor.</div>
+            ) : (
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {slots.map((slot) => {
+                  const booked = slot.status === "booked";
+                  const active = slot.time === selectedTime;
+                  return (
+                    <button key={slot.time} disabled={booked} onClick={() => { setSelectedTime(slot.time); setError(""); setTimeout(() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); }} className="relative rounded-[17px] border px-3 py-4 text-center transition active:scale-95 disabled:cursor-not-allowed" style={{ borderColor: active ? rose : booked ? "#EEE8E7" : line, background: active ? roseSoft : booked ? "#F5F2F1" : "#fff", color: booked ? "#B8AFAD" : active ? roseDark : text }}>
+                      <span className="flex items-center justify-center gap-1.5 text-sm font-bold"><Clock3 size={14} />{slot.time}</span>
+                      <span className="mt-1 block text-[10px] font-semibold">{booked ? "Dolu" : active ? "Seçildi" : "Müsait"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </section>
 
-              <div className="mt-5 rounded-[24px] p-5" style={{ background: rosePale }}>
-                <div className="flex justify-between gap-4 border-b pb-4" style={{ borderColor: line }}>
-                  <span className="text-xs" style={{ color: muted }}>Hizmet</span>
-                  <span className="text-right text-sm font-bold">{service?.name}</span>
+          {selectedTime && specialist && service && (
+            <section id="alinda-booking-form" className="mt-8 rounded-[28px] border p-5 sm:p-7" style={{ borderColor: rose, background: rosePale }}>
+              <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: line }}>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>05 / RANDEVU</p>
+                  <h2 className="mt-1 text-xl font-bold">Randevunuzu tamamlayın</h2>
                 </div>
-                <div className="flex justify-between gap-4 border-b py-4" style={{ borderColor: line }}>
-                  <span className="text-xs" style={{ color: muted }}>Tarih</span>
-                  <span className="text-sm font-bold">{selectedDateInfo?.dateLabel}</span>
-                </div>
-                <div className="flex justify-between gap-4 pt-4">
-                  <span className="text-xs" style={{ color: muted }}>Saat</span>
-                  <span className="text-sm font-bold">{selectedTime}</span>
+                <div className="rounded-2xl bg-white px-4 py-3 text-sm">
+                  <p className="font-bold">{selectedTime} · {specialist.name}</p>
+                  <p className="mt-1 text-xs" style={{ color: muted }}>{service.name} · ₺{service.price.toLocaleString("tr-TR")}</p>
                 </div>
               </div>
 
-              <div className="mt-6 space-y-4">
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <label className="block text-sm font-bold">
-                  Ad Soyad
+                  <span className="flex items-center gap-2"><UserRound size={15} /> Ad Soyad</span>
                   <input value={name} onChange={(event) => setName(event.target.value)} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-sm outline-none" style={{ borderColor: line }} placeholder="Adınız ve soyadınız" />
                 </label>
                 <label className="block text-sm font-bold">
-                  Telefon
+                  <span className="flex items-center gap-2"><Phone size={15} /> Telefon</span>
                   <input value={phone} onChange={(event) => setPhone(event.target.value)} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-sm outline-none" style={{ borderColor: line }} placeholder="05xx xxx xx xx" inputMode="tel" />
                 </label>
               </div>
 
-              <div className="mt-5 space-y-2 text-xs" style={{ color: muted }}>
-                <span className="flex items-center gap-2"><MapPin size={14} />{business.address}</span>
-                <span className="flex items-center gap-2"><Phone size={14} />{business.phone}</span>
+              {error && <div role="alert" className="mt-4 rounded-[17px] border px-4 py-3 text-sm" style={{ borderColor: "#E9C5C2", background: "#FFF0EE", color: "#A54D47" }}>{error}</div>}
+
+              <button onClick={() => void confirmBooking()} disabled={!name.trim() || !phone.trim() || saving} className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-[18px] text-sm font-bold text-white shadow-[0_10px_24px_rgba(216,137,130,0.22)] disabled:cursor-not-allowed disabled:opacity-40" style={{ background: rose }}>
+                {saving ? "Randevu oluşturuluyor…" : "Randevuyu Al"}<ChevronRight size={17} />
+              </button>
+
+              <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs" style={{ color: muted }}>
+                <span className="flex items-center gap-1.5"><MapPin size={13} />{business.address}</span>
+                <span className="flex items-center gap-1.5"><Phone size={13} />{business.phone}</span>
               </div>
             </section>
           )}
 
-          {error && (
-            <div role="alert" className="mt-5 rounded-[17px] border px-4 py-3 text-sm" style={{ borderColor: "#E9C5C2", background: "#FFF0EE", color: "#A54D47" }}>
-              {error}
-            </div>
-          )}
-        </div>
-
-        <div className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[440px] border-t bg-[#FFFDFC]/95 p-4 backdrop-blur-xl" style={{ borderColor: line }}>
-          <button
-            onClick={() => (step < 3 ? goNext() : void confirmBooking())}
-            disabled={step === 1 ? !service : step === 2 ? !selectedTime || loadingSlots : !name.trim() || !phone.trim() || saving}
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-[18px] text-sm font-bold text-white shadow-[0_10px_24px_rgba(216,137,130,0.22)] disabled:cursor-not-allowed disabled:opacity-40"
-            style={{ background: rose }}
-          >
-            {step === 3 ? (saving ? "Randevu oluşturuluyor…" : "Randevuyu Onayla") : "Devam Et"}
-            {step < 3 && <ArrowRight size={17} />}
-          </button>
+          {error && !selectedTime && <div role="alert" className="mt-5 rounded-[17px] border px-4 py-3 text-sm" style={{ borderColor: "#E9C5C2", background: "#FFF0EE", color: "#A54D47" }}>{error}</div>}
         </div>
       </div>
     </main>
