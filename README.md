@@ -75,9 +75,15 @@ Her işletmenin kendi markasına ait profesyonel bir randevu sayfasına sahip ol
 - [x] Şehir, ilçe, adres ve telefon düzenleme
 - [x] İşletme baş harfleri düzenleme
 - [x] Ana ve yardımcı marka rengi düzenleme
+- [x] Hizmet ekleme / düzenleme / silme
+- [x] 7 günlük çalışma saatlerini yönetme
+- [x] Randevuları panelden görüntüleme
 - [x] Loading / boş / hata durumları
 - [x] Başarılı işlem ve hata bildirimleri
 - [x] İşletme sahibi erişim kontrolü
+- [x] Firebase Web App yapılandırmasının repo içinde çalışır hale getirilmesi
+- [x] `.gitignore` ile local/environment dosyalarının korunması
+- [x] GitHub Actions production build workflow'u eklenmesi
 
 ---
 
@@ -206,9 +212,12 @@ Firebase Storage tarafında:
 ### Phase 10 — Panel ve işletme yönetimi
 - [x] İşletme ayarları
 - [x] İşletme iletişim bilgileri
-- [ ] Hizmet yönetimi UX son rötuşları
-- [ ] Çalışma saatleri UX son rötuşları
-- [ ] Mobil panel incelemesi
+- [x] Hizmet yönetimi
+- [x] Çalışma saatleri yönetimi
+- [x] Randevu listesinin temel panel görünümü
+- [x] Firebase bağlantısı ve gerçek proje entegrasyonu
+- [x] GitHub Actions build altyapısı
+- [ ] Mobil panel son incelemesi
 
 ### Phase 11 — Randevu Yönetimi
 - [ ] Randevu listesini geliştirme
@@ -265,9 +274,11 @@ Firebase Storage tarafında:
 - [ ] Son görsel tutarlılık turu
 
 ### Phase 16 — Firebase ve uçtan uca test
-- [ ] `.env.local` yapılandırması
-- [ ] Firebase Web SDK kontrolü
-- [ ] Authentication testleri
+- [x] Firebase Web SDK yapılandırmasının gerçek proje ile eşleştirilmesi
+- [x] Firebase Authentication bağlantısının hazırlanması
+- [x] Firestore bağlantısının hazırlanması
+- [x] Firebase Storage bağlantısının hazırlanması
+- [ ] Authentication gerçek senaryo testleri
 - [ ] Firestore okuma/yazma testleri
 - [ ] Storage upload/delete testleri
 - [ ] Randevu oluşturma testleri
@@ -275,11 +286,13 @@ Firebase Storage tarafında:
 - [ ] Panel yetki testleri
 - [ ] Public availability testleri
 - [ ] Uçtan uca manuel test
+- [ ] GitHub Actions build sonucunun doğrulanması
 
 ### Phase 17 — Production
-- [ ] Firebase App Hosting
-- [ ] GitHub repository bağlantısı
-- [ ] Production environment variables
+- [ ] Next.js için production hosting stratejisinin netleştirilmesi
+- [ ] Firebase Hosting / uygun deployment yapılandırması
+- [ ] GitHub repository bağlantısı veya CI/CD deployment
+- [ ] Production environment değişkenleri gerekiyorsa tanımlanması
 - [ ] İlk deployment
 - [ ] Canlı URL testi
 - [ ] Public booking testi
@@ -335,15 +348,40 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 
 ## ⚠️ Mevcut Durum
 
-**ALINDA şu anda çalışan bir MVP seviyesinde.**
+**ALINDA şu anda gerçek Firebase projesine bağlı, MVP seviyesinde çalışan bir ürün durumunda.**
 
-Temel randevu altyapısı, Firebase entegrasyonu, işletme paneli, hizmetler, çalışma saatleri, dinamik uygunluk ve slot çakışma koruması mevcut.
+Şu ana kadar doğrulanan altyapı:
 
-Ancak henüz **production'a alınmış değil**.
+- Firebase Authentication aktif.
+- Firestore'da gerçek işletme kaydı mevcut.
+- Authentication kullanıcısı ile işletme `ownerId` bağlantısı kurulmuş durumda.
+- `services`, `hours` ve `bookings` yapıları hazır.
+- Firebase Storage bucket ve güvenlik kuralları hazır.
+- Public randevu akışı, dinamik uygunluk ve slot kilitleme altyapısı mevcut.
+- İşletme panelinin temel bölümleri hazır.
+- Firebase Web SDK için repo içinde fallback yapılandırması mevcut; istenirse environment değişkenleriyle override edilebilir.
+- `.gitignore` ve GitHub Actions production build workflow'u eklendi.
 
-Bir sonraki gerçek geliştirme adımı:
+Henüz doğrulanmamış / yapılmamış kritik noktalar:
 
-> **Randevu yönetimini profesyonelleştirmek → güvenlik ve edge-case testleri → mobil/premium UX → Firebase uçtan uca test → production → ilk gerçek işletme.**
+- GitHub Actions production build sonucunun başarıyla alınması.
+- Public tarafta gerçek Firebase verisiyle uçtan uca randevu testi.
+- Panelden gerçek veri ekleme / değiştirme / silme testleri.
+- Randevu onay / red / iptal işlemleri.
+- Production deployment.
+- Canlı URL üzerinden gerçek müşteri akışının test edilmesi.
+
+### 🎯 Şu anki gerçek sıra
+
+1. **GitHub Actions build'i doğrula.**
+2. **Gerçek Firebase ile `/login` → `/panel` akışını test et.**
+3. **Randevu yönetimini tamamla:** onayla / reddet / iptal et / filtrele.
+4. **Public + panel uçtan uca testlerini yap.**
+5. **Security / edge-case kontrolü yap.**
+6. **Production deployment.**
+7. **İlk gerçek işletme pilotu.**
+
+> Yani şu an yeni özellik eklemekten önce **mevcut MVP'yi gerçek Firebase üzerinde doğrulama ve randevu yönetimini tamamlama** aşamasındayız.
 
 ---
 
@@ -365,3 +403,5 @@ Bir sonraki gerçek geliştirme adımı:
 4. Mobil uyumluluğu baştan düşün.
 5. Arayüzü premium, temiz ve anlaşılır tut.
 6. Production'a çıkmadan önce Firebase ve güvenlik akışlarını gerçek senaryolarla test et.
+7. GitHub Actions build'i yeşil olmadan production deployment yapma.
+8. Gerçek işletme verisiyle doğrulanmayan bir özelliği "tamamlandı" kabul etme.
