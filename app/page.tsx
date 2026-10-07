@@ -230,6 +230,15 @@ export default function Home() {
                   features: [...planFeatures, "AI destekli WhatsApp randevu sekreteri", "WhatsApp üzerinden randevu sorgulama ve iptal", "Günlük WhatsApp randevu özeti", "Doğal dil ile randevu talebi anlama"],
                 },
                 {
+                  name: "Starter Yıllık",
+                  oldPrice: "₺10.000",
+                  price: "₺4.999",
+                  suffix: "/ yıl",
+                  badge: "YILLIK",
+                  description: "Starter özelliklerinin 12 aylık kullanımı. Aylık Starter'a göre 989 TL daha avantajlı.",
+                  features: planFeatures,
+                },
+                {
                   name: "Pro Yıllık",
                   oldPrice: "₺15.000",
                   price: "₺7.500",
