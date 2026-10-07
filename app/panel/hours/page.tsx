@@ -77,6 +77,14 @@ export default function HoursPage() {
 
   async function saveHours() {
     if (!businessId) return;
+
+    const invalidDay = days.find((day) => day.enabled && day.open >= day.close);
+    if (invalidDay) {
+      setError(`${invalidDay.label} için açılış saati kapanış saatinden önce olmalıdır.`);
+      setSaved(false);
+      return;
+    }
+
     setSaving(true);
     setSaved(false);
     setError("");
@@ -101,20 +109,20 @@ export default function HoursPage() {
     <main className="min-h-screen bg-alinda-cream">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:py-10">
         <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-alinda-muted hover:text-alinda-ink"><ArrowLeft size={16} /> Dashboard</Link>
-        <header className="mt-8 flex items-start justify-between gap-4"><div><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-alinda-ink text-white"><Clock3 size={19} /></div><h1 className="text-3xl font-semibold tracking-tight">Çalışma Saatleri</h1></div><p className="mt-3 text-sm text-alinda-muted">Müşterilerinizin randevu alabileceği gün ve saatleri belirleyin.</p></div><button onClick={() => void saveHours()} disabled={saving || loading || !businessId} className="hidden items-center gap-2 rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 sm:inline-flex"><Save size={16} />{saving ? "Kaydediliyor…" : "Kaydet"}</button></header>
+        <header className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-alinda-ink text-white"><Clock3 size={19} /></div><h1 className="text-3xl font-semibold tracking-tight">Çalışma Saatleri</h1></div><p className="mt-3 text-sm text-alinda-muted">Müşterilerinizin randevu alabileceği gün ve saatleri belirleyin.</p></div><button type="button" onClick={() => void saveHours()} disabled={saving || loading || !businessId} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 sm:w-auto"><Save size={16} />{saving ? "Kaydediliyor…" : "Kaydet"}</button></header>
 
         {error && <div role="alert" className="mt-6 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-sm text-alinda-danger">{error}</div>}
         {saved && <div role="status" className="mt-6 rounded-xl border border-[#CFE2D5] bg-[#EEF7F0] px-4 py-3 text-sm text-alinda-success">Çalışma saatleri kaydedildi.</div>}
 
-        <section className="mt-8 overflow-hidden rounded-[24px] border border-alinda-line bg-white shadow-card">
+        <section aria-label="Haftalık çalışma saatleri" className="mt-8 overflow-hidden rounded-[24px] border border-alinda-line bg-white shadow-card">
           {loading ? <div className="p-6 text-sm text-alinda-muted">Çalışma saatleri yükleniyor…</div> : days.map((day, index) => <div key={day.id} className={`px-5 py-5 sm:px-6 ${index ? "border-t border-alinda-line" : ""}`}>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <label className="flex items-center gap-3"><input type="checkbox" checked={day.enabled} onChange={(e) => updateDay(day.id, { enabled: e.target.checked })} className="h-5 w-5 rounded border-alinda-line accent-black" /><span className="w-24 text-sm font-semibold">{day.label}</span></label>
-              {day.enabled ? <div className="flex items-center gap-3"><label className="flex items-center gap-2"><span className="text-xs text-alinda-muted">Açılış</span><input type="time" value={day.open} onChange={(e) => updateDay(day.id, { open: e.target.value })} className="h-10 rounded-xl border border-alinda-line px-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" /></label><span className="text-alinda-muted">—</span><label className="flex items-center gap-2"><span className="text-xs text-alinda-muted">Kapanış</span><input type="time" value={day.close} onChange={(e) => updateDay(day.id, { close: e.target.value })} className="h-10 rounded-xl border border-alinda-line px-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" /></label></div> : <span className="text-sm text-alinda-muted">Kapalı</span>}
+              <label className="flex min-h-11 items-center gap-3"><input type="checkbox" checked={day.enabled} onChange={(e) => updateDay(day.id, { enabled: e.target.checked })} className="h-5 w-5 rounded border-alinda-line accent-black" /><span className="min-w-24 text-sm font-semibold">{day.label}</span></label>
+              {day.enabled ? <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2 sm:flex sm:items-center sm:gap-3"><label className="min-w-0"><span className="mb-1 block text-xs text-alinda-muted">Açılış</span><input aria-label={`${day.label} açılış saati`} type="time" value={day.open} onChange={(e) => updateDay(day.id, { open: e.target.value })} className="h-11 w-full rounded-xl border border-alinda-line px-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" /></label><span className="pb-2 text-center text-alinda-muted">—</span><label className="min-w-0"><span className="mb-1 block text-xs text-alinda-muted">Kapanış</span><input aria-label={`${day.label} kapanış saati`} type="time" value={day.close} onChange={(e) => updateDay(day.id, { close: e.target.value })} className="h-10 rounded-xl border border-alinda-line px-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" /></label></div> : <span className="text-sm text-alinda-muted">Kapalı</span>}
             </div>
           </div>)}
         </section>
-        <button onClick={() => void saveHours()} disabled={saving || loading || !businessId} className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-alinda-ink text-sm font-semibold text-white disabled:opacity-50 sm:hidden"><Save size={16} />{saving ? "Kaydediliyor…" : "Çalışma saatlerini kaydet"}</button>
+        <button type="button" onClick={() => void saveHours()} disabled={saving || loading || !businessId} className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-alinda-ink text-sm font-semibold text-white disabled:opacity-50 sm:hidden"><Save size={16} />{saving ? "Kaydediliyor…" : "Çalışma saatlerini kaydet"}</button>
       </div>
     </main>
   );
