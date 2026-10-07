@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { Activity, Bot, CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LayoutDashboard, LogOut, MessageCircle, Plus, ShieldCheck, Store, Ticket, Trash2, Users, X } from "lucide-react";
+import { Activity, Bot, CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LayoutDashboard, LogOut, Megaphone, MessageCircle, Plus, ShieldCheck, Store, Ticket, Trash2, Users, X } from "lucide-react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 
 type AdminBusiness = {
@@ -219,6 +219,7 @@ export default function AdminPage() {
                   <a href="/admin/activity-logs" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Activity size={18} /> Aktivite Logları</a>
                   <a href="/admin/ai-secretary" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Bot size={18} /> AI Sekreter</a>
                   <a href="/admin/coupons" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Ticket size={18} /> Kuponlar</a>
+                  <a href="/admin/announcements" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Megaphone size={18} /> Duyurular</a>
             <div className="flex items-center gap-3 rounded-xl bg-alinda-cream px-3 py-2.5 text-sm font-medium"><Store size={18} /> İşletmeler</div>
           </nav>
           <div className="mt-auto">
