@@ -17,6 +17,8 @@ service cloud.firestore {
         && request.resource.data.serviceName is string
         && request.resource.data.serviceDurationMinutes is int
         && request.resource.data.servicePrice is number
+        && request.resource.data.specialistId is string
+        && request.resource.data.specialistName is string
         && request.resource.data.customerName is string
         && request.resource.data.customerPhone is string
         && request.resource.data.date is string
@@ -30,13 +32,12 @@ service cloud.firestore {
       return request.resource.data.slotId == slotId
         && request.resource.data.date is string
         && request.resource.data.time is string
+        && request.resource.data.specialistId is string
         && request.resource.data.status == 'pending'
         && request.resource.data.createdAt == request.time;
     }
 
     match /businesses/{businessId} {
-      // Public booking pages need the business profile.
-      // Keep sensitive/internal fields out of this document in production.
       allow get: if true;
       allow list: if false;
 
@@ -47,6 +48,11 @@ service cloud.firestore {
         && request.resource.data.ownerId == request.auth.uid;
 
       match /services/{serviceId} {
+        allow get, list: if true;
+        allow create, update, delete: if isOwner(businessId);
+      }
+
+      match /specialists/{specialistId} {
         allow get, list: if true;
         allow create, update, delete: if isOwner(businessId);
       }
@@ -63,8 +69,6 @@ service cloud.firestore {
       }
 
       match /slots/{slotId} {
-        // Availability checks need to read a single deterministic slot.
-        // Listing slots remains blocked, so the public client cannot enumerate bookings.
         allow create: if validSlotCreate(businessId, slotId)
           && !exists(/databases/$(database)/documents/businesses/$(businessId)/slots/$(slotId));
         allow get: if true;
