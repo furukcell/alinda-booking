@@ -81,6 +81,12 @@ ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 
 Bu README, projedeki mevcut gerçek durumu takip etmek için güncellendi.
 
+### 2026-10-07 — Super Admin işletme yönetimi
+
+Super Admin artık işletme listesinden işletme bilgilerini düzenleyebilir, Starter / Pro planını değiştirebilir, işletmeyi aktif / pasif yapabilir, owner e-posta adresini görebilir, güvenli şifre sıfırlama bağlantısı üretebilir ve işletmeyi alt koleksiyonlarıyla birlikte kalıcı olarak silebilir. Pasif işletmelerin public randevu sayfası erişimi kapatılır.
+
+Ayrıca randevu panelindeki bekleyen randevular için onaylama ve iptal etme akışı main branch'e alınmıştır; iptal edilen randevunun slotları tekrar müsait hale gelir.
+
 ### Son tamamlanan geliştirmeler
 
 - [x] Public booking akışı hizmet → uzman → tarih → saat şeklinde yeniden düzenlendi.
@@ -349,17 +355,23 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [x] Yeni işletme oluşturma
 - [x] Yeni işletme owner Authentication hesabı oluşturma
 - [x] İşletme oluşturma API'si
+- [x] Super Admin işletme bilgilerini düzenleme
+- [x] Starter / Pro plan yönetimi
+- [x] İşletme aktif / pasif yönetimi
+- [x] İşletme ve owner hesabı için güvenli silme akışı
+- [x] Owner e-posta görüntüleme
+- [x] Owner şifre sıfırlama bağlantısı oluşturma
 - [ ] App Hosting'de `/admin` rollout doğrulaması
 - [ ] Panelde hardcoded demo işletmesi bağlantılarını kaldırma
 - [ ] Paneli Auth `ownerId` üzerinden tamamen dinamik hale getirme
 - [ ] Tüm panel alt sayfalarında tenant izolasyonu
 - [ ] Yeni işletme owner login → panel testi
 - [ ] Yeni işletme public booking uçtan uca testi
-- [ ] Super Admin işletme düzenleme
-- [ ] İşletme aktif / pasif yönetimi
-- [ ] İşletme arşivleme / silme
-- [ ] İşletme detay ekranı
-- [ ] Owner şifre sıfırlama yönetimi
+- [x] Super Admin işletme düzenleme
+- [x] İşletme aktif / pasif yönetimi
+- [x] İşletme arşivleme / silme
+- [x] İşletme detay / yönetim modalı
+- [x] Owner şifre sıfırlama yönetimi
 
 ### Phase 10 — Panel ve işletme yönetimi
 - [x] İşletme ayarları
@@ -384,12 +396,12 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [x] Hizmete göre uzman filtreleme
 - [x] Uzman bazlı uygunluk hesabı
 - [x] Hizmet seans süresine göre otomatik saat üretimi
-- [ ] Randevu listesini geliştirme
+- [x] Randevu listesini geliştirme
 - [ ] Randevu detay ekranı
-- [ ] Bekliyor / onaylandı / reddedildi / iptal edildi durumları
-- [ ] Randevu onaylama
+- [x] Bekliyor / onaylandı / iptal edildi durumları
+- [x] Randevu onaylama
 - [ ] Randevu reddetme
-- [ ] Randevu iptal etme
+- [x] Randevu iptal etme
 - [ ] Tarih filtresi
 - [ ] Durum filtresi
 - [ ] Müşteri arama
@@ -588,7 +600,8 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 - `docs/roadmap.md` — Detaylı ürün yol haritası
 - `docs/sales.md` — Demo ve satış notları
 - `app/admin/page.tsx` — Super Admin arayüzü
-- `app/api/admin/businesses/route.ts` — Super Admin işletme API'si
+- `app/api/admin/businesses/route.ts` — Super Admin işletme yönetim API'si
+- `app/api/admin/businesses/reset-password/route.ts` — Owner şifre sıfırlama bağlantısı API'si
 - `lib/whatsapp/server.ts` — WhatsApp server entegrasyonu
 - `lib/firebase/admin.ts` — Firebase Admin SDK
 
@@ -606,9 +619,9 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 | WhatsApp kod altyapısı | 🟡 Hazır / production bekliyor |
 | Pro günlük WhatsApp özeti | 🟡 Kod hazır / Meta template + env + test bekliyor |
 | AI WhatsApp sekreteri | 🔴 Planlandı / yapılacak |
-| Super Admin | 🟡 Kod hazır / rollout doğrulama bekliyor |
+| Super Admin | 🟢 İşletme yönetimi hazır / rollout doğrulama bekliyor |
 | Multi-tenant panel | 🟡 Geliştirme devam ediyor |
-| Randevu durum yönetimi | 🔴 Yapılacak |
+| Randevu durum yönetimi | 🟢 Onay / iptal hazır |
 | Güvenlik audit | 🟡 Yapılacak |
 | E2E test | 🔴 Yapılacak |
 | Custom domain | 🔴 Yapılacak |
