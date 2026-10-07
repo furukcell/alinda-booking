@@ -419,3 +419,5 @@ Henüz doğrulanmamış / yapılmamış kritik noktalar:
 
 
 <!-- ALINDA_APP_HOSTING_ROLLOUT_2026-10-07 -->
+
+<!-- ALINDA_APP_HOSTING_REFRESH_2026-10-07T07-47 -->
