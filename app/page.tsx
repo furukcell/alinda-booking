@@ -211,8 +211,33 @@ export default function Home() {
 
             <div className="grid gap-5 md:grid-cols-2">
               {[
-                { name: "Aylık", oldPrice: "₺999", price: "₺499", suffix: "/ ay", badge: "%50 indirim", description: "Kısa süreli kampanyalı fiyat. Sınırlı süre için aylık abonelik avantajı." },
-                { name: "Yıllık", oldPrice: "₺9.999", price: "₺4.999", suffix: "/ yıl", badge: "%50 indirim", description: "Kısa süreli kampanyalı fiyat. 12 aylık kullanım için avantajlı teklif." },
+                {
+                  name: "Starter",
+                  oldPrice: "₺999",
+                  price: "₺499",
+                  suffix: "/ ay",
+                  badge: "Başlangıç",
+                  description: "Online randevu sisteminin tüm temel özellikleriyle işletmenizi dijitale taşıyın.",
+                  features: planFeatures,
+                },
+                {
+                  name: "Pro",
+                  oldPrice: "₺1.500",
+                  price: "₺750",
+                  suffix: "/ ay",
+                  badge: "PRO",
+                  description: "AI destekli WhatsApp sekreteri ve işletme özetleriyle randevu işini daha da otomatikleştirin.",
+                  features: [...planFeatures, "AI destekli WhatsApp randevu sekreteri", "WhatsApp üzerinden randevu sorgulama ve iptal", "Günlük WhatsApp randevu özeti", "Doğal dil ile randevu talebi anlama"],
+                },
+                {
+                  name: "Pro Yıllık",
+                  oldPrice: "₺15.000",
+                  price: "₺7.500",
+                  suffix: "/ yıl",
+                  badge: "EN AVANTAJLI",
+                  description: "Pro özelliklerinin 12 aylık kullanımı. Aylık Pro'ya göre 3.750 TL daha avantajlı.",
+                  features: [...planFeatures, "AI destekli WhatsApp randevu sekreteri", "WhatsApp üzerinden randevu sorgulama ve iptal", "Günlük WhatsApp randevu özeti", "Doğal dil ile randevu talebi anlama"],
+                },
               ].map((plan) => (
                 <div key={plan.name} className={`relative rounded-[30px] border p-7 shadow-card sm:p-8 ${plan.name === "Yıllık" ? "border-alinda-accent bg-[#FFF8F6] shadow-[0_18px_55px_rgba(216,137,130,0.13)]" : "border-alinda-line bg-alinda-cream"}`}>
                   <span className="absolute right-5 top-5 rounded-full bg-[#EAF6EE] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.08em] text-[#4E8762]">{plan.badge}</span>
@@ -226,7 +251,7 @@ export default function Home() {
                   <div className="mt-6 border-t border-alinda-line pt-5">
                     <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-alinda-muted">Pakete dahil</p>
                     <ul className="mt-4 space-y-2.5">
-                      {planFeatures.map((feature) => <li key={feature} className="flex items-start gap-2 text-xs leading-5"><span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EAF6EE] text-[#4E8762]"><Check size={11} strokeWidth={3} /></span><span>{feature}</span></li>)}
+                      {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2 text-xs leading-5"><span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EAF6EE] text-[#4E8762]"><Check size={11} strokeWidth={3} /></span><span>{feature}</span></li>)}
                     </ul>
                   </div>
                   <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-alinda-accent px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:opacity-90">WhatsApp'tan bilgi al <MessageCircle size={16} /></a>
