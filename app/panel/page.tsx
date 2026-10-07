@@ -31,8 +31,11 @@ export default function PanelPage() {
       <div className="mx-auto flex min-h-screen max-w-[1440px]">
         <aside className="hidden w-64 shrink-0 border-r border-alinda-line bg-white px-5 py-6 lg:block">
           <div className="flex items-center gap-3 px-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-alinda-ink text-sm font-semibold text-white">A</div>
-            <span className="text-sm font-semibold tracking-[0.18em]">ALINDA</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-alinda-accent-soft text-sm font-semibold text-alinda-accent">MB</div>
+            <div>
+              <p className="text-sm font-semibold">Meltem Beauty Studio</p>
+              <p className="text-[10px] text-alinda-muted">İşletme paneli</p>
+            </div>
           </div>
           <div className="mt-9 rounded-2xl bg-alinda-cream p-4">
             <p className="text-xs text-alinda-muted">İşletme</p>
