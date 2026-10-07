@@ -4,6 +4,8 @@ import {
   ArrowUpRight,
   CalendarCheck2,
   CalendarDays,
+  Mail,
+  MessageCircle,
   Check,
   Clock3,
   LayoutDashboard,
@@ -49,6 +51,8 @@ export default function Home() {
           </Link>
           <nav className="flex items-center gap-2 sm:gap-4" aria-label="Ana navigasyon">
             <a href="#demolar" className="hidden px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">Demolar</a>
+            <a href="#fiyatlar" className="hidden px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">Fiyatlar</a>
+            <a href="#iletisim" className="hidden px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">İletişim</a>
             <Link href="/login" className="inline-flex h-10 items-center rounded-full bg-alinda-ink px-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-alinda-ink-soft">İşletme girişi</Link>
           </nav>
         </div>
@@ -190,6 +194,53 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="fiyatlar" className="scroll-mt-20 border-y border-alinda-line bg-white/60">
+        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">Basit fiyatlandırma</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">İşletmen için tek plan, net fiyat.</h2>
+            <p className="mt-4 text-base leading-7 text-alinda-muted">Online randevu sayfanı oluştur, hizmetlerini ve çalışma saatlerini yönet, müşterilerinden gelen randevuları tek panelden takip et.</p>
+          </div>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            <div className="rounded-[28px] border border-alinda-line bg-alinda-cream p-6 shadow-card sm:p-8">
+              <p className="text-sm font-semibold text-alinda-muted">Aylık</p>
+              <div className="mt-3 flex items-end gap-2">
+                <span className="text-4xl font-semibold tracking-tight">₺499</span>
+                <span className="pb-1 text-sm text-alinda-muted">/ ay</span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-alinda-muted">Aylık ödeme ile ALINDA Booking işletme hesabını kullan.</p>
+              <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-alinda-ink px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-alinda-ink-soft">WhatsApp'tan bilgi al <MessageCircle size={16} /></a>
+            </div>
+
+            <div className="relative rounded-[28px] border border-alinda-accent bg-white p-6 shadow-elevated sm:p-8">
+              <span className="absolute right-5 top-5 rounded-full bg-alinda-accent-soft px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-alinda-accent">Avantajlı</span>
+              <p className="text-sm font-semibold text-alinda-muted">Yıllık</p>
+              <div className="mt-3 flex items-end gap-2">
+                <span className="text-4xl font-semibold tracking-tight">₺4.999</span>
+                <span className="pb-1 text-sm text-alinda-muted">/ yıl</span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-alinda-muted">Yıllık ödeme ile daha avantajlı fiyatla ALINDA Booking kullan.</p>
+              <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-alinda-ink px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-alinda-ink-soft">WhatsApp'tan bilgi al <MessageCircle size={16} /></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="iletisim" className="scroll-mt-20 bg-alinda-ink text-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">FK Digital</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">İşletmeniz için online randevu sistemi mi arıyorsunuz?</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/60">ALINDA Booking ile işletmenize özel randevu sayfanızı oluşturun. Detaylar ve kurulum için bize ulaşın.</p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-alinda-ink transition hover:-translate-y-0.5"><MessageCircle size={17} /> WhatsApp</a>
+            <a href="mailto:kurtulusfaruk94@gmail.com" className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/20 px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-white/40"><Mail size={17} /> E-posta</a>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div className="rounded-[32px] border border-alinda-line bg-white px-6 py-10 text-center shadow-card sm:px-10 sm:py-14">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-alinda-accent-soft text-alinda-accent"><UserRound size={22} /></div>
@@ -200,10 +251,28 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-alinda-line bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-7 text-xs text-alinda-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <span className="font-semibold tracking-[0.18em] text-alinda-ink">ALINDA</span>
-          <span>Randevu yönetimini sadeleştir.</span>
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.2fr_.8fr_.8fr] lg:px-8">
+          <div>
+            <p className="font-semibold tracking-[0.18em] text-alinda-ink">ALINDA Booking</p>
+            <p className="mt-2 max-w-sm text-xs leading-5 text-alinda-muted">FK Digital tarafından geliştirilmiştir. İşletmeler için sade ve modern online randevu yönetimi.</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-alinda-ink">Hızlı bağlantılar</p>
+            <div className="mt-3 flex flex-col gap-2 text-xs text-alinda-muted">
+              <a href="#fiyatlar" className="transition hover:text-alinda-ink">Fiyatlar & Abonelikler</a>
+              <a href="#iletisim" className="transition hover:text-alinda-ink">İletişim</a>
+              <Link href="/login" className="transition hover:text-alinda-ink">İşletme girişi</Link>
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-alinda-ink">Bize ulaşın</p>
+            <div className="mt-3 flex flex-col gap-2 text-xs text-alinda-muted">
+              <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="transition hover:text-alinda-ink">WhatsApp · 0542 152 38 05</a>
+              <a href="mailto:kurtulusfaruk94@gmail.com" className="break-all transition hover:text-alinda-ink">kurtulusfaruk94@gmail.com</a>
+            </div>
+          </div>
         </div>
+        <div className="border-t border-alinda-line px-4 py-4 text-center text-[11px] text-alinda-muted">© {new Date().getFullYear()} FK Digital · ALINDA Booking</div>
       </footer>
     </main>
   );
