@@ -62,6 +62,6 @@ export async function interpretBusinessMessage(businessId:string,text:string) {
   const ref=getAdminDb().collection("businesses").doc(businessId);
   const [businessSnap,servicesSnap,specialistsSnap]=await Promise.all([ref.get(),ref.collection("services").get(),ref.collection("specialists").get()]);
   const services=servicesSnap.docs.map(d=>({id:d.id,name:String(d.data().name||""),durationMinutes:Number(d.data().durationMinutes||30),price:Number(d.data().price||0)})).filter(x=>x.name);
-  const specialists=specialistsSnap.docs.map(d=>({id:d.id,name:String(d.data().name||""),serviceIds:Array.isArray(d.data().serviceIds)?d.data().serviceIds.filter((x):x is string=>typeof x==="string"):[]}));
+  const specialists=specialistsSnap.docs.map(d=>({id:d.id,name:String(d.data().name||""),serviceIds:Array.isArray(d.data().serviceIds)?d.data().serviceIds.filter((x: unknown):x is string=>typeof x==="string"):[]}));
   return interpretSecretaryMessage({businessName:String(businessSnap.data()?.name||"işletmemiz"),text,services,specialists});
 }
