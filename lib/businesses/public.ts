@@ -116,6 +116,7 @@ export async function getPublicBusiness(slug: string): Promise<Business | undefi
       address: typeof data.address === "string" ? data.address : "",
       phone: typeof data.phone === "string" ? data.phone : "",
       initials: typeof data.initials === "string" ? data.initials : "AL",
+      logoUrl: typeof data.logoUrl === "string" ? data.logoUrl : undefined,
       primaryColor: typeof data.primaryColor === "string" ? data.primaryColor : "#B86F61",
       primaryColorSoft: typeof data.primaryColorSoft === "string" ? data.primaryColorSoft : "#F3E4E0",
       services,
