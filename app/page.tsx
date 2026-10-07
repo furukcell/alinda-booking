@@ -227,16 +227,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="iletisim" className="scroll-mt-20 bg-alinda-ink text-white">
+      <section id="iletisim" className="scroll-mt-20 border-y border-alinda-line bg-gradient-to-br from-[#FFF7F4] via-white to-[#F4ECEA]">
         <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">FK Digital</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">İşletmeniz için online randevu sistemi mi arıyorsunuz?</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/60">ALINDA Booking ile işletmenize özel randevu sayfanızı oluşturun. Detaylar ve kurulum için bize ulaşın.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">FK Digital</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-alinda-ink sm:text-4xl">İşletmeniz için online randevu sistemi mi arıyorsunuz?</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-alinda-muted">ALINDA Booking ile işletmenize özel randevu sayfanızı oluşturun. Detaylar ve kurulum için bize ulaşın.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-alinda-ink transition hover:-translate-y-0.5"><MessageCircle size={17} /> WhatsApp</a>
-            <a href="mailto:kurtulusfaruk94@gmail.com" className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/20 px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-white/40"><Mail size={17} /> E-posta</a>
+            <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-alinda-accent px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:opacity-90"><MessageCircle size={17} /> WhatsApp</a>
+            <a href="mailto:destek.fkdigital@gmail.com" className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-alinda-line bg-white px-6 text-sm font-semibold text-alinda-ink transition hover:-translate-y-0.5 hover:border-alinda-accent"><Mail size={17} /> E-posta</a>
           </div>
         </div>
       </section>
@@ -268,7 +268,7 @@ export default function Home() {
             <p className="text-xs font-semibold text-alinda-ink">Bize ulaşın</p>
             <div className="mt-3 flex flex-col gap-2 text-xs text-alinda-muted">
               <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="transition hover:text-alinda-ink">WhatsApp · 0542 152 38 05</a>
-              <a href="mailto:kurtulusfaruk94@gmail.com" className="break-all transition hover:text-alinda-ink">kurtulusfaruk94@gmail.com</a>
+              <a href="mailto:destek.fkdigital@gmail.com" className="break-all transition hover:text-alinda-ink">destek.fkdigital@gmail.com</a>
             </div>
           </div>
         </div>
