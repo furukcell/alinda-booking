@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
@@ -280,7 +279,7 @@ export function BusinessBooking({ business }: { business: Business }) {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               {business.logoUrl ? (
-                <Image src={business.logoUrl} alt={business.name} width={40} height={40} className="h-10 w-10 rounded-[14px] object-contain" />
+                <img src={business.logoUrl} alt={business.name} className="h-10 w-10 rounded-[14px] object-contain" />
               ) : (
                 <div className="flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-bold" style={{ background: roseSoft, color: roseDark }}>{business.initials}</div>
               )}
@@ -303,7 +302,7 @@ export function BusinessBooking({ business }: { business: Business }) {
               </div>
               <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3">
                 {business.logoUrl ? (
-                  <Image src={business.logoUrl} alt={business.name} width={44} height={44} className="h-11 w-11 rounded-[15px] object-contain" />
+                  <img src={business.logoUrl} alt={business.name} className="h-11 w-11 rounded-[15px] object-contain" />
                 ) : (
                   <div className="flex h-11 w-11 items-center justify-center rounded-[15px]" style={{ background: roseSoft, color: roseDark }}>{business.initials}</div>
                 )}
