@@ -360,7 +360,6 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - Online ödeme / iyzico
 - Otomatik abonelik sistemi
 - SMS gönderimi
-- WhatsApp API
 - Mobil uygulama
 - Gelişmiş CRM
 - Kampanya / sadakat sistemi
