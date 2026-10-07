@@ -27,6 +27,7 @@ type BusinessForm = {
   district: string;
   address: string;
   phone: string;
+  whatsappNotificationPhone: string;
   initials: string;
   primaryColor: string;
   primaryColorSoft: string;
@@ -41,6 +42,7 @@ const emptyForm: BusinessForm = {
   district: "",
   address: "",
   phone: "",
+  whatsappNotificationPhone: "",
   initials: "",
   primaryColor: "#B86F61",
   primaryColorSoft: "#F3E4E0"
@@ -90,6 +92,7 @@ export default function BusinessSettingsPage() {
             district: data.district ?? "",
             address: data.address ?? "",
             phone: data.phone ?? "",
+            whatsappNotificationPhone: data.whatsappNotificationPhone ?? data.phone ?? "",
             initials: data.initials ?? "",
             primaryColor: data.primaryColor ?? emptyForm.primaryColor,
             primaryColorSoft: data.primaryColorSoft ?? emptyForm.primaryColorSoft
@@ -274,6 +277,7 @@ export default function BusinessSettingsPage() {
         district: form.district.trim(),
         address: form.address.trim(),
         phone: form.phone.trim(),
+        whatsappNotificationPhone: form.whatsappNotificationPhone.trim(),
         initials: form.initials.trim().slice(0, 3).toUpperCase(),
         primaryColor: form.primaryColor,
         primaryColorSoft: form.primaryColorSoft
@@ -341,6 +345,7 @@ export default function BusinessSettingsPage() {
                 <Field label="Şehir" value={form.city} onChange={(value) => updateField("city", value)} required />
                 <Field label="İlçe" value={form.district} onChange={(value) => updateField("district", value)} required />
                 <Field label="Telefon" value={form.phone} onChange={(value) => updateField("phone", value)} />
+                <Field label="WhatsApp bildirim telefonu" value={form.whatsappNotificationPhone} onChange={(value) => updateField("whatsappNotificationPhone", value)} hint="Yeni randevu bildirimlerinin gönderileceği salon/işletme telefonu." />
                 <div className="sm:col-span-2"><Field label="Adres" value={form.address} onChange={(value) => updateField("address", value)} /></div>
               </div>
             </section>
