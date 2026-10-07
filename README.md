@@ -254,7 +254,12 @@ Super Admin ile:
 - İşletme aktif/pasif yapılır.
 - Owner e-postası görüntülenir.
 - Owner için şifre sıfırlama bağlantısı oluşturulur.
-- İşletme yönetimi ve silme/arşivleme işlemleri yapılabilir.
+- İşletme yönetimi ve silme işlemleri yapılabilir.
+- İşletme detaylarını görüntüleme.
+- Salt okunur destek görünümü.
+- İşletme erişimini manuel açma/kapatma.
+- Abonelik ve ödeme bilgilerini yönetme.
+- WhatsApp Merkezi üzerinden tüm işletmelerin WhatsApp durumunu görme.
 
 Yetki modeli superadmins/{uid} üzerinden çalışır.
 
@@ -451,6 +456,8 @@ Landing page'de güncel planlar:
 
 ### Starter — 499 TL / ay
 
+### Starter Yıllık — 4.999 TL / yıl
+
 Temel online randevu ve işletme yönetimi.
 
 ### Pro — 750 TL / ay
@@ -512,6 +519,13 @@ Production öncesi ayrıca kapsamlı security audit yapılacaktır.
     ├── primaryColor
     ├── primaryColorSoft
     ├── plan
+    ├── billingCycle
+    ├── subscriptionStatus
+    ├── paymentStatus
+    ├── subscriptionStartDate
+    ├── subscriptionEndDate
+    ├── trialEndDate
+    ├── accessEnabled
     ├── whatsappDailySummaryEnabled
     │
     ├── services/{serviceId}
@@ -545,7 +559,11 @@ tutulur.
 
 ---
 
-# 🛠 Teknoloji Stack
+# 📱 Super Admin WhatsApp Merkezi
+
+Super Admin için merkezi WhatsApp görünümü bulunmaktadır. İşletmelerin WhatsApp bağlantı durumu, telefon numarası, doğrulanmış işletme adı, planı ve Pro günlük özet durumu tek ekranda görülebilir. Access token gibi gizli bilgiler gösterilmez.
+
+# 🛡️ Güvenlik
 
 - Next.js 15
 - React 19
@@ -698,6 +716,11 @@ Secret değerleri repository içine yazılmamalıdır.
 - [x] Owner e-posta görüntüleme
 - [x] Şifre reset bağlantısı
 - [x] İşletme yönetimi
+- [x] İşletme detay ekranı
+- [x] Salt okunur destek görünümü
+- [x] Manuel abonelik yönetimi
+- [x] Manuel erişim aç/kapat
+- [x] Super Admin WhatsApp Merkezi
 
 ---
 
@@ -826,7 +849,12 @@ Secret değerleri repository içine yazılmamalıdır.
 | Slot locking | 🟢 Hazır |
 | İşletme paneli | 🟢 Hazır |
 | Owner tabanlı multi-tenant | 🟢 Kod tarafı hazır / E2E test bekliyor |
-| Super Admin | 🟢 Kod tarafı hazır / canlı E2E test bekliyor |
+| Super Admin | 🟢 Geliştirildi / canlı E2E doğrulaması bekliyor |
+| İşletme detayları | 🟢 Hazır |
+| Destek görünümü | 🟢 Hazır |
+| Manuel abonelik | 🟢 Hazır |
+| Manuel erişim aç/kapat | 🟢 Hazır |
+| WhatsApp Merkezi | 🟢 Kodlandı / canlı doğrulama bekliyor |
 | Logo / branding | 🟢 Hazır |
 | WhatsApp altyapısı | 🟢 Kod hazır / Meta production bekliyor |
 | WhatsApp secretary | 🟢 Deterministic akış hazır |
@@ -902,6 +930,8 @@ Super Admin şifresi güvenlik nedeniyle repository içinde tutulmaz.
 ## Son Durum
 
 **ALINDA artık yalnızca bir booking prototipi değildir.**
+
+Core booking, multi-tenant yapı, işletme paneli, Super Admin, işletme detayları, salt okunur destek görünümü, manuel abonelik yönetimi, erişim kontrolü, WhatsApp altyapısı, WhatsApp secretary, randevu sorgulama/iptal, AI intent katmanı ve Pro günlük özet altyapısı kurulmuştur.
 
 Core randevu sistemi, işletme paneli, owner tabanlı multi-tenant yapı, Super Admin, WhatsApp server/webhook altyapısı, gerçek WhatsApp randevu akışı, randevu sorgulama/iptal ve AI intent katmanı kurulmuş durumdadır.
 
