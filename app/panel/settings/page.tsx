@@ -65,6 +65,8 @@ export default function BusinessSettingsPage() {
   const [whatsappLoading, setWhatsappLoading] = useState(true);
   const [whatsappBusy, setWhatsappBusy] = useState(false);
   const [whatsappError, setWhatsappError] = useState("");
+  const [plan, setPlan] = useState<"starter" | "pro">("starter");
+  const [dailySummaryEnabled, setDailySummaryEnabled] = useState(false);
   const [facebookReady, setFacebookReady] = useState(false);
   const signupData = useRef<{ code?: string; wabaId?: string; phoneNumberId?: string }>({});
 
@@ -87,6 +89,8 @@ export default function BusinessSettingsPage() {
 
           const data = snapshot.data();
           setBusinessId(id);
+          setPlan(data.plan === "pro" ? "pro" : "starter");
+          setDailySummaryEnabled(data.whatsappDailySummaryEnabled === true);
           setForm({
             name: data.name ?? "",
             slug: data.slug ?? "",
@@ -332,7 +336,8 @@ export default function BusinessSettingsPage() {
         whatsappNotificationPhone: form.whatsappNotificationPhone.trim(),
         initials: form.initials.trim().slice(0, 3).toUpperCase(),
         primaryColor: form.primaryColor,
-        primaryColorSoft: form.primaryColorSoft
+        primaryColorSoft: form.primaryColorSoft,
+        whatsappDailySummaryEnabled: plan === "pro" && dailySummaryEnabled
       });
       setSaved(true);
     } catch {
@@ -483,6 +488,40 @@ export default function BusinessSettingsPage() {
               )}
 
               {whatsappError && <div role="alert" className="mt-4 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-xs text-alinda-danger">{whatsappError}</div>}
+            </section>
+
+            <section className="rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-alinda-accent">PRO</p>
+                  <h2 className="mt-1 font-semibold">Günlük WhatsApp randevu özeti</h2>
+                  <p className="mt-1 text-xs leading-5 text-alinda-muted">
+                    Her sabah WhatsApp işletme numaranıza o günün randevularını; saat, müşteri adı, hizmet, uzman ve referans numarasıyla gönderir.
+                  </p>
+                </div>
+                <span className="rounded-full bg-alinda-cream px-2.5 py-1 text-[11px] font-semibold">{plan === "pro" ? "Pro" : "Starter"}</span>
+              </div>
+              {plan === "pro" ? (
+                <label className="mt-5 flex cursor-pointer items-center justify-between gap-4 rounded-2xl bg-alinda-cream p-4">
+                  <span>
+                    <span className="block text-sm font-semibold">Sabah özetini gönder</span>
+                    <span className="mt-1 block text-xs text-alinda-muted">Her gün Türkiye saatiyle sabah 08:00 civarında gönderilir.</span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={dailySummaryEnabled}
+                    onChange={(event) => {
+                      setSaved(false);
+                      setDailySummaryEnabled(event.target.checked);
+                    }}
+                    className="h-5 w-5 accent-black"
+                  />
+                </label>
+              ) : (
+                <div className="mt-5 rounded-2xl border border-alinda-line bg-alinda-cream p-4 text-xs text-alinda-muted">
+                  Bu özellik yalnızca Pro pakette kullanılabilir.
+                </div>
+              )}
             </section>
 
             <div className="sticky bottom-4 flex items-center justify-end gap-3 rounded-2xl border border-alinda-line bg-white/95 p-3 shadow-card backdrop-blur">
