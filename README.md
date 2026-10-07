@@ -81,6 +81,10 @@ ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 
 Bu README, projedeki mevcut gerçek durumu takip etmek için güncellendi.
 
+### 2026-10-07 — Hizmet paneli mobil UX polish
+
+Hizmet yönetim ekranındaki yeni hizmet aksiyonu mobilde de görünür hale getirildi. Hizmet formu ve silme onayı küçük ekranlarda dikey akışa uyumlu hale getirildi; liste aksiyonlarına keyboard focus durumları eklendi.
+
 ### 2026-10-07 — Owner tabanlı multi-tenant panel
 
 Ana işletme dashboard'u artık sabit `meltem-guzellik` işletmesine bağlı değil. Giriş yapan Firebase kullanıcısının `ownerId` alanı üzerinden kendi işletmesi bulunuyor; işletme adı, logo, şehir/ilçe, slug, public randevu bağlantısı ve günlük randevular gerçek Firestore verisinden yükleniyor. Hizmetler, uzmanlar, çalışma saatleri, randevular ve ayarlar ekranları da `getOwnedBusinessId()` ile giriş yapan owner'ın işletmesine bağlanıyor.
