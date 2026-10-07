@@ -16,7 +16,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
     try {
       const auth = getFirebaseAuth();
-      unsubscribe = onAuthStateChanged(auth, (nextUser) => {
+      unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
         setUser(nextUser);
         if (!nextUser) {
           setChecking(false);
