@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { getWhatsAppConnection, getWhatsAppTemplateConfig, sendWhatsAppTemplate } from "@/lib/whatsapp/server";
@@ -36,7 +37,16 @@ function buildReply(text: string, businessName: string) {
 
 export async function POST(request: Request) {
   try {
-    const payload = await request.json();
+    const rawBody = await request.text();
+    const signature = request.headers.get("x-hub-signature-256") || "";
+    const appSecret = process.env.META_APP_SECRET || "";
+    if (appSecret) {
+      const expected = "sha256=" + createHmac("sha256", appSecret).update(rawBody).digest("hex");
+      const a = Buffer.from(signature);
+      const b = Buffer.from(expected);
+      if (a.length !== b.length || !timingSafeEqual(a, b)) return NextResponse.json({ error: "Geçersiz imza." }, { status: 401 });
+    }
+    const payload = JSON.parse(rawBody);
     const entry = Array.isArray(payload?.entry) ? payload.entry : [];
 
     for (const item of entry) {
