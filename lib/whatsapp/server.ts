@@ -145,6 +145,8 @@ export async function getWhatsAppConnection(businessId: string) {
   if (!snapshot.exists()) return null;
 
   const data = snapshot.data() as WhatsAppConnection;
+  if (!data.encryptedAccessToken || !data.wabaId || !data.phoneNumberId) return null;
+
   return {
     ...data,
     accessToken: decrypt(data.encryptedAccessToken)
