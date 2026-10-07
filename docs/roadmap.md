@@ -48,17 +48,17 @@ This roadmap is the working implementation plan for taking ALINDA from the curre
 
 **Goal:** Turn incoming bookings into a usable appointment management workflow.
 
-- [ ] Appointment list refinement
+- [x] Appointment list refinement
 - [ ] Appointment detail view
 - [ ] Pending / confirmed / rejected / cancelled statuses
 - [ ] Confirm appointment
 - [ ] Reject appointment
 - [ ] Cancel appointment
-- [ ] Date filtering
-- [ ] Status filtering
-- [ ] Customer search
+- [x] Date filtering
+- [x] Status filtering
+- [x] Customer search
 - [ ] Appointment history
-- [ ] Empty states and operational feedback
+- [x] Empty states and operational feedback
 
 ## Phase 12 — Business Profile & Media
 
@@ -172,6 +172,6 @@ This roadmap is the working implementation plan for taking ALINDA from the curre
 
 We will work **one phase at a time** and only mark an item complete after it has been implemented and verified.
 
-**Current next step:** Phase 10 — Service/working-hours UX polish and mobile panel review.
+**Current next step:** Phase 11 — Appointment detail view and appointment history.
 
 **Deployment policy:** Production deployment is intentionally postponed until the core product, security, UX and end-to-end Firebase flow have been verified.
