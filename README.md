@@ -104,6 +104,11 @@ Bu README, projedeki mevcut gerçek durumu takip etmek için güncellendi.
 - [x] Yeni işletme için Firebase Authentication owner hesabı oluşturulabiliyor.
 - [x] `superadmins/{uid}` Firestore yetki modeli eklendi.
 - [x] Super Admin için Firebase ID token + Admin SDK doğrulaması eklendi.
+- [x] İşletme plan alanı (`starter` / `pro`) eklendi.
+- [x] Pro işletmeler için günlük WhatsApp randevu özeti ayarı eklendi.
+- [x] Günlük özet API endpoint'i ve GitHub Actions zamanlayıcısı eklendi.
+- [x] Günlük özet; saat, müşteri adı, hizmet, uzman ve referans numarası ile hazırlanıyor.
+- [x] İptal edilmiş randevular günlük özete dahil edilmiyor.
 
 ### Firebase'de yapılan Super Admin bootstrap
 
@@ -426,6 +431,11 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [x] Müşteriye randevu bildirimi altyapısı
 - [ ] Meta App Review / production izinleri
 - [ ] Onaylı WhatsApp template'lerinin production'da tanımlanması
+- [ ] `WHATSAPP_DAILY_SUMMARY_TEMPLATE` Meta template'inin oluşturulması
+- [ ] App Hosting Secret/Environment'a `WHATSAPP_DAILY_SUMMARY_TEMPLATE` eklenmesi
+- [ ] App Hosting Secret/Environment'a `CRON_SECRET` eklenmesi
+- [ ] Pro test işletmesinin `plan: pro` yapılması
+- [ ] Günlük özet için gerçek WhatsApp uçtan uca testinin yapılması
 
 ### Phase 14 — Güvenlik ve Edge Case'ler
 - [ ] Firestore Rules tam inceleme
@@ -594,6 +604,8 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 | Logo / branding | 🟢 Hazır |
 | Firebase | 🟢 Bağlı |
 | WhatsApp kod altyapısı | 🟡 Hazır / production bekliyor |
+| Pro günlük WhatsApp özeti | 🟡 Kod hazır / Meta template + env + test bekliyor |
+| AI WhatsApp sekreteri | 🔴 Planlandı / yapılacak |
 | Super Admin | 🟡 Kod hazır / rollout doğrulama bekliyor |
 | Multi-tenant panel | 🟡 Geliştirme devam ediyor |
 | Randevu durum yönetimi | 🔴 Yapılacak |
