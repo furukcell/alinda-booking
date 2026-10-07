@@ -1,7 +1,7 @@
 "use client";
 
 import { collection, doc, getDocs, serverTimestamp, setDoc } from "firebase/firestore";
-import { ArrowLeft, Clock3, Save } from "@lucide/react";
+import { ArrowLeft, Clock3, Save } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
