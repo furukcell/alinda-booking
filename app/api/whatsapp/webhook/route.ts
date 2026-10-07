@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { handleSecretaryMessage, sendSecretaryReply } from "@/lib/whatsapp/secretary";
+import { lookupWhatsAppBooking, cancelWhatsAppBooking } from "@/lib/whatsapp/booking-lookup";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -48,7 +49,12 @@ export async function POST(request: Request) {
           }
           const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
           const name = typeof contacts[0]?.profile?.name === "string" ? contacts[0].profile.name : "WhatsApp müşterisi";
-          const reply = await handleSecretaryMessage(businessRef.id, String(message.from), String(message.text.body), name);
+          const incomingText = String(message.text.body).trim();
+          const refMatch = incomingText.toUpperCase().match(/(?:^|\\s)([A-Z0-9]{5})(?:$|\\s)/)?.[1];
+          let reply: string;
+          if (refMatch && /randevum|randevu sorgu|randevu kontrol/i.test(incomingText)) reply = await lookupWhatsAppBooking(businessRef.id, refMatch, String(message.from));
+          else if (refMatch && /randevu iptal|iptal/i.test(incomingText)) reply = await cancelWhatsAppBooking(businessRef.id, refMatch, String(message.from));
+          else reply = await handleSecretaryMessage(businessRef.id, String(message.from), incomingText, name);
           await sendSecretaryReply(businessRef.id, String(message.from), reply);
         }
       }
