@@ -14,6 +14,11 @@ export type AvailableDate = {
   dayId: string;
 };
 
+export type BookingSlot = {
+  time: string;
+  status: "available" | "booked";
+};
+
 const defaultHours: Record<string, WorkingDay> = {
   sunday: { enabled: false, open: "10:00", close: "16:00" },
   monday: { enabled: true, open: "09:00", close: "18:00" },
@@ -35,8 +40,8 @@ function toDateId(date: Date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-function slotId(date: string, time: string) {
-  return `${date}_${time}`.replace(/[^a-zA-Z0-9_-]/g, "-");
+function slotId(date: string, time: string, specialistId: string) {
+  return `${date}_${time}_${specialistId}`.replace(/[^a-zA-Z0-9_-]/g, "-");
 }
 
 function minutes(value: string) {
@@ -48,7 +53,7 @@ function timeFromMinutes(value: number) {
   return `${pad(Math.floor(value / 60))}:${pad(value % 60)}`;
 }
 
-export function getNextDates(count = 14): AvailableDate[] {
+export function getNextDates(count = 30): AvailableDate[] {
   const now = new Date();
   return Array.from({ length: count }, (_, index) => {
     const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + index);
@@ -63,8 +68,6 @@ export function getNextDates(count = 14): AvailableDate[] {
 
 async function getWorkingDay(businessId: string, dayId: string): Promise<WorkingDay> {
   const fallback = defaultHours[dayId];
-  if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) return fallback;
-
   const snapshot = await getDoc(doc(getFirebaseDb(), "businesses", businessId, "hours", dayId));
   if (!snapshot.exists()) return fallback;
 
@@ -76,39 +79,51 @@ async function getWorkingDay(businessId: string, dayId: string): Promise<Working
   };
 }
 
-export async function getAvailableSlots(
+export async function getDailySlots(
   businessId: string,
   date: string,
   dayId: string,
+  specialistId: string,
   durationMinutes: number
-): Promise<string[]> {
+): Promise<{ slots: BookingSlot[]; working: boolean; open: string; close: string }> {
   const workingDay = await getWorkingDay(businessId, dayId);
-  if (!workingDay.enabled) return [];
+  if (!workingDay.enabled) {
+    return { slots: [], working: false, open: workingDay.open, close: workingDay.close };
+  }
 
   const opening = minutes(workingDay.open);
   const closing = minutes(workingDay.close);
-  const latestStart = closing - Math.max(1, durationMinutes);
-  if (latestStart < opening) return [];
+  const duration = Math.max(30, Math.ceil(durationMinutes / 30) * 30);
+  const latestStart = closing - duration;
+  if (latestStart < opening) {
+    return { slots: [], working: true, open: workingDay.open, close: workingDay.close };
+  }
 
   const now = new Date();
   const todayId = toDateId(now);
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const slots: string[] = [];
+  const candidateTimes: string[] = [];
 
   for (let value = opening; value <= latestStart; value += 30) {
-    const time = timeFromMinutes(value);
     if (date === todayId && value <= currentMinutes) continue;
-    slots.push(time);
+    candidateTimes.push(timeFromMinutes(value));
   }
 
-  if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || slots.length === 0) return slots;
+  const slots = await Promise.all(candidateTimes.map(async (time) => {
+    const start = minutes(time);
+    const segments = Array.from({ length: duration / 30 }, (_, index) => timeFromMinutes(start + index * 30));
 
-  const occupied = await Promise.all(
-    slots.map(async (time) => {
-      const snapshot = await getDoc(doc(getFirebaseDb(), "businesses", businessId, "slots", slotId(date, time)));
-      return [time, snapshot.exists()] as const;
-    })
-  );
+    const snapshots = await Promise.all(
+      segments.map((segment) =>
+        getDoc(doc(getFirebaseDb(), "businesses", businessId, "slots", slotId(date, segment, specialistId)))
+      )
+    );
 
-  return occupied.filter(([, isTaken]) => !isTaken).map(([time]) => time);
+    return {
+      time,
+      status: snapshots.some((snapshot) => snapshot.exists()) ? "booked" as const : "available" as const
+    };
+  }));
+
+  return { slots, working: true, open: workingDay.open, close: workingDay.close };
 }
