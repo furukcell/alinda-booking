@@ -19,6 +19,29 @@ async function getState(bid:string,phone:string){const x=await getAdminDb().coll
 async function setState(bid:string,phone:string,s:State){await getAdminDb().collection("businesses").doc(bid).collection("whatsappConversations").doc(phone).set(s)}
 function ref(){const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",v=new Uint32Array(5);crypto.getRandomValues(v);return Array.from(v,x=>a[x%a.length]).join("")}
 async function create(bid:string,s:S,slot:any,name:string,phone:string){const db=getAdminDb(),base=db.collection("businesses").doc(bid),dur=Math.max(30,Math.ceil(s.durationMinutes/30)*30),ts=Array.from({length:dur/30},(_,i)=>tm(min(slot.time)+i*30)),id=ref(),b=base.collection("bookings").doc(id),rs=ts.map(t=>base.collection("slots").doc((slot.date+"_"+t+"_"+slot.specialistId).replace(/[^a-zA-Z0-9_-]/g,"-")));await db.runTransaction(async tx=>{const bs=await tx.get(b),ss=await Promise.all(rs.map(r=>tx.get(r)));if(bs.exists||ss.some(q=>q.exists))throw new Error("SLOT_TAKEN");rs.forEach((r,i)=>tx.set(r,{slotId:r.id,date:slot.date,time:ts[i],specialistId:slot.specialistId,status:"pending",createdAt:new Date()}));tx.set(b,{businessId:bid,referenceNo:id,serviceId:s.id,serviceName:s.name,serviceDurationMinutes:s.durationMinutes,servicePrice:s.price,specialistId:slot.specialistId,specialistName:slot.specialistName,customerName:name,customerPhone:phone,date:slot.date,time:slot.time,whatsappOptIn:true,status:"pending",slotId:rs[0].id,createdAt:new Date()})});return id}
+function extractReference(text:string){const m=norm(text).toUpperCase().match(/(?:^|\s)([A-Z0-9]{5})(?:$|\s)/);return m?.[1]}
+
+async function findBooking(businessId:string,referenceNo:string){
+  if(!/^[A-Z0-9]{5}$/.test(referenceNo)) return;
+  const ref=getAdminDb().collection("businesses").doc(businessId).collection("bookings").doc(referenceNo);
+  const snap=await ref.get();
+  return snap.exists?{ref,data:snap.data()||{}}:undefined;
+}
+async function lookupBooking(businessId:string,referenceNo:string){
+  const found=await findBooking(businessId,referenceNo);
+  if(!found)return"Bu referansla eşleşen bir randevu bulamadım.";
+  const d=found.data;
+  if(d.status==="cancelled")return"Bu randevu daha önce iptal edilmiş.";
+  return"Randevunuz bulundu. ✅\\n\\n"+String(d.serviceName||"Hizmet")+"\\n"+String(d.specialistName||"Uzman")+"\\n"+fmt(String(d.date))+" "+String(d.time)+"\\n\\nReferans: "+referenceNo;
+}
+async function cancelBooking(businessId:string,referenceNo:string){
+  const found=await findBooking(businessId,referenceNo);
+  if(!found)return"Bu referansla eşleşen bir randevu bulamadım.";
+  if(found.data.status==="cancelled")return"Bu randevu zaten iptal edilmiş.";
+  await found.ref.update({status:"cancelled",cancelledAt:new Date()});
+  return"Randevunuz iptal edildi. ✅\\n\\nReferans: "+referenceNo;
+}
+
 export async function handleSecretaryMessage(bid:string,phone:string,text:string,customerName:string){const d=await data(bid),v=norm(text),state=await getState(bid,phone);if(state&&["evet","onay","onayla","tamam","olur"].includes(v)){const s=d.services.find(x=>x.id===state.serviceId);if(!s)return"Hizmet artık aktif değil. Yeni bir randevu isteği yazabilirsiniz.";try{const id=await create(bid,s,{date:state.date,time:state.time,specialistId:state.specialistId,specialistName:state.specialistName},state.customerName||customerName||"WhatsApp müşterisi",phone);return"Randevunuz oluşturuldu. ✅\n\n"+s.name+"\n"+state.specialistName+"\n"+fmt(state.date)+" "+state.time+"\n\nReferans: "+id}catch{return"Seçtiğiniz saat az önce alınmış. Başka bir saat deneyelim mi?"}}if(v==="iptal"||v.includes("randevu iptal")){const refNo=extractReference(text);if(!refNo)return"İptal işlemi için 5 karakterli randevu referans numaranızı yazın.";const result=await cancelBooking(bid,refNo);return result.ok?"Randevunuz iptal edildi. ✅\\n\\nReferans: "+refNo:result.message;}
   if(v.includes("randevum")||v.includes("randevu sorgu")){const refNo=extractReference(text);if(!refNo)return"Randevunuzu kontrol etmek için 5 karakterli referans numaranızı yazın.";return lookupBooking(bid,refNo);}if(["merhaba","selam","slm","hey"].includes(v))return"Merhaba 👋 "+(d.business.name||"işletmemiz")+" için randevu konusunda yardımcı olabilirim. Örn: “Yarın 15:00 manikür istiyorum.”";const s=d.services.find(x=>{const n=norm(x.name);return v.includes(n)||n.split(/\s+/).some(w=>w.length>=4&&v.includes(w))});if(!s)return d.services.length?"Tabii 😊 Hangi hizmet için randevu istiyorsunuz?\n\n"+d.services.slice(0,8).map(x=>"• "+x.name).join("\n"):"Şu anda tanımlı bir hizmet bulunmuyor.";const wanted=timeOf(text),day=dateOf(text),dates=day?[day]:Array.from({length:7},(_,i)=>add(today(),i+1));let found:any[]=[];for(const x of dates){found=await slots(bid,s,d.specialists,d.hours,x,wanted);if(found.length)break}if(!found.length)return wanted?s.name+" için "+(day?fmt(day):"istediğiniz gün")+" "+wanted+" saatinde müsaitlik bulamadım. Başka bir saat deneyelim mi?":s.name+" için yakın tarihlerde uygun saat bulamadım. Farklı bir gün deneyelim mi?";const f=found[0];await setState(bid,phone,{serviceId:s.id,specialistId:f.specialistId,specialistName:f.specialistName,date:f.date,time:f.time,customerName:customerName||"WhatsApp müşterisi",expiresAt:Date.now()+900000});const alt=found.slice(1).map(x=>fmt(x.date)+" "+x.time+" — "+x.specialistName).join("\n");return"Müsait bir saat buldum. 😊\n\n"+s.name+"\n"+f.specialistName+"\n"+fmt(f.date)+" "+f.time+"\n\nBu saati onaylıyor musunuz? “Evet” yazabilirsiniz."+ (alt?"\n\nAlternatifler:\n"+alt:"")}
 export async function sendSecretaryReply(bid:string,to:string,message:string){const c=await getWhatsAppConnection(bid),t=process.env.WHATSAPP_SECRETARY_REPLY_TEMPLATE;if(!c||!t)return false;const cfg=getWhatsAppTemplateConfig();await sendWhatsAppTemplate(c.phoneNumberId,c.accessToken,to,t,cfg.language,[message]);return true}
