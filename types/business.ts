@@ -38,6 +38,7 @@ export type Business = {
   initials: string;
   logoUrl?: string;
   plan?: "starter" | "pro";
+  active?: boolean;
   whatsappDailySummaryEnabled?: boolean;
   primaryColor: string;
   primaryColorSoft: string;
