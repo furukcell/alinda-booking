@@ -1,0 +1,18 @@
+name: ALINDA WhatsApp Daily Summary
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+jobs:
+  send-daily-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Günlük randevu özetlerini gönder
+        env:
+          CRON_SECRET: ${{ secrets.ALINDA_CRON_SECRET }}
+        run: |
+          curl --fail-with-body -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            https://alinda-booking--alinda-booking-9e0d8.europe-west4.hosted.app/api/whatsapp/daily-summary
