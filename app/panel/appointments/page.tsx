@@ -63,6 +63,21 @@ export default function AppointmentsPage() {
     });
   }, [bookings, customerSearch, dateFilter, statusFilter]);
 
+  async function sendStatusWhatsApp(bookingId: string, status: "confirmed" | "cancelled") {
+    try {
+      const user = getFirebaseAuth().currentUser;
+      if (!user) return;
+      const token = await user.getIdToken();
+      await fetch("/api/whatsapp/booking-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ bookingId, status })
+      });
+    } catch {
+      // WhatsApp is best-effort; appointment status must remain successful.
+    }
+  }
+
   async function updateStatus(booking: Booking, status: "confirmed" | "cancelled") {
     if (updatingId) return;
     const action = status === "confirmed" ? "onaylamak" : "iptal etmek";
@@ -78,6 +93,7 @@ export default function AppointmentsPage() {
         if (status === "cancelled") batch.delete(slotRef); else batch.update(slotRef, { status: "confirmed" });
       }
       await batch.commit();
+      void sendStatusWhatsApp(booking.id, status);
       setBookings((current) => current.map((item) => item.id === booking.id ? { ...item, status } : item));
       setSuccess(status === "confirmed" ? "Randevu onaylandı." : "Randevu iptal edildi ve saatleri yeniden açıldı.");
     } catch { setError(status === "confirmed" ? "Randevu onaylanamadı. Randevu saatleri değişmiş olabilir." : "Randevu iptal edilemedi. Lütfen tekrar deneyin."); }
