@@ -3,7 +3,8 @@
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -17,9 +18,31 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       const auth = getFirebaseAuth();
       unsubscribe = onAuthStateChanged(auth, (nextUser) => {
         setUser(nextUser);
-        setChecking(false);
+        if (!nextUser) {
+          setChecking(false);
+          router.replace("/login");
+          return;
+        }
 
-        if (!nextUser) router.replace("/login");
+        try {
+          const snapshot = await getDocs(
+            query(collection(getFirebaseDb(), "businesses"), where("ownerId", "==", nextUser.uid), limit(1))
+          );
+          if (snapshot.empty) {
+            setChecking(false);
+            return;
+          }
+          const business = snapshot.docs[0].data();
+          if (business.accessEnabled === false) {
+            setChecking(false);
+            router.replace("/access-suspended");
+            return;
+          }
+        } catch {
+          // Keep the normal authenticated panel flow if the access check cannot be read.
+        }
+
+        setChecking(false);
       });
     } catch {
       setChecking(false);
