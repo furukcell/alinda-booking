@@ -69,6 +69,14 @@ ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 > **Hosting:** Firebase App Hosting — backend: `alinda-booking`, bölge: `europe-west4 (Netherlands)`.
 > GitHub Actions production build'i başarıyla tamamlanmaktadır ve `main` branch'i App Hosting backend'ine bağlıdır.
 
+## 🔐 Super Admin Giriş Bilgileri
+
+- **Yönetim paneli:** https://alinda-booking--alinda-booking-9e0d8.europe-west4.hosted.app/admin
+- **E-posta:** admin@alindabooking.com
+- **Şifre:** Firebase Authentication'da bu hesap için belirlenen şifre
+
+> Not: Super Admin şifresi güvenlik nedeniyle repo içinde düz metin olarak tutulmamalıdır. Şifre unutulursa Firebase Authentication üzerinden sıfırlanmalıdır.
+
 ## 🆕 2026-10-07 Güncel Durum
 
 Bu README, projedeki mevcut gerçek durumu takip etmek için güncellendi.
