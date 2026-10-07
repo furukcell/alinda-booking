@@ -68,6 +68,10 @@ export function BusinessBooking({ business }: { business: Business }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<{ couponId: string; code: string; discount: number; total: number } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [confirmedReference, setConfirmedReference] = useState("");
@@ -126,6 +130,8 @@ export function BusinessBooking({ business }: { business: Business }) {
   useEffect(() => {
     setSelectedSpecialist(specialists[0]?.id ?? "");
     setSelectedTime("");
+    setCoupon(null);
+    setCouponError("");
   }, [selectedService, specialists]);
 
   useEffect(() => {
@@ -174,6 +180,24 @@ export function BusinessBooking({ business }: { business: Business }) {
     };
   }, [business.id, selectedDateInfo, service, specialist]);
 
+  async function applyCoupon() {
+    const code = couponCode.trim().toUpperCase();
+    if (!code || !service || couponLoading) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const response = await fetch(`/api/coupons/validate?businessId=${encodeURIComponent(business.id)}&code=${encodeURIComponent(code)}&subtotal=${encodeURIComponent(service.price)}`, { cache: "no-store" });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Kupon uygulanamadı.");
+      setCoupon({ couponId: data.couponId, code: data.code, discount: data.discount, total: data.total });
+    } catch (error) {
+      setCoupon(null);
+      setCouponError(error instanceof Error ? error.message : "Kupon uygulanamadı.");
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
   async function confirmBooking() {
     if (!service || !specialist || !selectedDateInfo || !selectedTime || !name.trim() || !phone.trim() || saving) {
       return;
@@ -194,6 +218,14 @@ export function BusinessBooking({ business }: { business: Business }) {
         date: selectedDateInfo.id,
         time: selectedTime
       });
+
+      if (coupon) {
+        void fetch("/api/coupons/redeem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ couponId: coupon.couponId, businessId: business.id, bookingId: bookingRef.id })
+        }).catch(() => undefined);
+      }
 
       setConfirmedReference(bookingRef.id);
       setConfirmed(true);
@@ -489,7 +521,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 </div>
                 <div className="rounded-2xl bg-white px-4 py-3 text-sm">
                   <p className="font-bold">{selectedTime} · {specialist.name}</p>
-                  <p className="mt-1 text-xs" style={{ color: muted }}>{service.name} · {selectedDateInfo?.dateLabel} · ₺{service.price.toLocaleString("tr-TR")}</p>
+                  <p className="mt-1 text-xs" style={{ color: muted }}>{service.name} · {selectedDateInfo?.dateLabel} · {coupon ? <><span className="line-through">₺{service.price.toLocaleString("tr-TR")}</span> · <strong style={{ color: roseDark }}>₺{coupon.total.toLocaleString("tr-TR")}</strong></> : <>₺{service.price.toLocaleString("tr-TR")}</>}</p>
                 </div>
               </div>
 
@@ -502,6 +534,22 @@ export function BusinessBooking({ business }: { business: Business }) {
                   <span className="flex items-center gap-2"><Phone size={15} /> Telefon</span>
                   <input value={phone} onChange={(event) => setPhone(event.target.value)} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-sm outline-none" style={{ borderColor: line }} placeholder="05xx xxx xx xx" inputMode="tel" />
                 </label>
+              </div>
+              <div className="mt-4 rounded-[18px] border bg-white p-4" style={{ borderColor: line }}>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                  <label className="block flex-1 text-sm font-bold">
+                    <span>🎟️ İndirim kuponu</span>
+                    <input value={couponCode} onChange={(event) => { setCouponCode(event.target.value.toUpperCase()); setCoupon(null); setCouponError(""); }} className="mt-2 h-12 w-full rounded-[15px] border bg-white px-4 text-sm font-mono uppercase outline-none" style={{ borderColor: line }} placeholder="KUPON KODU" />
+                  </label>
+                  <button type="button" onClick={() => void applyCoupon()} disabled={!couponCode.trim() || couponLoading} className="h-12 rounded-[15px] border px-5 text-sm font-bold disabled:opacity-40" style={{ borderColor: rose, color: roseDark }}>
+                    {couponLoading ? "Kontrol…" : "Uygula"}
+                  </button>
+                </div>
+                {couponError && <p className="mt-2 text-xs font-medium" style={{ color: "#A54D47" }}>{couponError}</p>}
+                {coupon && <div className="mt-3 flex items-center justify-between rounded-[14px] px-3 py-2 text-xs" style={{ background: availableGreen, color: availableGreenText }}>
+                  <span><strong>{coupon.code}</strong> uygulandı · ₺{coupon.discount.toLocaleString("tr-TR")} indirim</span>
+                  <strong>₺{coupon.total.toLocaleString("tr-TR")}</strong>
+                </div>}
               </div>
 
               <label className="mt-4 flex items-start gap-3 rounded-[17px] border bg-white px-4 py-3 text-xs leading-5" style={{ borderColor: line }}>
