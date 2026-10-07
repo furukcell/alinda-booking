@@ -3,6 +3,7 @@ export type BookingStatus = "pending" | "confirmed" | "cancelled";
 export type Booking = {
   id: string;
   businessId: string;
+  referenceNo: string;
   serviceId: string;
   serviceName: string;
   serviceDurationMinutes: number;
