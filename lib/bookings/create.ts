@@ -16,6 +16,7 @@ export type CreateBookingInput = {
   customerPhone: string;
   date: string;
   time: string;
+  whatsappOptIn: boolean;
 };
 
 function minutes(value: string) {
@@ -82,6 +83,7 @@ export async function createBooking(input: CreateBookingInput) {
         customerPhone,
         date: input.date,
         time: input.time,
+        whatsappOptIn: input.whatsappOptIn,
         status: "pending",
         slotId: slotRefs[0].id,
         createdAt: serverTimestamp()
