@@ -40,6 +40,8 @@ Her işletmenin kendi markasına ait profesyonel bir randevu sayfasına sahip ol
 - Randevu referans numarası
 - İşletme logo yönetimi
 - WhatsApp bildirim altyapısı
+- WhatsApp randevu durum bildirimleri
+- WhatsApp sekreter webhook altyapısı
 - Super Admin işletme yönetimi altyapısı
 
 ---
@@ -411,15 +413,15 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [x] Uzman bazlı uygunluk hesabı
 - [x] Hizmet seans süresine göre otomatik saat üretimi
 - [x] Randevu listesini geliştirme
-- [ ] Randevu detay ekranı
+- [x] Randevu detay ekranı
 - [x] Bekliyor / onaylandı / iptal edildi durumları
 - [x] Randevu onaylama
 - [ ] Randevu reddetme
 - [x] Randevu iptal etme
-- [ ] Tarih filtresi
-- [ ] Durum filtresi
-- [ ] Müşteri arama
-- [ ] Randevu geçmişi
+- [x] Tarih filtresi
+- [x] Durum filtresi
+- [x] Müşteri arama
+- [x] Randevu geçmişi
 
 ### Phase 12 — İşletme Profili ve Medya
 - [x] Logo yükleme
@@ -455,6 +457,9 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [x] İşletmeye yeni randevu bildirimi altyapısı
 - [x] WhatsApp opt-in alanı
 - [x] Müşteriye randevu bildirimi altyapısı
+- [x] Müşteriye onay / iptal durum bildirimi altyapısı
+- [x] WhatsApp webhook ve temel sekreter yanıt altyapısı
+- [ ] AI destekli müsaitlik sorgulama ve randevu oluşturma
 - [ ] Meta App Review / production izinleri
 - [ ] Onaylı WhatsApp template'lerinin production'da tanımlanması
 - [ ] `WHATSAPP_DAILY_SUMMARY_TEMPLATE` Meta template'inin oluşturulması
@@ -633,7 +638,7 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 | Firebase | 🟢 Bağlı |
 | WhatsApp kod altyapısı | 🟡 Hazır / production bekliyor |
 | Pro günlük WhatsApp özeti | 🟡 Kod hazır / Meta template + env + test bekliyor |
-| AI WhatsApp sekreteri | 🔴 Planlandı / yapılacak |
+| AI WhatsApp sekreteri | 🟡 Webhook + temel yanıt hazır / AI randevu akışı yapılacak |
 | Super Admin | 🟢 İşletme yönetimi hazır / rollout doğrulama bekliyor |
 | Multi-tenant panel | 🟢 Owner tabanlı temel panel hazır / tenant testleri devam ediyor |
 | Randevu durum yönetimi | 🟢 Onay / iptal hazır |
