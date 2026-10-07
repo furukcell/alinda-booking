@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
   Check,
+  ChevronLeft,
   ChevronRight,
   Clock3,
   MapPin,
@@ -30,7 +31,7 @@ const muted = "#8F817E";
 const line = "#F0DFDC";
 
 export function BusinessBooking({ business }: { business: Business }) {
-  const dates = useMemo(() => getNextDates(30), []);
+  const dates = useMemo(() => getNextDates(366), []);
   const [selectedService, setSelectedService] = useState(business.services[0]?.id ?? "");
   const [selectedSpecialist, setSelectedSpecialist] = useState("");
   const [selectedDate, setSelectedDate] = useState(dates[0]?.id ?? "");
@@ -74,17 +75,28 @@ export function BusinessBooking({ business }: { business: Business }) {
       let group = groups.find((item) => item.key === key);
       if (!group) {
         const parsed = new Date(date.id + "T12:00:00");
-        group = {
-          key,
-          label: parsed.toLocaleDateString("tr-TR", { month: "long", year: "numeric" }),
-          dates: []
-        };
+        group = { key, label: parsed.toLocaleDateString("tr-TR", { month: "long", year: "numeric" }), dates: [] };
         groups.push(group);
       }
       group.dates.push(date);
     }
-    return groups;
+    return groups.slice(0, 12);
   }, [dates]);
+
+  const [selectedMonth, setSelectedMonth] = useState(dates[0]?.id.slice(0, 7) ?? "");
+  const activeMonthIndex = monthGroups.findIndex((group) => group.key === selectedMonth);
+  const activeMonth = monthGroups[activeMonthIndex] ?? monthGroups[0];
+  const activeMonthDates = activeMonth?.dates ?? [];
+
+  function changeMonth(direction: -1 | 1) {
+    const nextIndex = Math.min(Math.max(activeMonthIndex + direction, 0), monthGroups.length - 1);
+    const nextMonth = monthGroups[nextIndex];
+    if (!nextMonth) return;
+    setSelectedMonth(nextMonth.key);
+    if (!nextMonth.dates.some((item) => item.id === selectedDate)) {
+      chooseDate(nextMonth.dates[0].id, false);
+    }
+  }
 
   useEffect(() => {
     setSelectedSpecialist(specialists[0]?.id ?? "");
@@ -187,11 +199,14 @@ export function BusinessBooking({ business }: { business: Business }) {
     setSelectedSpecialist(first?.id ?? "");
   }
 
-  function chooseDate(id: string) {
+  function chooseDate(id: string, scroll = true) {
     setSelectedDate(id);
+    setSelectedMonth(id.slice(0, 7));
     setSelectedTime("");
     setError("");
-    document.getElementById("alinda-hours")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (scroll) {
+      document.getElementById("alinda-hours")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   if (confirmed && service && specialist && selectedDateInfo) {
@@ -337,33 +352,44 @@ export function BusinessBooking({ business }: { business: Business }) {
               </div>
             </div>
 
-            <div className="mt-4 space-y-5">
-              {monthGroups.map((group) => (
-                <div key={group.key} className="rounded-[24px] border p-4 sm:p-5" style={{ borderColor: line }}>
-                  <div className="mb-4 flex items-center gap-2">
-                    <CalendarDays size={16} style={{ color: roseDark }} />
-                    <p className="text-sm font-bold capitalize">{group.label}</p>
+            {activeMonth && (
+              <div className="mt-4 rounded-[24px] border p-4 sm:p-5" style={{ borderColor: line }}>
+                <div className="flex items-center justify-between gap-3 border-b pb-4" style={{ borderColor: line }}>
+                  <button type="button" onClick={() => changeMonth(-1)} disabled={activeMonthIndex <= 0} className="flex h-10 w-10 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-30" style={{ borderColor: line, background: rosePale }} aria-label="Önceki ay">
+                    <ChevronLeft size={18} />
+                  </button>
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <CalendarDays size={17} style={{ color: roseDark }} />
+                      <p className="text-base font-bold capitalize">{activeMonth.label}</p>
+                    </div>
+                    <p className="mt-1 text-[11px]" style={{ color: muted }}>{activeMonthIndex + 1} / {monthGroups.length} ay</p>
                   </div>
-                  <div className="grid grid-cols-7 gap-1.5">
-                    {["P", "S", "Ç", "P", "C", "C", "P"].map((day, index) => (
-                      <span key={group.key + "-day-" + index} className="pb-1 text-center text-[10px] font-bold" style={{ color: muted }}>{day}</span>
-                    ))}
-                    {Array.from({ length: (new Date(group.dates[0].id + "T12:00:00").getDay() + 6) % 7 }, (_, index) => (
-                      <span key={"empty-" + group.key + "-" + index} />
-                    ))}
-                    {group.dates.map((date) => {
-                      const active = date.id === selectedDate;
-                      return (
-                        <button key={date.id} onClick={() => chooseDate(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
-                          <span className="block text-[9px] font-semibold uppercase" style={{ color: active ? "rgba(255,255,255,.72)" : muted }}>{date.label}</span>
-                          <span className="mt-0.5 block text-sm font-bold">{Number(date.id.slice(8))}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <button type="button" onClick={() => changeMonth(1)} disabled={activeMonthIndex >= monthGroups.length - 1} className="flex h-10 w-10 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-30" style={{ borderColor: line, background: rosePale }} aria-label="Sonraki ay">
+                    <ChevronRight size={18} />
+                  </button>
                 </div>
-              ))}
-            </div>
+
+                <div className="mt-4 grid grid-cols-7 gap-1.5">
+                  {["P", "S", "Ç", "P", "C", "C", "P"].map((day, index) => (
+                    <span key={"day-" + index} className="pb-1 text-center text-[10px] font-bold" style={{ color: muted }}>{day}</span>
+                  ))}
+                  {activeMonthDates.length > 0 && Array.from(
+                    { length: (new Date(activeMonthDates[0].id + "T12:00:00").getDay() + 6) % 7 },
+                    (_, index) => <span key={"empty-" + index} />
+                  )}
+                  {activeMonthDates.map((date) => {
+                    const active = date.id === selectedDate;
+                    return (
+                      <button key={date.id} onClick={() => chooseDate(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
+                        <span className="block text-[9px] font-semibold uppercase" style={{ color: active ? "rgba(255,255,255,.72)" : muted }}>{date.label}</span>
+                        <span className="mt-0.5 block text-sm font-bold">{Number(date.id.slice(8))}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </section>
 
           <section className="mt-9" id="alinda-hours">
