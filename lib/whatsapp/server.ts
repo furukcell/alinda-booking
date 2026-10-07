@@ -208,6 +208,8 @@ export function getWhatsAppTemplateConfig() {
   return {
     ownerTemplate: process.env.WHATSAPP_OWNER_BOOKING_TEMPLATE || "",
     customerTemplate: process.env.WHATSAPP_CUSTOMER_BOOKING_TEMPLATE || "",
+    customerConfirmedTemplate: process.env.WHATSAPP_CUSTOMER_CONFIRMED_TEMPLATE || "",
+    customerCancelledTemplate: process.env.WHATSAPP_CUSTOMER_CANCELLED_TEMPLATE || "",
     dailySummaryTemplate: process.env.WHATSAPP_DAILY_SUMMARY_TEMPLATE || "",
     language: process.env.WHATSAPP_TEMPLATE_LANGUAGE || "tr"
   };
