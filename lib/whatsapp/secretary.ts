@@ -38,7 +38,7 @@ async function cancelBooking(businessId:string,referenceNo:string){
   const found=await findBooking(businessId,referenceNo);
   if(!found)return"Bu referansla eşleşen bir randevu bulamadım.";
   if(found.data.status==="cancelled")return"Bu randevu zaten iptal edilmiş.";
-  await found.ref.update({status:"cancelled",cancelledAt:new Date()});
+  const db=getAdminDb(),base=db.collection("businesses").doc(businessId),d=found.data,duration=Math.max(30,Math.ceil(Number(d.serviceDurationMinutes||30)/30)*30),start=min(String(d.time||"00:00"));\n  await db.runTransaction(async tx=>{ const current=await tx.get(found.ref); if(!current.exists) throw new Error("BOOKING_NOT_FOUND"); for(let i=0;i<duration/30;i++){ const id=(String(d.date)+"_"+tm(start+i*30)+"_"+String(d.specialistId)).replace(/[^a-zA-Z0-9_-]/g,"-"); tx.delete(base.collection("slots").doc(id)); } tx.update(found.ref,{status:"cancelled",cancelledAt:new Date()}); });
   return"Randevunuz iptal edildi. ✅\\n\\nReferans: "+referenceNo;
 }
 
