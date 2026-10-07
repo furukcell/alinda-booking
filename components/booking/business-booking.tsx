@@ -30,6 +30,30 @@ const text = "#2D2625";
 const muted = "#8F817E";
 const line = "#F0DFDC";
 
+function BookingFooter() {
+  return (
+    <footer className="border-t px-5 py-8 sm:px-8" style={{ borderColor: line, background: "#FFFDFC" }}>
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: roseDark }}>ALINDA Booking · FK Digital</p>
+          <p className="mt-2 max-w-md text-xs leading-5" style={{ color: muted }}>
+            İşletmeniz için böyle bir randevu sayfası mı istiyorsunuz? Kendi online randevu sisteminizi oluşturun.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <a href="/#fiyatlar" className="rounded-full border px-4 py-2 text-xs font-semibold transition hover:bg-white" style={{ borderColor: line, color: text }}>Fiyatlar</a>
+          <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="rounded-full px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90" style={{ background: rose }}>WhatsApp</a>
+          <a href="mailto:kurtulusfaruk94@gmail.com" className="rounded-full border px-4 py-2 text-xs font-semibold transition hover:bg-white" style={{ borderColor: line, color: text }}>E-posta</a>
+        </div>
+      </div>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t pt-4 text-[10px]" style={{ borderColor: line, color: muted }}>
+        <a href="/" className="font-semibold transition hover:opacity-70">ALINDA ana sayfa</a>
+        <span>FK Digital tarafından geliştirilmiştir.</span>
+      </div>
+    </footer>
+  );
+}
+
 export function BusinessBooking({ business }: { business: Business }) {
   const dates = useMemo(() => getNextDates(366), []);
   const [selectedService, setSelectedService] = useState(business.services[0]?.id ?? "");
@@ -243,6 +267,7 @@ export function BusinessBooking({ business }: { business: Business }) {
             </button>
           </section>
         </div>
+        <BookingFooter />
       </main>
     );
   }
@@ -480,6 +505,7 @@ export function BusinessBooking({ business }: { business: Business }) {
 
           {error && !selectedTime && <div role="alert" className="mt-5 rounded-[17px] border px-4 py-3 text-sm" style={{ borderColor: "#E9C5C2", background: "#FFF0EE", color: "#A54D47" }}>{error}</div>}
         </div>
+        <BookingFooter />
       </div>
     </main>
   );
