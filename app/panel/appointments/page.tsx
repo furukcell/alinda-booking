@@ -16,6 +16,48 @@ export default function AppointmentsPage() {
   const [referenceSearch, setReferenceSearch] = useState("");
   const [searching, setSearching] = useState(false);
 
+  async function searchByReference() {
+  const value = referenceSearch.trim().toUpperCase();
+  if (!value) return;
+  setSearching(true);
+  setError("");
+
+  try {
+    const user = getFirebaseAuth().currentUser;
+    if (!user) throw new Error("AUTH");
+    const businessId = await getOwnedBusinessId(user.uid);
+    if (!businessId) throw new Error("NO_BUSINESS");
+    const ref = collection(getFirebaseDb(), "businesses", businessId, "bookings");
+    const snapshot = await getDocs(query(ref, where("referenceNo", "==", value)));
+    setBookings(snapshot.docs.map((item) => ({ id: item.id, ...item.data() } as Booking)));
+    if (snapshot.empty) setError(`“${value}” referans numaralı randevu bulunamadı.`);
+  } catch {
+    setError("Referans numarasıyla arama yapılamadı.");
+  } finally {
+    setSearching(false);
+  }
+  }
+
+  async function clearReferenceSearch() {
+  setReferenceSearch("");
+  setError("");
+  setLoading(true);
+  try {
+    const user = getFirebaseAuth().currentUser;
+    if (!user) return;
+    const businessId = await getOwnedBusinessId(user.uid);
+    if (!businessId) return;
+    const ref = collection(getFirebaseDb(), "businesses", businessId, "bookings");
+    const snapshot = await getDocs(query(ref, orderBy("date", "asc")));
+    setBookings(snapshot.docs.map((item) => ({ id: item.id, ...item.data() } as Booking)));
+  } catch {
+    setError("Randevular yüklenemedi.");
+  } finally {
+    setLoading(false);
+  }
+  }
+
+
   useEffect(() => {
     let unsubscribe = () => {};
     try {
@@ -37,47 +79,6 @@ export default function AppointmentsPage() {
       setError("Firebase yapılandırılmamış.");
       setLoading(false);
     }
-    async function searchByReference() {
-    const value = referenceSearch.trim().toUpperCase();
-    if (!value) return;
-    setSearching(true);
-    setError("");
-
-    try {
-      const user = getFirebaseAuth().currentUser;
-      if (!user) throw new Error("AUTH");
-      const businessId = await getOwnedBusinessId(user.uid);
-      if (!businessId) throw new Error("NO_BUSINESS");
-      const ref = collection(getFirebaseDb(), "businesses", businessId, "bookings");
-      const snapshot = await getDocs(query(ref, where("referenceNo", "==", value)));
-      setBookings(snapshot.docs.map((item) => ({ id: item.id, ...item.data() } as Booking)));
-      if (snapshot.empty) setError(`“${value}” referans numaralı randevu bulunamadı.`);
-    } catch {
-      setError("Referans numarasıyla arama yapılamadı.");
-    } finally {
-      setSearching(false);
-    }
-  }
-
-  async function clearReferenceSearch() {
-    setReferenceSearch("");
-    setError("");
-    setLoading(true);
-    try {
-      const user = getFirebaseAuth().currentUser;
-      if (!user) return;
-      const businessId = await getOwnedBusinessId(user.uid);
-      if (!businessId) return;
-      const ref = collection(getFirebaseDb(), "businesses", businessId, "bookings");
-      const snapshot = await getDocs(query(ref, orderBy("date", "asc")));
-      setBookings(snapshot.docs.map((item) => ({ id: item.id, ...item.data() } as Booking)));
-    } catch {
-      setError("Randevular yüklenemedi.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return () => unsubscribe();
   }, []);
 
