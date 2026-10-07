@@ -14,5 +14,6 @@ export type Booking = {
   date: string;
   time: string;
   status: BookingStatus;
+  whatsappOptIn?: boolean;
   createdAt?: unknown;
 };
