@@ -1,0 +1,3 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getAdminDb } from "@/lib/firebase/admin";
+export async function GET(req:NextRequest){try{const businessId=(req.nextUrl.searchParams.get("businessId")||"").trim();if(!businessId)return NextResponse.json({announcements:[]});const s=await getAdminDb().collection("announcements").where("active","==",true).get(),today=new Date().toISOString().slice(0,10);const announcements=s.docs.map(d=>({id:d.id,...d.data()})).filter((x:any)=>(!x.businessId||x.businessId===businessId)&&(!x.startDate||today>=x.startDate)&&(!x.endDate||today<=x.endDate));return NextResponse.json({announcements})}catch{return NextResponse.json({announcements:[]})}}
