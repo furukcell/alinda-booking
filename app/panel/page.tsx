@@ -20,6 +20,7 @@ const nav = [
   { href: "/panel", label: "Genel Bakış", icon: Store },
   { href: "/panel/appointments", label: "Randevular", icon: CalendarDays },
   { href: "/panel/services", label: "Hizmetler", icon: Scissors },
+  { href: "/panel/specialists", label: "Uzmanlar", icon: Users },
   { href: "/panel/hours", label: "Çalışma Saatleri", icon: Clock3 },
   { href: "/panel/settings", label: "İşletme Ayarları", icon: Settings2 }
 ];
@@ -75,6 +76,7 @@ export default function PanelPage() {
               <p className="mt-2 text-sm leading-6 text-white/60">Hizmetlerinizi, çalışma saatlerinizi ve randevu sayfanızı tek yerden yönetin.</p>
               <div className="mt-6 space-y-2">
                 <Link href="/panel/services" className="flex items-center justify-between rounded-xl bg-white px-4 py-3 text-sm font-semibold text-alinda-ink">Hizmet ekle <ArrowUpRight size={16} /></Link>
+                <Link href="/panel/specialists" className="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white">Uzmanları yönet <ArrowUpRight size={16} /></Link>
                 <Link href="/panel/hours" className="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white">Çalışma saatleri <ArrowUpRight size={16} /></Link>
               </div>
             </aside>
