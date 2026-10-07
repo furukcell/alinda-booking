@@ -2,7 +2,7 @@
 
 import { onAuthStateChanged } from "firebase/auth";
 import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp, updateDoc } from "firebase/firestore";
-import { ArrowLeft, Check, Clock3, Pencil, Plus, Scissors, Trash2, X } from "@lucide/react";
+import { ArrowLeft, Check, Clock3, Pencil, Plus, Scissors, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
