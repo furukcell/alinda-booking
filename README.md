@@ -219,6 +219,35 @@ Firebase Storage tarafında:
 
 ---
 
+## 📲 WhatsApp Entegrasyonu
+
+ALINDA'da WhatsApp Business bağlantısı için Meta Embedded Signup altyapısı hazırlandı.
+
+Akış:
+
+1. İşletme panelinden **İşletme Ayarları → WhatsApp'ı Bağla** açılır.
+2. Meta'nın Embedded Signup ekranında işletmenin WhatsApp Business hesabı seçilir.
+3. ALINDA, dönen bağlantı kodunu sunucu tarafında güvenli şekilde işler.
+4. WABA aboneliği oluşturulur ve WhatsApp numarası ALINDA'ya bağlanır.
+5. Yeni randevu oluşturulduğunda, onaylı WhatsApp şablonları üzerinden işletmeye ve müşteriye bildirim gönderilebilir.
+
+### Gerekli Meta ayarları
+
+App Hosting ortamında şu değişkenler tanımlanmalıdır:
+
+- `NEXT_PUBLIC_META_APP_ID`
+- `NEXT_PUBLIC_META_CONFIG_ID`
+- `META_APP_SECRET` — **Secret Manager**
+- `WHATSAPP_TOKEN_ENCRYPTION_KEY` — **Secret Manager**, 32 byte Base64 anahtar
+- `WHATSAPP_GRAPH_VERSION` — örn. `v25.0`
+- `WHATSAPP_OWNER_BOOKING_TEMPLATE`
+- `WHATSAPP_CUSTOMER_BOOKING_TEMPLATE`
+- `WHATSAPP_TEMPLATE_LANGUAGE` — `tr`
+
+WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenerek işletmenin `integrations/whatsapp` dokümanında tutulur.
+
+> Meta tarafında Embedded Signup için gerekli ürün/izin/App Review adımları ayrıca tamamlanmalıdır. İşletmeye gönderilen ilk mesajlar için onaylı mesaj şablonları ve alıcıdan gerekli WhatsApp iletişim izni bulunmalıdır.
+
 ## 🗺️ Sıradaki Yol Haritası
 
 ### Phase 10 — Panel ve işletme yönetimi
