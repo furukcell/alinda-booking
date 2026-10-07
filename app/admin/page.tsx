@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { Activity, CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LayoutDashboard, LogOut, MessageCircle, Plus, ShieldCheck, Store, Trash2, Users, X } from "lucide-react";
+import { Activity, Bot, CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LayoutDashboard, LogOut, MessageCircle, Plus, ShieldCheck, Store, Trash2, Users, X } from "lucide-react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 
 type AdminBusiness = {
@@ -217,6 +217,7 @@ export default function AdminPage() {
             <a href="/admin/dashboard" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><LayoutDashboard size={18} /> Dashboard</a>
             <a href="/admin/whatsapp" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><MessageCircle size={18} /> WhatsApp Merkezi</a>
                   <a href="/admin/activity-logs" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Activity size={18} /> Aktivite Logları</a>
+                  <a href="/admin/ai-secretary" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Bot size={18} /> AI Sekreter</a>
             <div className="flex items-center gap-3 rounded-xl bg-alinda-cream px-3 py-2.5 text-sm font-medium"><Store size={18} /> İşletmeler</div>
           </nav>
           <div className="mt-auto">
