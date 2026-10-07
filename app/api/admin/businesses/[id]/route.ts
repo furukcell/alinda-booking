@@ -79,6 +79,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
         id,
         ...business,
         createdAt: dateValue(business.createdAt),
+        accessEnabled: business.accessEnabled !== false,
         updatedAt: dateValue(business.updatedAt),
       },
       owner,
