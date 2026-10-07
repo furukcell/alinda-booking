@@ -66,6 +66,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
       <div className="mx-auto min-h-screen max-w-[1500px] px-4 py-6 sm:px-6 lg:px-10 lg:py-9">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-alinda-muted hover:text-alinda-ink"><ArrowLeft size={17} /> İşletmelere dön</Link>
+          <Link href={`/admin/businesses/${b.id}/support`} className="inline-flex h-10 items-center gap-2 rounded-full border border-alinda-line bg-white px-4 text-sm font-semibold"><UserRound size={15} /> Destek görünümü</Link>
           <a href={`/${b.slug}`} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-full border border-alinda-line bg-white px-4 text-sm font-semibold"><ExternalLink size={15} /> Randevu sayfası</a>
         </div>
 
