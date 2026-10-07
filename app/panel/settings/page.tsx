@@ -1,7 +1,7 @@
 "use client";
 
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { ArrowLeft, Check, Loader2, Settings2 } from "@lucide/react";
+import { ArrowLeft, Check, Loader2, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { onAuthStateChanged } from "firebase/auth";
