@@ -85,8 +85,8 @@ export default function ServicesPage() {
       setError("Hizmet adı zorunlu.");
       return;
     }
-    if (!Number.isFinite(duration) || duration < 5) {
-      setError("Süre en az 5 dakika olmalı.");
+    if (!Number.isFinite(duration) || duration < 30 || duration % 30 !== 0) {
+      setError("Süre 30 dakikanın katı olmalı (30, 60, 90 dakika gibi).");
       return;
     }
     if (!Number.isFinite(price) || price < 0) {
@@ -173,7 +173,7 @@ export default function ServicesPage() {
           <form onSubmit={handleSubmit} className="mt-5 grid gap-4 sm:grid-cols-2">
             <label className="block sm:col-span-2"><span className="mb-2 block text-sm font-medium">Hizmet adı</span><input required maxLength={80} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-11 w-full rounded-xl border border-alinda-line px-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" placeholder="Örn. Saç Kesimi" /></label>
             <label className="block sm:col-span-2"><span className="mb-2 block text-sm font-medium">Açıklama <span className="font-normal text-alinda-muted">(opsiyonel)</span></span><textarea maxLength={300} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="min-h-24 w-full rounded-xl border border-alinda-line px-3 py-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" placeholder="Hizmet hakkında kısa bilgi" /></label>
-            <label className="block"><span className="mb-2 block text-sm font-medium">Süre (dakika)</span><div className="relative"><Clock3 size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-alinda-muted" /><input required type="number" min="5" step="5" value={form.durationMinutes} onChange={(e) => setForm({ ...form, durationMinutes: e.target.value })} className="h-11 w-full rounded-xl border border-alinda-line pl-9 pr-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" /></div></label>
+            <label className="block"><span className="mb-2 block text-sm font-medium">Seans süresi</span><div className="relative"><Clock3 size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-alinda-muted" /><input required type="number" min="30" step="30" value={form.durationMinutes} onChange={(e) => setForm({ ...form, durationMinutes: e.target.value })} className="h-11 w-full rounded-xl border border-alinda-line pl-9 pr-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" /><p className="mt-1.5 text-xs text-alinda-muted">Randevu saatleri bu süreye göre otomatik hesaplanır.</p></div></label>
             <label className="block"><span className="mb-2 block text-sm font-medium">Fiyat (₺)</span><input required type="number" min="0" step="10" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="h-11 w-full rounded-xl border border-alinda-line px-3 text-sm outline-none focus:border-alinda-ink focus:ring-4 focus:ring-black/5" placeholder="600" /></label>
             <div className="flex gap-2 sm:col-span-2"><button disabled={saving || !businessId} className="inline-flex h-11 items-center justify-center rounded-xl bg-alinda-ink px-5 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Kaydediliyor…" : editingId ? "Değişiklikleri kaydet" : "Hizmeti ekle"}</button>{editingId && <button type="button" onClick={resetForm} className="h-11 rounded-xl border border-alinda-line px-5 text-sm font-semibold">İptal</button>}</div>
           </form>
