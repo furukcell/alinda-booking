@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth, getAdminDb } from "@/lib/firebase/admin";
+import { logAdminActivity } from "@/lib/admin-activity";
 
 async function requireSuperAdmin(request: NextRequest) {
   const authorization = request.headers.get("authorization") || "";
@@ -113,6 +114,16 @@ export async function POST(request: NextRequest) {
       plan: "starter", active: true, billingCycle: "monthly", subscriptionStatus: "active", paymentStatus: "comped", subscriptionStartDate: new Date().toISOString().slice(0, 10), subscriptionEndDate: null, trialEndDate: null, whatsappDailySummaryEnabled: false, createdAt: new Date(),
     });
 
+    await logAdminActivity({
+      adminUid: admin.uid,
+      adminEmail: admin.email,
+      action: "business_created",
+      businessId: slug,
+      businessName: name,
+      summary: `${name} işletmesi oluşturuldu.`,
+      details: { plan: "starter", billingCycle: "monthly", ownerEmail },
+    });
+
     return NextResponse.json({
       business: { id: slug, name, slug, category, city, district, address: "", phone, ownerId: ownerUid, ownerEmail, plan: "starter", active: true },
     }, { status: 201 });
@@ -135,6 +146,7 @@ export async function PATCH(request: NextRequest) {
     const snapshot = await businessRef.get();
     if (!snapshot.exists) return NextResponse.json({ error: "İşletme bulunamadı." }, { status: 404 });
 
+    const before = snapshot.data() || {};
     const updates: Record<string, unknown> = { updatedAt: new Date() };
     if (typeof body.name === "string") updates.name = clean(body.name);
     if (typeof body.category === "string") updates.category = clean(body.category);
@@ -159,6 +171,48 @@ export async function PATCH(request: NextRequest) {
     if (Object.keys(updates).length === 1) return NextResponse.json({ error: "Güncellenecek alan bulunamadı." }, { status: 400 });
 
     await businessRef.update(updates);
+
+    const changedFields = Object.keys(updates).filter((key) => key !== "updatedAt");
+    const businessName = clean((updates.name as string) || before.name) || businessId;
+
+    if (changedFields.length > 0) {
+      await logAdminActivity({
+        adminUid: admin.uid,
+        adminEmail: admin.email,
+        action: "business_updated",
+        businessId,
+        businessName,
+        summary: `${businessName} işletme bilgileri güncellendi.`,
+        details: { changedFields },
+      });
+    }
+
+    const subscriptionFields = ["plan", "billingCycle", "subscriptionStatus", "paymentStatus", "subscriptionStartDate", "subscriptionEndDate", "trialEndDate"];
+    const changedSubscriptionFields = changedFields.filter((field) => subscriptionFields.includes(field));
+    if (changedSubscriptionFields.length > 0) {
+      await logAdminActivity({
+        adminUid: admin.uid,
+        adminEmail: admin.email,
+        action: "subscription_updated",
+        businessId,
+        businessName,
+        summary: `${businessName} abonelik bilgileri güncellendi.`,
+        details: Object.fromEntries(changedSubscriptionFields.map((field) => [field, { before: before[field] ?? null, after: updates[field] ?? null }])),
+      });
+    }
+
+    if (typeof updates.accessEnabled === "boolean" && updates.accessEnabled !== before.accessEnabled) {
+      await logAdminActivity({
+        adminUid: admin.uid,
+        adminEmail: admin.email,
+        action: "access_changed",
+        businessId,
+        businessName,
+        summary: `${businessName} erişimi ${updates.accessEnabled ? "açıldı" : "kapatıldı"}.`,
+        details: { before: before.accessEnabled !== false, after: updates.accessEnabled },
+      });
+    }
+
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Admin business update failed", error);
@@ -184,7 +238,19 @@ export async function DELETE(request: NextRequest) {
     const snapshot = await businessRef.get();
     if (!snapshot.exists) return NextResponse.json({ error: "İşletme bulunamadı." }, { status: 404 });
 
-    const ownerId = clean(snapshot.data()?.ownerId);
+    const businessData = snapshot.data() || {};
+    const ownerId = clean(businessData.ownerId);
+
+    await logAdminActivity({
+      adminUid: admin.uid,
+      adminEmail: admin.email,
+      action: "business_deleted",
+      businessId,
+      businessName: clean(businessData.name) || businessId,
+      summary: `${clean(businessData.name) || businessId} işletmesi silindi.`,
+      details: { ownerEmail: clean(businessData.ownerEmail), ownerId },
+    });
+
     await db.recursiveDelete(businessRef);
 
     if (ownerId) {
