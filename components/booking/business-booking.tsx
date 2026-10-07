@@ -289,12 +289,12 @@ export function BusinessBooking({ business }: { business: Business }) {
         </header>
 
         <div className="px-5 pb-20 pt-7 sm:px-8">
-          <section className="rounded-[28px] border p-6 sm:p-8" style={{ borderColor: line, background: rosePale }}>
+          <section className="rounded-[26px] border p-5 sm:p-6" style={{ borderColor: line, background: rosePale }}>
             <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
               <div>
                 <p className="text-sm font-medium" style={{ color: roseDark }}>Merhaba 👋</p>
-                <h1 className="mt-1 text-[30px] font-bold leading-tight tracking-[-0.04em] sm:text-4xl">Randevunuzu seçin.</h1>
-                <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: muted }}>Önce hizmeti, ardından o hizmeti yapan uzmanı seçin. Sonra takvimden boş bir saate dokunarak randevunuzu oluşturun.</p>
+                <h1 className="mt-1 text-[27px] font-bold leading-tight tracking-[-0.04em] sm:text-3xl">Randevunuzu seçin.</h1>
+                <p className="mt-2 max-w-xl text-xs leading-5 sm:text-sm sm:leading-6" style={{ color: muted }}>Hizmeti ve uzmanı seçin. Ardından takvimden uygun gün ve saati seçerek randevunuzu oluşturun.</p>
               </div>
               <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-[15px]" style={{ background: roseSoft, color: roseDark }}>{business.initials}</div>
@@ -409,6 +409,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                       <button key={date.id} onClick={() => chooseDate(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
                         <span className="block text-[9px] font-semibold uppercase" style={{ color: active ? "rgba(255,255,255,.72)" : muted }}>{date.label}</span>
                         <span className="mt-0.5 block text-sm font-bold">{Number(date.id.slice(8))}</span>
+                        {active && <span className="mt-1 block text-[8px] font-bold uppercase tracking-wide text-white/90">Seçildi</span>}
                       </button>
                     );
                   })}
@@ -423,7 +424,14 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>04 / SAAT</p>
                 <h2 className="mt-1 text-xl font-bold">{selectedDateInfo?.dateLabel}</h2>
               </div>
-              {working && <span className="text-xs" style={{ color: muted }}>{openTime} – {closeTime}</span>}
+              <div className="flex items-center gap-3">
+                {working && <span className="text-xs" style={{ color: muted }}>{openTime} – {closeTime}</span>}
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-center gap-4 text-[10px] sm:hidden">
+              <span className="flex items-center gap-1.5" style={{ color: availableGreenText }}><span className="h-2 w-2 rounded-full" style={{ background: availableGreenBorder }} /> Müsait</span>
+              <span className="flex items-center gap-1.5" style={{ color: bookedPinkText }}><span className="h-2 w-2 rounded-full" style={{ background: bookedPinkBorder }} /> Dolu</span>
             </div>
 
             {loadingSlots ? (
@@ -443,7 +451,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                   const booked = slot.status === "booked";
                   const active = slot.time === selectedTime;
                   return (
-                    <button key={slot.time} disabled={booked} onClick={() => { setSelectedTime(slot.time); setError(""); setTimeout(() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); }} className="relative rounded-[17px] border px-3 py-4 text-center transition active:scale-95 disabled:cursor-not-allowed" style={{ borderColor: active ? rose : booked ? bookedPinkBorder : availableGreenBorder, background: active ? roseSoft : booked ? bookedPink : availableGreen, color: booked ? bookedPinkText : active ? roseDark : availableGreenText }}>
+                    <button key={slot.time} disabled={booked} onClick={() => { setSelectedTime(slot.time); setError(""); setTimeout(() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); }} className="relative rounded-[17px] border px-3 py-4 text-center transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-75" style={{ borderColor: active ? rose : booked ? bookedPinkBorder : availableGreenBorder, background: active ? roseSoft : booked ? bookedPink : availableGreen, color: booked ? bookedPinkText : active ? roseDark : availableGreenText, boxShadow: active ? "0 8px 20px rgba(216,137,130,0.12)" : "none" }}>
                       <span className="flex items-center justify-center gap-1.5 text-sm font-bold"><Clock3 size={14} />{slot.time}</span>
                       <span className="mt-1 block text-[10px] font-semibold">{booked ? "Dolu" : active ? "Seçildi" : "Müsait"}</span>
                     </button>
@@ -462,7 +470,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 </div>
                 <div className="rounded-2xl bg-white px-4 py-3 text-sm">
                   <p className="font-bold">{selectedTime} · {specialist.name}</p>
-                  <p className="mt-1 text-xs" style={{ color: muted }}>{service.name} · ₺{service.price.toLocaleString("tr-TR")}</p>
+                  <p className="mt-1 text-xs" style={{ color: muted }}>{service.name} · {selectedDateInfo?.dateLabel} · ₺{service.price.toLocaleString("tr-TR")}</p>
                 </div>
               </div>
 
