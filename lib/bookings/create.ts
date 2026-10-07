@@ -36,7 +36,15 @@ export async function createBooking(input: CreateBookingInput) {
 
   try {
     await runTransaction(db, async (transaction) => {
-      transaction.create(slotRef, {
+      const slotSnapshot = await transaction.get(slotRef);
+
+      if (slotSnapshot.exists()) {
+        const error = new Error("SLOT_TAKEN") as Error & { code?: string };
+        error.code = "already-exists";
+        throw error;
+      }
+
+      transaction.set(slotRef, {
         slotId,
         date: input.date,
         time: input.time,
