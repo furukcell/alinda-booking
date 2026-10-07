@@ -51,15 +51,17 @@ Her işletmenin kendi markasına ait profesyonel bir randevu sayfasına sahip ol
 
 ---
 
-## 🌐 Web Panel ve Test Adresleri
+## 🌐 Canlı Web Panel ve Test Adresleri
 
-Firebase Hosting için tanımlı site adresi:
+ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 
-- **Ana site:** https://alinda-booking-9e0d8.web.app
-- **İşletme girişi:** https://alinda-booking-9e0d8.web.app/login
-- **İşletme paneli:** https://alinda-booking-9e0d8.web.app/panel
+- **Canlı site:** https://alinda-booking--alinda-booking-9e0d8.europe-west4.hosted.app
+- **İşletme girişi:** https://alinda-booking--alinda-booking-9e0d8.europe-west4.hosted.app/login
+- **İşletme paneli:** https://alinda-booking--alinda-booking-9e0d8.europe-west4.hosted.app/panel
+- **Demo işletme / randevu sayfası:** https://alinda-booking--alinda-booking-9e0d8.europe-west4.hosted.app/meltem-guzellik
 
-> ⚠️ Not: Bu adresler Firebase Hosting site adına göre tanımlıdır. GitHub Actions build'i başarıyla tamamlandı; ancak şu an için bu repodan Firebase Hosting'e otomatik production deployment yapılmış olduğu doğrulanmış değildir. Canlı panel testi, deployment tamamlandıktan sonra yapılmalıdır.
+> **Hosting:** Firebase App Hosting — backend: `alinda-booking`, bölge: `europe-west4 (Netherlands)`.
+> GitHub Actions production build'i başarıyla tamamlanmaktadır ve `main` branch'i App Hosting backend'ine bağlıdır.
 
 ## 📌 Proje Aşamaları
 
@@ -299,12 +301,12 @@ Firebase Storage tarafında:
 - [ ] GitHub Actions build sonucunun doğrulanması
 
 ### Phase 17 — Production
-- [ ] Next.js için production hosting stratejisinin netleştirilmesi
-- [ ] Firebase Hosting / uygun deployment yapılandırması
-- [ ] GitHub repository bağlantısı veya CI/CD deployment
-- [ ] Production environment değişkenleri gerekiyorsa tanımlanması
-- [ ] İlk deployment
-- [ ] Canlı URL testi
+- [x] Next.js için production hosting stratejisinin netleştirilmesi
+- [x] Firebase App Hosting yapılandırması
+- [x] GitHub repository bağlantısı / otomatik rollout
+- [x] Production environment değişkenleri kontrolü
+- [x] İlk deployment
+- [ ] Canlı URL üzerinden uçtan uca test
 - [ ] Public booking testi
 - [ ] Login / panel testi
 - [ ] Custom domain
@@ -374,21 +376,20 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 
 Henüz doğrulanmamış / yapılmamış kritik noktalar:
 
-- GitHub Actions production build sonucunun başarıyla alınması.
 - Public tarafta gerçek Firebase verisiyle uçtan uca randevu testi.
 - Panelden gerçek veri ekleme / değiştirme / silme testleri.
 - Randevu onay / red / iptal işlemleri.
-- Production deployment.
 - Canlı URL üzerinden gerçek müşteri akışının test edilmesi.
+- Custom domain bağlantısı.
 
 ### 🎯 Şu anki gerçek sıra
 
-1. **GitHub Actions build'i doğrula.**
+1. **Canlı App Hosting URL'sini ve yeni rollout'u doğrula.**
 2. **Gerçek Firebase ile `/login` → `/panel` akışını test et.**
 3. **Randevu yönetimini tamamla:** onayla / reddet / iptal et / filtrele.
 4. **Public + panel uçtan uca testlerini yap.**
 5. **Security / edge-case kontrolü yap.**
-6. **Production deployment.**
+6. **Custom domain bağla.**
 7. **İlk gerçek işletme pilotu.**
 
 > Yani şu an yeni özellik eklemekten önce **mevcut MVP'yi gerçek Firebase üzerinde doğrulama ve randevu yönetimini tamamlama** aşamasındayız.
