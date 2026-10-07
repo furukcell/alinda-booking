@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, MessageCircle, RefreshCw, ShieldCheck, XCircle } from "lucide-react";
