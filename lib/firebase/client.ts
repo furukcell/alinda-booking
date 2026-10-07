@@ -11,7 +11,7 @@ import { getStorage, type FirebaseStorage } from "firebase/storage";
  * the repository runnable with the registered ALINDA Web App as well.
  */
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyA9iX2kLJyb5MqGK0be1l-h0gsEv9D0CUi",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyA9iX2kLJyb5MqGKObe1l-h0gsEv9D0CuI",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "alinda-booking-9e0d8.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "alinda-booking-9e0d8",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "alinda-booking-9e0d8.firebasestorage.app",
