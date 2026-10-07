@@ -1,252 +1,242 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
   CalendarCheck2,
-  CalendarDays,
-  Mail,
-  MessageCircle,
   Check,
   Clock3,
   LayoutDashboard,
-  Scissors,
+  Mail,
+  MessageCircle,
   ShieldCheck,
-  Store,
+  Smartphone,
   UserRound,
 } from "lucide-react";
-import { businesses } from "@/lib/mock/businesses";
 
-const features = [
+const benefits = [
   {
     icon: CalendarCheck2,
-    title: "Online randevu",
-    text: "Müşteriler hizmet seçer, uygun zamanı belirler ve randevu talebini gönderir.",
+    title: "Telefon trafiğini azaltın",
+    text: "Müşterileriniz uygun gün ve saati kendileri seçsin. Siz sürekli telefonla randevu ayarlamak zorunda kalmayın.",
   },
   {
     icon: LayoutDashboard,
-    title: "İşletme paneli",
-    text: "Hizmetleri, çalışma saatlerini ve gelen randevuları tek bir panelden yönet.",
+    title: "Her şeyi tek panelden yönetin",
+    text: "Hizmetlerinizi, fiyatlarınızı, çalışma saatlerinizi, uzmanlarınızı ve gelen randevuları tek yerden kontrol edin.",
+  },
+  {
+    icon: Clock3,
+    title: "Boş saatler otomatik gösterilsin",
+    text: "Mesai saatleriniz ve alınmış randevular dikkate alınır. Müşteriye yalnızca uygun zamanlar sunulur.",
+  },
+  {
+    icon: Smartphone,
+    title: "Müşteriniz için çok kolay",
+    text: "Uygulama indirmeye gerek yok. İşletmenize özel bağlantıyı Instagram, WhatsApp veya Google üzerinden paylaşmanız yeterli.",
+  },
+  {
+    icon: UserRound,
+    title: "Uzman bazlı randevu",
+    text: "Birden fazla çalışanınız varsa müşteriniz hizmeti seçtikten sonra istediği uzmanı seçebilir.",
   },
   {
     icon: ShieldCheck,
-    title: "İşletmeye özel",
-    text: "Her işletme kendi adresine ve kendi hizmet yapısına sahip ayrı bir deneyim sunar.",
+    title: "İşletmenize özel sistem",
+    text: "Kendi işletme bilgileriniz, hizmetleriniz, çalışma düzeniniz ve randevu sayfanız size özel çalışır.",
   },
 ];
 
-const steps = [
-  ["01", "İşletmeni oluştur", "İşletme bilgilerini ve hizmetlerini tanımla."],
-  ["02", "Randevu sayfanı paylaş", "Sana özel bağlantıyı müşterilerinle paylaş."],
-  ["03", "Randevuları yönet", "Gelen talepleri panelden takip et ve işletmeni düzenle."],
+const planFeatures = [
+  "İşletmenize özel online randevu sayfası",
+  "Hizmet ve fiyat yönetimi",
+  "Çalışma saatleri yönetimi",
+  "Uzman / personel yönetimi",
+  "Uzmanlara özel çalışma saatleri",
+  "Randevu takvimi ve dolu saat kontrolü",
+  "Müşteri adı ve telefon bilgileri",
+  "Mobil uyumlu randevu deneyimi",
+  "WhatsApp randevu bildirim altyapısı",
+  "İşletme yönetim paneli",
 ];
 
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-hidden bg-alinda-cream">
-      <header className="sticky top-0 z-20 border-b border-alinda-line/80 bg-alinda-cream/85 backdrop-blur-xl">
+    <main className="min-h-screen overflow-hidden bg-alinda-cream text-alinda-ink">
+      <header className="sticky top-0 z-30 border-b border-alinda-line/80 bg-alinda-cream/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-3" aria-label="ALINDA ana sayfa">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-alinda-ink text-sm font-semibold text-white">A</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-alinda-accent text-sm font-semibold text-white">A</span>
             <span className="text-sm font-semibold tracking-[0.2em]">ALINDA</span>
           </Link>
-          <nav className="flex items-center gap-2 sm:gap-4" aria-label="Ana navigasyon">
-            <a href="#demolar" className="hidden px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">Demolar</a>
-            <a href="#fiyatlar" className="hidden px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">Fiyatlar</a>
-            <a href="#iletisim" className="hidden px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">İletişim</a>
+          <nav className="flex items-center gap-1 sm:gap-3" aria-label="Ana navigasyon">
+            <a href="#neden-alinda" className="hidden rounded-full px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">Neden ALINDA?</a>
+            <a href="#fiyatlar" className="hidden rounded-full px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">Fiyatlar</a>
+            <a href="#iletisim" className="hidden rounded-full px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">İletişim</a>
             <Link href="/login" className="inline-flex h-10 items-center rounded-full bg-alinda-ink px-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-alinda-ink-soft">İşletme girişi</Link>
           </nav>
         </div>
       </header>
 
       <section className="relative">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-24 lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:px-8 lg:pt-28">
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-alinda-line bg-white/70 px-3 py-1.5 text-xs font-semibold text-alinda-muted shadow-card">
-              <span className="h-1.5 w-1.5 rounded-full bg-alinda-accent" />
-              ALINDA Booking
-            </div>
-            <h1 className="mt-6 max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-alinda-ink sm:text-6xl sm:leading-[1.04] lg:text-[68px]">
-              Randevuları işletmen için daha kolay yönet.
-            </h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-alinda-muted sm:text-lg sm:leading-8">
-              İşletmene özel randevu sayfası oluştur, hizmetlerini ve çalışma saatlerini yönet, müşterilerinden gelen randevuları tek yerde takip et.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href="#demolar" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-alinda-ink px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-alinda-ink-soft">
-                Demoyu incele <ArrowRight size={17} />
-              </a>
-              <Link href="/login" className="inline-flex h-12 items-center justify-center rounded-full border border-alinda-line bg-white px-6 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-alinda-ink">
-                İşletme paneline giriş
-              </Link>
-            </div>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-xs text-alinda-muted">
-              <span className="inline-flex items-center gap-2"><Check size={15} /> Mobil uyumlu</span>
-              <span className="inline-flex items-center gap-2"><Check size={15} /> İşletmeye özel sayfa</span>
-              <span className="inline-flex items-center gap-2"><Check size={15} /> Firebase altyapısı</span>
-            </div>
+        <div className="absolute left-1/2 top-0 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-alinda-accent-soft/60 blur-3xl" aria-hidden="true" />
+        <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-20 text-center sm:px-6 sm:pb-28 sm:pt-28 lg:px-8">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-alinda-line bg-white/75 px-4 py-2 text-xs font-semibold text-alinda-muted shadow-card">
+            <span className="h-2 w-2 rounded-full bg-alinda-accent" />
+            ALINDA Booking · FK Digital
+          </div>
+          <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-semibold tracking-[-0.045em] sm:text-6xl sm:leading-[1.04] lg:text-[72px]">
+            Randevu yönetimini<br />
+            <span className="text-alinda-accent">işletmeniz için kolaylaştırıyoruz.</span>
+          </h1>
+          <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-alinda-muted sm:text-lg sm:leading-8">
+            ALINDA Booking; güzellik salonu, kuaför, berber, bakım merkezi ve randevu ile çalışan işletmeler için geliştirilmiş online randevu ve işletme yönetim sistemidir.
+          </p>
+          <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+            <a href="#fiyatlar" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-alinda-accent px-6 text-sm font-semibold text-white shadow-[0_10px_28px_rgba(216,137,130,0.2)] transition hover:-translate-y-0.5 hover:opacity-90">
+              Paketleri incele <ArrowRight size={17} />
+            </a>
+            <a href="#neden-alinda" className="inline-flex h-12 items-center justify-center rounded-full border border-alinda-line bg-white px-6 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-alinda-accent">
+              Neleri çözüyoruz?
+            </a>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div className="absolute -inset-10 rounded-full bg-alinda-accent-soft/70 blur-3xl" aria-hidden="true" />
-            <div className="relative rounded-[32px] border border-alinda-line bg-white p-4 shadow-elevated sm:p-5">
-              <div className="rounded-[24px] border border-alinda-line bg-alinda-cream p-5 sm:p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F3E4E0] text-sm font-semibold text-[#B86F61]">MB</div>
-                    <div>
-                      <p className="text-sm font-semibold">Meltem Beauty Studio</p>
-                      <p className="mt-0.5 text-xs text-alinda-muted">Bodrum · Güzellik</p>
-                    </div>
-                  </div>
-                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-alinda-muted">Randevu</span>
-                </div>
-
-                <div className="mt-5 rounded-2xl border border-alinda-line bg-white p-4">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-alinda-muted"><Scissors size={14} /> Hizmet</div>
-                  <div className="mt-3 flex items-end justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold">Signature Saç Kesimi</p>
-                      <p className="mt-1 text-xs text-alinda-muted">45 dakika</p>
-                    </div>
-                    <span className="text-sm font-semibold">₺600</span>
-                  </div>
-                </div>
-
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  <div className="rounded-2xl border border-alinda-line bg-white p-4">
-                    <CalendarDays size={17} className="text-alinda-accent" />
-                    <p className="mt-3 text-xs text-alinda-muted">Tarih</p>
-                    <p className="mt-1 text-sm font-semibold">18 Eylül</p>
-                  </div>
-                  <div className="rounded-2xl border border-alinda-line bg-white p-4">
-                    <Clock3 size={17} className="text-alinda-accent" />
-                    <p className="mt-3 text-xs text-alinda-muted">Saat</p>
-                    <p className="mt-1 text-sm font-semibold">14:30</p>
-                  </div>
-                </div>
-
-                <div className="mt-3 flex items-center justify-between rounded-2xl bg-alinda-ink px-4 py-3.5 text-white">
-                  <span className="text-sm font-medium">Randevu talebi</span>
-                  <ArrowUpRight size={17} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-y border-alinda-line bg-white/55">
-        <div className="mx-auto grid max-w-6xl gap-px bg-alinda-line md:grid-cols-3">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <div key={feature.title} className="bg-white px-6 py-8 sm:px-8 sm:py-10">
-                <Icon size={22} className="text-alinda-accent" />
-                <h2 className="mt-5 text-lg font-semibold">{feature.title}</h2>
-                <p className="mt-2 max-w-sm text-sm leading-6 text-alinda-muted">{feature.text}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section id="demolar" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">Canlı demo deneyimi</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">İşletmenin müşteriye görünen yüzü.</h2>
-            <p className="mt-4 text-base leading-7 text-alinda-muted">Aşağıdaki örnek işletmelerden birini aç ve müşterinin randevu oluştururken yaşayacağı akışı incele.</p>
-          </div>
-          <span className="text-sm text-alinda-muted">/{"{işletme-slug}"}</span>
-        </div>
-
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          {businesses.map((business) => (
-            <Link key={business.id} href={`/${business.slug}`} className="group rounded-[28px] border border-alinda-line bg-white p-6 shadow-card transition duration-200 hover:-translate-y-1 hover:shadow-elevated sm:p-7">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-semibold" style={{ backgroundColor: business.primaryColorSoft, color: business.primaryColor }}>{business.initials}</div>
-                <span className="flex h-9 w-9 items-center justify-center rounded-full border border-alinda-line text-alinda-muted transition group-hover:border-alinda-ink group-hover:text-alinda-ink"><ArrowUpRight size={17} /></span>
-              </div>
-              <div className="mt-6 flex items-center gap-2 text-xs text-alinda-muted"><Store size={14} />{business.category}</div>
-              <h3 className="mt-2 text-2xl font-semibold">{business.name}</h3>
-              <p className="mt-2 text-sm leading-6 text-alinda-muted">{business.description}</p>
-              <div className="mt-6 flex items-center gap-2 text-sm font-medium">Randevu sayfasını aç <ArrowRight size={16} className="transition group-hover:translate-x-1" /></div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-alinda-ink text-white">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Basit akış</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Kur, paylaş, yönet.</h2>
-          </div>
-          <div className="mt-12 grid gap-10 md:grid-cols-3 md:gap-6">
-            {steps.map(([number, title, text]) => (
-              <div key={number} className="border-t border-white/15 pt-5">
-                <span className="text-xs font-semibold tracking-[0.16em] text-white/45">{number}</span>
-                <h3 className="mt-6 text-xl font-semibold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/55">{text}</p>
+          <div className="mx-auto mt-14 grid max-w-4xl gap-3 sm:grid-cols-3">
+            {[
+              ["24/7", "Online randevu erişimi"],
+              ["Tek panel", "İşletme yönetimi"],
+              ["Mobil", "Müşteri deneyimi"],
+            ].map(([value, label]) => (
+              <div key={label} className="rounded-[22px] border border-alinda-line bg-white/80 px-5 py-5 shadow-card">
+                <p className="text-2xl font-semibold tracking-tight text-alinda-accent">{value}</p>
+                <p className="mt-1 text-xs text-alinda-muted">{label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="fiyatlar" className="scroll-mt-20 border-y border-alinda-line bg-white/60">
+      <section id="neden-alinda" className="scroll-mt-20 border-y border-alinda-line bg-white/60">
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">Basit fiyatlandırma</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">İşletmen için tek plan, net fiyat.</h2>
-            <p className="mt-4 text-base leading-7 text-alinda-muted">Online randevu sayfanı oluştur, hizmetlerini ve çalışma saatlerini yönet, müşterilerinden gelen randevuları tek panelden takip et.</p>
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">Neyi çözüyoruz?</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Randevu almak kolay olmalı. Yönetmek de öyle.</h2>
+            <p className="mt-5 text-base leading-7 text-alinda-muted sm:text-lg">
+              Bir işletme büyüdükçe telefon, WhatsApp mesajları, kağıt ajandalar ve farklı uygulamalar arasında randevu takibi zorlaşır. ALINDA'nın amacı tam olarak bu karmaşayı ortadan kaldırmak.
+            </p>
           </div>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
-            <div className="rounded-[28px] border border-alinda-line bg-alinda-cream p-6 shadow-card sm:p-8">
-              <p className="text-sm font-semibold text-alinda-muted">Aylık</p>
-              <div className="mt-3 flex items-end gap-2">
-                <span className="text-4xl font-semibold tracking-tight">₺499</span>
-                <span className="pb-1 text-sm text-alinda-muted">/ ay</span>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-alinda-muted">Aylık ödeme ile ALINDA Booking işletme hesabını kullan.</p>
-              <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-alinda-ink px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-alinda-ink-soft">WhatsApp'tan bilgi al <MessageCircle size={16} /></a>
-            </div>
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {benefits.map((benefit) => {
+              const Icon = benefit.icon;
+              return (
+                <article key={benefit.title} className="rounded-[26px] border border-alinda-line bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-elevated">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-alinda-accent-soft text-alinda-accent">
+                    <Icon size={21} />
+                  </div>
+                  <h3 className="mt-5 text-lg font-semibold">{benefit.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-alinda-muted">{benefit.text}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-            <div className="relative rounded-[28px] border border-alinda-accent bg-white p-6 shadow-elevated sm:p-8">
-              <span className="absolute right-5 top-5 rounded-full bg-alinda-accent-soft px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-alinda-accent">Avantajlı</span>
-              <p className="text-sm font-semibold text-alinda-muted">Yıllık</p>
-              <div className="mt-3 flex items-end gap-2">
-                <span className="text-4xl font-semibold tracking-tight">₺4.999</span>
-                <span className="pb-1 text-sm text-alinda-muted">/ yıl</span>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-alinda-muted">Yıllık ödeme ile daha avantajlı fiyatla ALINDA Booking kullan.</p>
-              <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-alinda-ink px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-alinda-ink-soft">WhatsApp'tan bilgi al <MessageCircle size={16} /></a>
+      <section className="bg-[#F5ECE9]">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 sm:py-24 lg:grid-cols-2 lg:items-center lg:px-8">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">Neden biz?</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Karmaşık bir yazılım değil, işletmenizin günlük yardımcısı.</h2>
+            <p className="mt-5 text-base leading-7 text-alinda-muted">
+              Size onlarca gereksiz özellik sunup sistemi zorlaştırmak yerine, randevu alan bir işletmenin gerçekten ihtiyaç duyduğu temel süreçlere odaklanıyoruz.
+            </p>
+          </div>
+          <div className="rounded-[30px] border border-white bg-white p-6 shadow-card sm:p-8">
+            <div className="space-y-5">
+              {[
+                ["Kolay kurulum", "İşletme bilgilerinizi, hizmetlerinizi ve çalışma saatlerinizi tanımlayın."],
+                ["Kolay paylaşım", "Size özel randevu bağlantınızı Instagram, WhatsApp ve diğer kanallarda paylaşın."],
+                ["Daha az telefon trafiği", "Müşteriler uygun zamanı kendileri seçsin, siz işinize odaklanın."],
+                ["Daha düzenli işletme", "Randevular, uzmanlar ve çalışma saatleri tek bir sistemde toplansın."],
+              ].map(([title, text]) => (
+                <div key={title} className="flex gap-4">
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EAF6EE] text-[#4E8762]">
+                    <Check size={15} strokeWidth={2.5} />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold">{title}</p>
+                    <p className="mt-1 text-sm leading-5 text-alinda-muted">{text}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section id="iletisim" className="scroll-mt-20 border-y border-alinda-line bg-gradient-to-br from-[#FFF7F4] via-white to-[#F4ECEA]">
+      <section id="fiyatlar" className="scroll-mt-20 border-y border-alinda-line bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+          <div className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">Abonelikler</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">İşletmeniz için ihtiyacınız olan her şey.</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-alinda-muted">
+              Aylık veya yıllık planı seçin. Her iki planda da ALINDA Booking'in tüm temel işletme özellikleri bulunur.
+            </p>
+          </div>
+
+          <div className="mt-12 grid items-start gap-5 lg:grid-cols-2">
+            {[
+              { name: "Aylık", price: "₺499", suffix: "/ ay", badge: "" },
+              { name: "Yıllık", price: "₺4.999", suffix: "/ yıl", badge: "2 ay ücretsiz avantajı" },
+            ].map((plan) => (
+              <div key={plan.name} className={`relative rounded-[30px] border p-7 shadow-card sm:p-9 ${plan.name === "Yıllık" ? "border-alinda-accent bg-[#FFF8F6] shadow-[0_18px_55px_rgba(216,137,130,0.13)]" : "border-alinda-line bg-alinda-cream"}`}>
+                {plan.badge && (
+                  <span className="absolute right-6 top-6 rounded-full bg-[#EAF6EE] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#4E8762]">
+                    {plan.badge}
+                  </span>
+                )}
+                <p className="text-sm font-semibold text-alinda-muted">{plan.name}</p>
+                <div className="mt-3 flex items-end gap-2">
+                  <span className="text-5xl font-semibold tracking-[-0.04em]">{plan.price}</span>
+                  <span className="pb-1 text-sm text-alinda-muted">{plan.suffix}</span>
+                </div>
+                <p className="mt-3 text-sm text-alinda-muted">Tüm temel ALINDA Booking özellikleri dahil.</p>
+
+                <div className="mt-7 border-t border-alinda-line pt-6">
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-alinda-muted">Pakete dahil</p>
+                  <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {planFeatures.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2.5 text-sm leading-5">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EAF6EE] text-[#4E8762]">
+                          <Check size={12} strokeWidth={3} />
+                        </span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-alinda-accent px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:opacity-90">
+                  WhatsApp'tan bilgi al <MessageCircle size={17} />
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-6 text-center text-xs text-alinda-muted">Kurulum ve abonelik hakkında detaylı bilgi için WhatsApp üzerinden bize ulaşabilirsiniz.</p>
+        </div>
+      </section>
+
+      <section id="iletisim" className="scroll-mt-20 bg-gradient-to-br from-[#FFF7F4] via-white to-[#F4ECEA]">
         <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">FK Digital</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-alinda-ink sm:text-4xl">İşletmeniz için online randevu sistemi mi arıyorsunuz?</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-alinda-muted">ALINDA Booking ile işletmenize özel randevu sayfanızı oluşturun. Detaylar ve kurulum için bize ulaşın.</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">İşletmenizi dijitale taşıyalım.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-alinda-muted">ALINDA Booking hakkında bilgi almak, sistemi işletmeniz için kurdurmak veya destek almak için bize ulaşabilirsiniz.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-alinda-accent px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:opacity-90"><MessageCircle size={17} /> WhatsApp</a>
             <a href="mailto:destek.fkdigital@gmail.com" className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-alinda-line bg-white px-6 text-sm font-semibold text-alinda-ink transition hover:-translate-y-0.5 hover:border-alinda-accent"><Mail size={17} /> E-posta</a>
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-        <div className="rounded-[32px] border border-alinda-line bg-white px-6 py-10 text-center shadow-card sm:px-10 sm:py-14">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-alinda-accent-soft text-alinda-accent"><UserRound size={22} /></div>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight">İşletme panelini keşfet.</h2>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-alinda-muted">Hizmetlerini ve çalışma saatlerini düzenle, gelen randevuları panelden takip et.</p>
-          <Link href="/login" className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-alinda-ink px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-alinda-ink-soft">İşletme girişi <ArrowRight size={17} /></Link>
         </div>
       </section>
 
@@ -259,6 +249,7 @@ export default function Home() {
           <div>
             <p className="text-xs font-semibold text-alinda-ink">Hızlı bağlantılar</p>
             <div className="mt-3 flex flex-col gap-2 text-xs text-alinda-muted">
+              <a href="#neden-alinda" className="transition hover:text-alinda-ink">Neden ALINDA?</a>
               <a href="#fiyatlar" className="transition hover:text-alinda-ink">Fiyatlar & Abonelikler</a>
               <a href="#iletisim" className="transition hover:text-alinda-ink">İletişim</a>
               <Link href="/login" className="transition hover:text-alinda-ink">İşletme girişi</Link>
