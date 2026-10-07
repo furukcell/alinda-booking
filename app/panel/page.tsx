@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Clock3, Scissors, Settings2, Store, Users } from "@lucide/react";
+import { ArrowUpRight, CalendarDays, Clock3, Scissors, Settings2, Store, Users } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 
 const stats = [
