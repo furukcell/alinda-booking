@@ -42,6 +42,7 @@ export function BusinessBooking({ business }: { business: Business }) {
   const [selectedTime, setSelectedTime] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
@@ -152,6 +153,7 @@ export function BusinessBooking({ business }: { business: Business }) {
         specialistName: specialist.name,
         customerName: name,
         customerPhone: phone,
+        whatsappOptIn,
         date: selectedDateInfo.id,
         time: selectedTime
       });
@@ -423,6 +425,19 @@ export function BusinessBooking({ business }: { business: Business }) {
                   <input value={phone} onChange={(event) => setPhone(event.target.value)} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-sm outline-none" style={{ borderColor: line }} placeholder="05xx xxx xx xx" inputMode="tel" />
                 </label>
               </div>
+
+              <label className="mt-4 flex items-start gap-3 rounded-[17px] border bg-white px-4 py-3 text-xs leading-5" style={{ borderColor: line }}>
+                <input
+                  type="checkbox"
+                  checked={whatsappOptIn}
+                  onChange={(event) => setWhatsappOptIn(event.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#D88982]"
+                />
+                <span>
+                  <span className="font-semibold">Randevu bilgilerini WhatsApp'tan almak istiyorum.</span>
+                  <span className="mt-0.5 block" style={{ color: muted }}>Telefon numaranızı verdiğiniz işletmeden randevu bildirimi almayı kabul ediyorum.</span>
+                </span>
+              </label>
 
               {error && <div role="alert" className="mt-4 rounded-[17px] border px-4 py-3 text-sm" style={{ borderColor: "#E9C5C2", background: "#FFF0EE", color: "#A54D47" }}>{error}</div>}
 
