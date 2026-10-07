@@ -16,6 +16,16 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid;
     }
 
+    function ownerAccessEnabled(businessId) {
+      return isOwner(businessId)
+        && get(/databases/$(database)/documents/businesses/$(businessId)).data.accessEnabled != false;
+    }
+
+    function publicBookingEnabled(businessId) {
+      return get(/databases/$(database)/documents/businesses/$(businessId)).data.active != false
+        && get(/databases/$(database)/documents/businesses/$(businessId)).data.accessEnabled != false;
+    }
+
     function validBookingCreate(businessId) {
       return request.resource.data.businessId == businessId
         && request.resource.data.referenceNo is string
@@ -60,13 +70,13 @@ service cloud.firestore {
       allow update: if isSuperAdmin()
         || (isOwner(businessId)
           && request.resource.data.ownerId == resource.data.ownerId);
-      allow delete: if isSuperAdmin() || isOwner(businessId);
+      allow delete: if isSuperAdmin() || ownerAccessEnabled(businessId);
       allow create: if isSuperAdmin()
         || (signedIn() && request.resource.data.ownerId == request.auth.uid);
 
       match /services/{serviceId} {
         allow get, list: if true;
-        allow create, update, delete: if isSuperAdmin() || isOwner(businessId);
+        allow create, update, delete: if isSuperAdmin() || ownerAccessEnabled(businessId);
       }
 
       match /specialists/{specialistId} {
@@ -80,9 +90,9 @@ service cloud.firestore {
       }
 
       match /bookings/{bookingId} {
-        allow create: if validBookingCreate(businessId);
-        allow get, list: if isSuperAdmin() || isOwner(businessId);
-        allow update, delete: if isSuperAdmin() || isOwner(businessId);
+        allow create: if validBookingCreate(businessId) && publicBookingEnabled(businessId);
+        allow get, list: if isSuperAdmin() || ownerAccessEnabled(businessId);
+        allow update, delete: if isSuperAdmin() || ownerAccessEnabled(businessId);
       }
 
       match /slots/{slotId} {
