@@ -1,12 +1,11 @@
 "use client";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 import { ArrowRight, CalendarDays, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
+import { getFirebaseAuth } from "@/lib/firebase/client";
 
 function getAuthErrorMessage(code?: string) {
   switch (code) {
@@ -53,8 +52,13 @@ export default function LoginPage() {
     try {
       const auth = getFirebaseAuth();
       const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
-      const adminSnapshot = await getDoc(doc(getFirebaseDb(), "superadmins", credential.user.uid));
-      router.replace(adminSnapshot.exists() ? "/admin" : "/panel");
+      const token = await credential.user.getIdToken();
+      const adminResponse = await fetch("/api/admin/session", {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      const adminData = await adminResponse.json().catch(() => ({ authorized: false }));
+      router.replace(adminData.authorized ? "/admin" : "/panel");
     } catch (authError) {
       const code = authError instanceof Error && "code" in authError ? String((authError as { code?: string }).code) : undefined;
       setError(getAuthErrorMessage(code));
