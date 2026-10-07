@@ -28,6 +28,13 @@ function timeFromMinutes(value: number) {
   return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
 }
 
+function generateReferenceNo() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const values = new Uint32Array(5);
+  crypto.getRandomValues(values);
+  return Array.from(values, (value) => alphabet[value % alphabet.length]).join("");
+}
+
 function getSlotId(date: string, time: string, specialistId: string) {
   return `${date}_${time}_${specialistId}`.replace(/[^a-zA-Z0-9_-]/g, "-");
 }
@@ -42,7 +49,8 @@ export async function createBooking(input: CreateBookingInput) {
   }
 
   const db = getFirebaseDb();
-  const bookingRef = doc(collection(db, "businesses", input.businessId, "bookings"));
+  const referenceNo = generateReferenceNo();
+  const bookingRef = doc(db, "businesses", input.businessId, "bookings", referenceNo);
   const duration = Math.max(30, Math.ceil(input.service.durationMinutes / 30) * 30);
   const start = minutes(input.time);
   const segmentTimes = Array.from({ length: duration / 30 }, (_, index) => timeFromMinutes(start + index * 30));
@@ -52,7 +60,11 @@ export async function createBooking(input: CreateBookingInput) {
 
   try {
     await runTransaction(db, async (transaction) => {
-      const snapshots = await Promise.all(slotRefs.map((slotRef) => transaction.get(slotRef)));
+      const [bookingSnapshot, ...snapshots] = await Promise.all([transaction.get(bookingRef), ...slotRefs.map((slotRef) => transaction.get(slotRef))]);
+
+      if (bookingSnapshot.exists()) {
+        throw new Error("REFERENCE_COLLISION");
+      }
 
       if (snapshots.some((snapshot) => snapshot.exists())) {
         const error = new Error("SLOT_TAKEN") as Error & { code?: string };
@@ -73,6 +85,7 @@ export async function createBooking(input: CreateBookingInput) {
 
       transaction.set(bookingRef, {
         businessId: input.businessId,
+        referenceNo,
         serviceId: input.service.id,
         serviceName: input.service.name,
         serviceDurationMinutes: input.service.durationMinutes,
@@ -90,6 +103,9 @@ export async function createBooking(input: CreateBookingInput) {
       });
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "REFERENCE_COLLISION") {
+      throw new Error("REFERENCE_COLLISION");
+    }
     if (typeof error === "object" && error !== null && "code" in error && error.code === "already-exists") {
       throw new Error("SLOT_TAKEN");
     }
