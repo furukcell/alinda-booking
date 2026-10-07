@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   try {
     const db = getAdminDb();
     const businessSnapshot = await db.collection("businesses").get();
-    const businesses = businessSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const businesses: Array<Record<string, any> & { id: string }> = businessSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
     const now = new Date();
     const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul" }).format(now);
