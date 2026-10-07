@@ -53,15 +53,15 @@ const actionFeatures = [
 
 function BookingPreview() {
   return (
-    <div className="relative mx-auto w-full max-w-[620px] lg:mr-0">
-      <div className="absolute -right-3 top-10 z-10 rounded-2xl border border-alinda-line bg-white/95 px-4 py-3 shadow-elevated backdrop-blur sm:-right-5 sm:top-14">
+    <div className="relative mx-auto w-full max-w-[760px] lg:mr-[-18px] xl:mr-[-30px]">
+      <div className="absolute -right-2 top-8 z-10 rounded-2xl border border-alinda-line bg-white/95 px-4 py-3 shadow-elevated backdrop-blur sm:-right-5 sm:top-12">
         <p className="text-[10px] font-semibold text-alinda-muted">Müşteriniz</p>
         <p className="mt-1 text-xs font-bold">Böyle randevu alır.</p>
       </div>
-      <div className="absolute -left-3 bottom-10 z-10 hidden rounded-2xl border border-alinda-line bg-white/95 px-4 py-3 shadow-card backdrop-blur sm:block">
+      <div className="absolute -left-3 bottom-8 z-10 hidden rounded-2xl border border-alinda-line bg-white/95 px-4 py-3 shadow-card backdrop-blur sm:block">
         <p className="text-xs font-semibold text-[#4E8762]">✓ Uygulama indirmeye gerek yok</p>
       </div>
-      <div className="overflow-hidden rounded-[34px] border border-white/80 bg-white shadow-[0_30px_90px_rgba(45,38,37,0.18)]">
+      <div className="overflow-hidden rounded-[38px] border border-white/80 bg-white shadow-[0_30px_90px_rgba(45,38,37,0.18)]">
         <Image
           src="/alinda-salon-hero.png"
           alt="ALINDA online randevu deneyimi"
@@ -95,12 +95,12 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-alinda-accent-soft/70 blur-3xl" aria-hidden="true" />
         <div className="absolute -right-40 top-20 h-[500px] w-[500px] rounded-full bg-[#F1E8E5] blur-3xl" aria-hidden="true" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 pb-20 pt-14 sm:px-6 sm:pb-24 sm:pt-20 lg:grid-cols-[1fr_.85fr] lg:px-8 lg:py-24">
-          <div>
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pb-20 pt-14 sm:px-6 sm:pb-24 sm:pt-20 lg:grid-cols-[.82fr_1.18fr] lg:gap-8 lg:px-8 lg:py-20">
+          <div className="relative z-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-alinda-line bg-white/80 px-4 py-2 text-xs font-semibold text-alinda-muted shadow-card">
               <span className="h-2 w-2 rounded-full bg-alinda-accent" /> ALINDA Booking · FK Digital
             </div>
-            <h1 className="mt-7 max-w-2xl text-4xl font-semibold leading-[1.04] tracking-[-0.05em] sm:text-6xl lg:text-[66px]">
+            <h1 className="mt-7 max-w-2xl text-4xl font-semibold leading-[1.04] tracking-[-0.05em] sm:text-6xl lg:text-[64px]">
               İşletmenizin<br />randevu işini<br /><span className="text-alinda-accent">ALINDA yönetsin.</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-alinda-muted sm:text-lg sm:leading-8">
