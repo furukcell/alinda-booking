@@ -7,6 +7,8 @@ export type Booking = {
   serviceName: string;
   serviceDurationMinutes: number;
   servicePrice: number;
+  specialistId: string;
+  specialistName: string;
   customerName: string;
   customerPhone: string;
   date: string;
