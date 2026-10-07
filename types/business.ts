@@ -36,6 +36,7 @@ export type Business = {
   address: string;
   phone: string;
   initials: string;
+  logoUrl?: string;
   primaryColor: string;
   primaryColorSoft: string;
   services: Service[];
