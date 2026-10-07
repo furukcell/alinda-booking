@@ -668,6 +668,8 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 
 
 ### WhatsApp Randevu İşlemleri
+- Doğal dil randevu talepleri için OpenAI Responses API tabanlı intent çözümleme desteği eklendi; AI yoksa mevcut deterministik akış çalışmaya devam eder.
+- AI tarafı yalnızca intent/tarih/saat/hizmet çözümleme yapar; uygunluk ve gerçek randevu oluşturma yine ALINDA'nın kendi Firestore transaction akışıyla yapılır.
 - Müşteri WhatsApp üzerinden 5 karakterli referans ile randevusunu sorgulayabilir.
 - Referans işlemlerinde müşterinin WhatsApp telefon numarası doğrulanır.
 - `iptal ABC12` ile randevu iptal talebi başlatılır; sistem randevuyu gösterip `Evet` onayı ister.
