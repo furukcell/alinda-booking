@@ -665,3 +665,10 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 <!-- ALINDA_APP_HOSTING_ROLLOUT_2026-10-07 -->
 
 <!-- ALINDA_APP_HOSTING_REFRESH_2026-10-07T07-47 -->
+
+
+### WhatsApp Randevu İşlemleri
+- Müşteri WhatsApp üzerinden 5 karakterli referans ile randevusunu sorgulayabilir.
+- Referans işlemlerinde müşterinin WhatsApp telefon numarası doğrulanır.
+- `iptal ABC12` formatıyla randevu iptal edilebilir.
+- İptalde hizmet süresine ait tüm slot segmentleri transaction içinde serbest bırakılır.
