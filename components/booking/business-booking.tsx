@@ -70,6 +70,7 @@ export function BusinessBooking({ business }: { business: Business }) {
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [confirmedReference, setConfirmedReference] = useState("");
   const [error, setError] = useState("");
 
   const service = useMemo(
@@ -194,6 +195,7 @@ export function BusinessBooking({ business }: { business: Business }) {
         time: selectedTime
       });
 
+      setConfirmedReference(bookingRef.id);
       setConfirmed(true);
 
       // WhatsApp bildirimi randevuyu geciktirmemeli; bağlantı hazır değilse
@@ -242,6 +244,10 @@ export function BusinessBooking({ business }: { business: Business }) {
               <Check size={30} />
             </div>
             <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: muted }}>Randevu talebi alındı</p>
+            <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border px-4 py-2" style={{ borderColor: line, background: rosePale }}>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: muted }}>Randevu referansı</span>
+              <span className="font-mono text-sm font-bold tracking-[0.18em]" style={{ color: roseDark }}>{confirmedReference}</span>
+            </div>
             <h1 className="mt-2 text-3xl font-bold tracking-tight">Görüşmek üzere, {name.split(" ")[0]}.</h1>
             <p className="mx-auto mt-3 max-w-sm text-sm leading-6" style={{ color: muted }}>{business.name} için randevu talebiniz oluşturuldu.</p>
             <div className="mt-7 rounded-[22px] p-5 text-left" style={{ background: rosePale }}>
@@ -262,7 +268,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <span className="text-sm font-bold">{selectedTime}</span>
               </div>
             </div>
-            <button onClick={() => { setConfirmed(false); setSelectedTime(""); setName(""); setPhone(""); }} className="mt-6 text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>
+            <button onClick={() => { setConfirmed(false); setConfirmedReference(""); setSelectedTime(""); setName(""); setPhone(""); }} className="mt-6 text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>
               Yeni randevu oluştur
             </button>
           </section>
