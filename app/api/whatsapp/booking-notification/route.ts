@@ -39,6 +39,7 @@ export async function POST(request: Request) {
       specialistName: string;
       customerName: string;
       customerPhone: string;
+      whatsappOptIn?: boolean;
       date: string;
       time: string;
     };
@@ -55,8 +56,8 @@ export async function POST(request: Request) {
     }
 
     const businessSnapshot = await db.doc(`businesses/${businessId}`).get();
-    const business = businessSnapshot.data() as { name?: string; phone?: string } | undefined;
-    const ownerPhone = business?.phone || "";
+    const business = businessSnapshot.data() as { name?: string; phone?: string; whatsappNotificationPhone?: string } | undefined;
+    const ownerPhone = business?.whatsappNotificationPhone || business?.phone || "";
 
     const common = [
       booking.customerName,
@@ -66,23 +67,27 @@ export async function POST(request: Request) {
       booking.time
     ];
 
-    await sendWhatsAppTemplate(
-      connection.phoneNumberId,
-      connection.accessToken,
-      ownerPhone,
-      templates.ownerTemplate,
-      templates.language,
-      [...common, booking.customerPhone]
-    );
+    if (ownerPhone) {
+      await sendWhatsAppTemplate(
+        connection.phoneNumberId,
+        connection.accessToken,
+        ownerPhone,
+        templates.ownerTemplate,
+        templates.language,
+        [...common, booking.customerPhone]
+      );
+    }
 
-    await sendWhatsAppTemplate(
-      connection.phoneNumberId,
-      connection.accessToken,
-      booking.customerPhone,
-      templates.customerTemplate,
-      templates.language,
-      [business?.name || "ALINDA", booking.serviceName, booking.specialistName, formatDate(booking.date), booking.time]
-    );
+    if (booking.whatsappOptIn) {
+      await sendWhatsAppTemplate(
+        connection.phoneNumberId,
+        connection.accessToken,
+        booking.customerPhone,
+        templates.customerTemplate,
+        templates.language,
+        [business?.name || "ALINDA", booking.serviceName, booking.specialistName, formatDate(booking.date), booking.time]
+      );
+    }
 
     await bookingRef.update({
       whatsappNotificationSentAt: new Date().toISOString()
