@@ -51,9 +51,8 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen bg-alinda-cream px-4 py-8 sm:px-6">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center">
-        <Link href="/" className="mx-auto flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-alinda-ink text-sm font-semibold text-white">A</span>
-          <span className="text-sm font-semibold tracking-[0.18em]">ALINDA</span>
+        <Link href="/" className="mx-auto text-center">
+          <span className="text-sm font-semibold tracking-[0.12em]">İŞLETME GİRİŞİ</span>
         </Link>
 
         <section className="mt-8 rounded-[28px] border border-alinda-line bg-white p-6 shadow-card sm:p-8">
