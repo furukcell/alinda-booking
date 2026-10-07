@@ -13,6 +13,8 @@ service cloud.firestore {
 
     function validBookingCreate(businessId) {
       return request.resource.data.businessId == businessId
+        && request.resource.data.referenceNo is string
+        && request.resource.data.referenceNo.size() == 5
         && request.resource.data.serviceId is string
         && request.resource.data.serviceName is string
         && request.resource.data.serviceDurationMinutes is int
