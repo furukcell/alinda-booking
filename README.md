@@ -35,6 +35,12 @@ Her işletmenin kendi markasına ait profesyonel bir randevu sayfasına sahip ol
 - Tenant bazlı güvenlik kuralları
 - Responsive ve premium UI
 - Demo / landing page
+- Uzman bazlı uygunluk ve uzman çalışma saatleri
+- 12 aylık public takvim
+- Randevu referans numarası
+- İşletme logo yönetimi
+- WhatsApp bildirim altyapısı
+- Super Admin işletme yönetimi altyapısı
 
 ---
 
@@ -62,6 +68,70 @@ ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 
 > **Hosting:** Firebase App Hosting — backend: `alinda-booking`, bölge: `europe-west4 (Netherlands)`.
 > GitHub Actions production build'i başarıyla tamamlanmaktadır ve `main` branch'i App Hosting backend'ine bağlıdır.
+
+## 🆕 2026-10-07 Güncel Durum
+
+Bu README, projedeki mevcut gerçek durumu takip etmek için güncellendi.
+
+### Son tamamlanan geliştirmeler
+
+- [x] Public booking akışı hizmet → uzman → tarih → saat şeklinde yeniden düzenlendi.
+- [x] Hizmete göre uzman filtreleme eklendi.
+- [x] Uzman fotoğrafı / adı / unvanı public tarafta gösteriliyor.
+- [x] Uzman bazlı çalışma saatleri ve izin günleri eklendi.
+- [x] Public tarafta 12 aylık takvim navigasyonu eklendi.
+- [x] Dolu saatler ve mesai dışı durumları görsel olarak ayrıştırıldı.
+- [x] Hizmet süresine göre otomatik seans blokları eklendi.
+- [x] 5 karakterli randevu referans numarası sistemi eklendi.
+- [x] İşletme panelinde referans numarasıyla randevu arama eklendi.
+- [x] İşletme logo yükleme / değiştirme / silme sistemi tamamlandı.
+- [x] Public işletme sayfasında işletme logosu / baş harfleri kullanılıyor.
+- [x] ALINDA ana sayfası pazarlama odaklı yeniden tasarlandı.
+- [x] Ana sayfa hero görseli büyütüldü.
+- [x] WhatsApp Business / Meta Embedded Signup server altyapısı hazırlandı.
+- [x] WhatsApp token şifreleme ve işletme bazlı bağlantı kaydı hazırlandı.
+- [x] Super Admin paneli `/admin` oluşturuldu.
+- [x] Super Admin API'si oluşturuldu.
+- [x] Super Admin üzerinden yeni işletme oluşturma akışı oluşturuldu.
+- [x] Yeni işletme için Firebase Authentication owner hesabı oluşturulabiliyor.
+- [x] `superadmins/{uid}` Firestore yetki modeli eklendi.
+- [x] Super Admin için Firebase ID token + Admin SDK doğrulaması eklendi.
+
+### Firebase'de yapılan Super Admin bootstrap
+
+İlk Super Admin hesabı Firebase Authentication'da oluşturuldu ve UID'si Firestore'da aşağıdaki yapıya eklendi:
+
+```text
+superadmins/{SUPER_ADMIN_UID}
+├── role: "superadmin"
+└── email: "admin@alindabooking.com"
+```
+
+> `/admin` kodu GitHub'da mevcut. Canlı ortamda 404 görülürse App Hosting Rollouts bölümünde yeni Super Admin commit'inin yayınlanıp yayınlanmadığı kontrol edilmelidir.
+
+### Şu anki en önemli ürün işi
+
+Super Admin'den yeni işletme oluşturulduktan sonra:
+
+```text
+SUPER ADMIN
+   ↓
+/admin
+   ↓
+Yeni işletme + owner Auth
+   ↓
+İşletme sahibi login
+   ↓
+/panel
+   ↓
+Kendi işletmesi
+   ↓
+/{business-slug}
+   ↓
+Müşteri randevusu
+```
+
+Bu zincirin tamamen dinamik multi-tenant hale getirilmesi gerekiyor. Özellikle mevcut panelde demo işletmesine bağlı hardcoded `meltem-guzellik` / işletme ID kullanımları temizlenmeli.
 
 ## 📌 Proje Aşamaları
 
@@ -258,6 +328,26 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 
 ## 🗺️ Sıradaki Yol Haritası
 
+### Phase 9.5 — Super Admin ve Multi-Tenant Yönetim
+
+- [x] Super Admin yetki modeli
+- [x] `/admin` dashboard
+- [x] İşletme listeleme
+- [x] Yeni işletme oluşturma
+- [x] Yeni işletme owner Authentication hesabı oluşturma
+- [x] İşletme oluşturma API'si
+- [ ] App Hosting'de `/admin` rollout doğrulaması
+- [ ] Panelde hardcoded demo işletmesi bağlantılarını kaldırma
+- [ ] Paneli Auth `ownerId` üzerinden tamamen dinamik hale getirme
+- [ ] Tüm panel alt sayfalarında tenant izolasyonu
+- [ ] Yeni işletme owner login → panel testi
+- [ ] Yeni işletme public booking uçtan uca testi
+- [ ] Super Admin işletme düzenleme
+- [ ] İşletme aktif / pasif yönetimi
+- [ ] İşletme arşivleme / silme
+- [ ] İşletme detay ekranı
+- [ ] Owner şifre sıfırlama yönetimi
+
 ### Phase 10 — Panel ve işletme yönetimi
 - [x] İşletme ayarları
 - [x] İşletme iletişim bilgileri
@@ -293,10 +383,10 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [ ] Randevu geçmişi
 
 ### Phase 12 — İşletme Profili ve Medya
-- [ ] Logo yükleme
+- [x] Logo yükleme
 - [ ] Kapak görseli
-- [ ] Storage upload arayüzü
-- [ ] Görsel önizleme / değiştirme / silme
+- [x] Storage upload arayüzü
+- [x] Görsel önizleme / değiştirme / silme
 - [ ] Sosyal medya alanları
 - [ ] Public profil geliştirmeleri
 
@@ -311,9 +401,9 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [ ] Tarih seçim UX'i
 - [ ] Saat seçim UX'i
 - [ ] Müşteri form doğrulaması
-- [ ] Randevu onay ekranı
-- [ ] Randevu referans numarası
-- [ ] Eski/geçersiz seçimlerin engellenmesi
+- [x] Randevu onay ekranı
+- [x] Randevu referans numarası
+- [x] Eski/geçersiz seçimlerin engellenmesi
 - [ ] Mobil deneyimin geliştirilmesi
 - [ ] Slot çakışması hata yönetimi
 
@@ -426,42 +516,51 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 
 ## ⚠️ Mevcut Durum
 
-**ALINDA şu anda gerçek Firebase projesine bağlı, MVP seviyesinde çalışan bir ürün durumunda.**
+**ALINDA şu anda gerçek Firebase projesine bağlı, MVP + Super Admin temel sistemi aşamasındadır.**
 
-Şu ana kadar doğrulanan altyapı:
+### Hazır olan ana parçalar
 
-- Firebase Authentication aktif.
-- Firestore'da gerçek işletme kaydı mevcut.
-- Authentication kullanıcısı ile işletme `ownerId` bağlantısı kurulmuş durumda.
-- `services`, `hours`, `specialists`, `bookings` ve `slots` yapıları hazır.
-- Firebase Storage bucket ve güvenlik kuralları hazır.
-- Public randevu akışı, dinamik uygunluk ve slot kilitleme altyapısı mevcut.
-- İşletme panelinin temel bölümleri hazır.
-- Firebase Web SDK için repo içinde fallback yapılandırması mevcut; istenirse environment değişkenleriyle override edilebilir.
-- `.gitignore` ve GitHub Actions production build workflow'u eklendi.
+- Firebase Authentication
+- Firestore
+- Firebase Storage
+- Firebase App Hosting
+- Public randevu sistemi
+- Hizmet → uzman → tarih → saat akışı
+- Uzman bazlı uygunluk
+- Hizmet süresine göre seans üretimi
+- Slot çakışma koruması
+- Randevu referans numarası
+- İşletme paneli
+- İşletme logo sistemi
+- ALINDA pazarlama ana sayfası
+- WhatsApp server altyapısı
+- Super Admin paneli ve işletme oluşturma API'si
 
-Henüz doğrulanmamış / yapılmamış kritik noktalar:
+### Henüz tamamlanmamış kritik işler
 
-- Public tarafta gerçek Firebase verisiyle uçtan uca randevu testi.
-- Panelden gerçek veri ekleme / değiştirme / silme testleri.
-- Randevu onay / red / iptal işlemleri.
-- WhatsApp Meta production yapılandırmasının tamamlanması ve gerçek mesaj testi.
-- Canlı URL üzerinden gerçek müşteri akışının test edilmesi.
-- Custom domain bağlantısı.
+- Super Admin rollout'unun canlı App Hosting'de doğrulanması
+- Panelin tamamen ownerId tabanlı multi-tenant hale getirilmesi
+- Yeni işletme oluşturma → owner login → panel → public booking uçtan uca testi
+- Randevu onay / red / iptal durum yönetimi
+- Firestore / Storage güvenlik audit'i
+- E2E production testleri
+- WhatsApp Meta production izinleri ve template'leri
+- Custom domain
+- İlk gerçek işletme pilotu
 
-### 🎯 Şu anki gerçek sıra
+### 🎯 Bundan sonra yapılacak sıra
 
-1. **Canlı App Hosting URL'sini ve yeni rollout'u doğrula.**
-2. **Gerçek Firebase ile `/login` → `/panel` akışını test et.**
-3. **Randevu yönetimini tamamla:** onayla / reddet / iptal et / filtrele.
-4. **Public + panel uçtan uca testlerini yap.**
-5. **Security / edge-case kontrolü yap.**
-6. **Custom domain bağla.**
-7. **İlk gerçek işletme pilotu.**
-
-> Yani şu an yeni özellik eklemekten önce **mevcut MVP'yi gerçek Firebase üzerinde doğrulama ve randevu yönetimini tamamlama** aşamasındayız.
-
----
+1. **App Hosting rollout'unu doğrula ve `/admin` sayfasını canlıda aç.**
+2. **Paneldeki hardcoded Meltem Beauty Studio bağlantılarını kaldır.**
+3. **Paneli Auth `ownerId` üzerinden tamamen multi-tenant yap.**
+4. **Super Admin'den test işletmesi oluştur.**
+5. **Test işletmesi owner hesabıyla login → panel testini yap.**
+6. **Test işletmesinin public randevu sayfasını test et.**
+7. **Randevu onay / red / iptal yönetimini tamamla.**
+8. **Firestore + Storage Rules audit yap.**
+9. **Uçtan uca production testi yap.**
+10. **WhatsApp production bağlantısını tamamla.**
+11. **Custom domain ve ilk gerçek işletme pilotuna geç.**
 
 ## 📁 Önemli Dosyalar
 
@@ -470,8 +569,30 @@ Henüz doğrulanmamış / yapılmamış kritik noktalar:
 - `firebase.json` — Firebase CLI yapılandırması
 - `docs/roadmap.md` — Detaylı ürün yol haritası
 - `docs/sales.md` — Demo ve satış notları
+- `app/admin/page.tsx` — Super Admin arayüzü
+- `app/api/admin/businesses/route.ts` — Super Admin işletme API'si
+- `lib/whatsapp/server.ts` — WhatsApp server entegrasyonu
+- `lib/firebase/admin.ts` — Firebase Admin SDK
 
 ---
+
+## 📊 Güncel Ürün Durumu
+
+| Alan | Durum |
+|---|---|
+| Public booking | 🟢 Hazır |
+| Uzman bazlı booking | 🟢 Hazır |
+| İşletme paneli | 🟢 Temel sistem hazır |
+| Logo / branding | 🟢 Hazır |
+| Firebase | 🟢 Bağlı |
+| WhatsApp kod altyapısı | 🟡 Hazır / production bekliyor |
+| Super Admin | 🟡 Kod hazır / rollout doğrulama bekliyor |
+| Multi-tenant panel | 🟡 Geliştirme devam ediyor |
+| Randevu durum yönetimi | 🔴 Yapılacak |
+| Güvenlik audit | 🟡 Yapılacak |
+| E2E test | 🔴 Yapılacak |
+| Custom domain | 🔴 Yapılacak |
+| İlk gerçek işletme | 🔴 Yapılacak |
 
 ## 📐 Geliştirme Prensipleri
 
