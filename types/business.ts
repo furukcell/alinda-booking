@@ -37,6 +37,8 @@ export type Business = {
   phone: string;
   initials: string;
   logoUrl?: string;
+  plan?: "starter" | "pro";
+  whatsappDailySummaryEnabled?: boolean;
   primaryColor: string;
   primaryColorSoft: string;
   services: Service[];
