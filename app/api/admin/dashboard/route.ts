@@ -39,10 +39,11 @@ export async function GET(request: NextRequest) {
     for (const business of businesses) {
       const active = business.active !== false;
       const plan = business.plan === "pro" ? "pro" : "starter";
+      const billingCycle = business.billingCycle === "annual" ? "annual" : "monthly";
 
       if (active) {
         activeCount += 1;
-        estimatedMrr += plan === "pro" ? 750 : 499;
+        estimatedMrr += billingCycle === "annual" ? (plan === "pro" ? 7500 : 4999) / 12 : (plan === "pro" ? 750 : 499);
       }
       if (plan === "pro") proCount += 1;
       else starterCount += 1;
