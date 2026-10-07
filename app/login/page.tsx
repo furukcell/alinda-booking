@@ -18,9 +18,21 @@ function getAuthErrorMessage(code?: string) {
     case "auth/too-many-requests":
       return "Çok fazla başarısız deneme yapıldı. Bir süre sonra tekrar deneyin.";
     case "auth/network-request-failed":
-      return "Bağlantı kurulamadı. İnternet bağlantınızı kontrol edin.";
+      return "Firebase sunucusuna bağlanılamadı. İnternet bağlantınızı kontrol edin.";
+    case "auth/unauthorized-domain":
+      return "Bu site Firebase Authentication için yetkilendirilmemiş.";
+    case "auth/operation-not-allowed":
+      return "E-posta/şifre ile giriş Firebase Authentication'da etkin değil.";
+    case "auth/invalid-api-key":
+      return "Firebase API anahtarı geçersiz.";
+    case "auth/app-not-authorized":
+      return "Bu domain Firebase Authentication kullanmaya yetkili değil. API anahtarı ve domain ayarlarını kontrol edin.";
+    case "auth/api-key-not-valid":
+      return "Firebase API anahtarı bu proje için geçerli değil.";
     default:
-      return "Giriş sırasında bir hata oluştu. Firebase ayarlarınızı kontrol edin.";
+      return code
+        ? `Firebase giriş hatası: ${code}`
+        : "Giriş sırasında bilinmeyen bir Firebase hatası oluştu.";
   }
 }
 
