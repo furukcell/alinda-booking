@@ -6,12 +6,13 @@ import { getStorage, type FirebaseStorage } from "firebase/storage";
 /**
  * ALINDA Booking Firebase configuration.
  *
- * The Firebase Web SDK configuration is public client-side configuration.
- * Environment variables are preferred when provided; the built-in values keep
- * the repository runnable with the registered ALINDA Web App as well.
+ * In Firebase App Hosting production builds, Firebase automatically provides
+ * the registered Web App configuration to the Firebase JS SDK. We use that
+ * automatic configuration in production and keep the explicit config for
+ * local development.
  */
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyA9iX2kLJyb5MqGKObe1l-h0gsEv9D0CuI",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyA9iXk2LJyb5MqGKObe1l-h0gsEv9D0CuI",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "alinda-booking-9e0d8.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "alinda-booking-9e0d8",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "alinda-booking-9e0d8.firebasestorage.app",
@@ -21,6 +22,14 @@ const firebaseConfig = {
 
 export function getFirebaseApp(): FirebaseApp {
   if (getApps().length) return getApp();
+
+  // App Hosting injects FIREBASE_WEBAPP_CONFIG and the Firebase JS SDK
+  // supports no-argument initialization there. This avoids relying on a
+  // manually copied API key in the production client bundle.
+  if (process.env.NODE_ENV === "production") {
+    return initializeApp();
+  }
+
   return initializeApp(firebaseConfig);
 }
 
