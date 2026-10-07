@@ -17,7 +17,6 @@ export async function POST(request: Request) {
     if (!bookingId || !status) return NextResponse.json({ ok: false, reason: "INVALID_INPUT" }, { status: 400 });
 
     const db = getAdminDb();
-    const bookingRef = db.docGroup ? null : null;
     const businessQuery = await db.collection("businesses").where("ownerId", "==", decoded.uid).limit(1).get();
     if (businessQuery.empty) return NextResponse.json({ ok: true, sent: false, reason: "NO_BUSINESS" });
     const businessDoc = businessQuery.docs[0];
