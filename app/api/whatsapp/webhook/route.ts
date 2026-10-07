@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { handleSecretaryMessage, sendSecretaryReply } from "@/lib/whatsapp/secretary";
-import { lookupWhatsAppBooking, cancelWhatsAppBooking } from "@/lib/whatsapp/booking-lookup";
+import { lookupWhatsAppBooking, prepareWhatsAppCancellation, cancelWhatsAppBooking } from "@/lib/whatsapp/booking-lookup";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -52,9 +52,22 @@ export async function POST(request: Request) {
           const incomingText = String(message.text.body).trim();
           const refMatch = incomingText.toUpperCase().match(/(?:^|\\s)([A-Z0-9]{5})(?:$|\\s)/)?.[1];
           let reply: string;
-          if (refMatch && /randevum|randevu sorgu|randevu kontrol/i.test(incomingText)) reply = await lookupWhatsAppBooking(businessRef.id, refMatch, String(message.from));
-          else if (refMatch && /randevu iptal|iptal/i.test(incomingText)) reply = await cancelWhatsAppBooking(businessRef.id, refMatch, String(message.from));
-          else reply = await handleSecretaryMessage(businessRef.id, String(message.from), incomingText, name);
+          const conversationRef = getAdminDb().collection(businessRef.path + "/whatsappConversations").doc(String(message.from));
+          const conversation = await conversationRef.get();
+          const pending = conversation.data();
+          const yes = ["evet","onay","onayla","tamam","olur"].includes(incomingText.toLocaleLowerCase("tr-TR").trim());
+          if (pending?.action === "cancel" && Number(pending.expiresAt) > Date.now() && yes) {
+            reply = await cancelWhatsAppBooking(businessRef.id, String(pending.referenceNo), String(message.from));
+            await conversationRef.delete();
+          } else if (refMatch && /randevum|randevu sorgu|randevu kontrol/i.test(incomingText)) {
+            reply = await lookupWhatsAppBooking(businessRef.id, refMatch, String(message.from));
+          } else if (refMatch && /randevu iptal|iptal/i.test(incomingText)) {
+            const prepared = await prepareWhatsAppCancellation(businessRef.id, refMatch, String(message.from));
+            reply = prepared.message;
+            if (prepared.state) await conversationRef.set(prepared.state);
+          } else {
+            reply = await handleSecretaryMessage(businessRef.id, String(message.from), incomingText, name);
+          }
           await sendSecretaryReply(businessRef.id, String(message.from), reply);
         }
       }
