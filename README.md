@@ -51,6 +51,16 @@ Her işletmenin kendi markasına ait profesyonel bir randevu sayfasına sahip ol
 
 ---
 
+## 🌐 Web Panel ve Test Adresleri
+
+Firebase Hosting için tanımlı site adresi:
+
+- **Ana site:** https://alinda-booking-9e0d8.web.app
+- **İşletme girişi:** https://alinda-booking-9e0d8.web.app/login
+- **İşletme paneli:** https://alinda-booking-9e0d8.web.app/panel
+
+> ⚠️ Not: Bu adresler Firebase Hosting site adına göre tanımlıdır. GitHub Actions build'i başarıyla tamamlandı; ancak şu an için bu repodan Firebase Hosting'e otomatik production deployment yapılmış olduğu doğrulanmış değildir. Canlı panel testi, deployment tamamlandıktan sonra yapılmalıdır.
+
 ## 📌 Proje Aşamaları
 
 ### Tamamlananlar
