@@ -1,5 +1,6 @@
 import { doc, getDoc } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
+import type { Specialist, SpecialistWorkingDay } from "@/types/business";
 
 type WorkingDay = {
   enabled: boolean;
@@ -83,15 +84,29 @@ export async function getDailySlots(
   businessId: string,
   date: string,
   dayId: string,
-  specialistId: string,
+  specialist: Specialist,
   durationMinutes: number
 ): Promise<{ slots: BookingSlot[]; working: boolean; open: string; close: string }> {
-  const workingDay = await getWorkingDay(businessId, dayId);
+  const businessDay = await getWorkingDay(businessId, dayId);
+  const specialistDay: SpecialistWorkingDay | undefined = specialist.schedule?.[dayId];
+  const workingDay: WorkingDay = specialistDay
+    ? {
+        enabled: specialistDay.enabled,
+        open: specialistDay.open,
+        close: specialistDay.close
+      }
+    : businessDay;
+
+  if (specialist.timeOffDates?.includes(date)) {
+    return { slots: [], working: false, open: workingDay.open, close: workingDay.close };
+  }
   if (!workingDay.enabled) {
     return { slots: [], working: false, open: workingDay.open, close: workingDay.close };
   }
 
   const opening = minutes(workingDay.open);
+  const breakStart = specialistDay?.breakStart ? minutes(specialistDay.breakStart) : null;
+  const breakEnd = specialistDay?.breakEnd ? minutes(specialistDay.breakEnd) : null;
   const closing = minutes(workingDay.close);
   const duration = Math.max(30, Math.ceil(durationMinutes / 30) * 30);
   const latestStart = closing - duration;
@@ -106,6 +121,8 @@ export async function getDailySlots(
 
   for (let value = opening; value <= latestStart; value += 30) {
     if (date === todayId && value <= currentMinutes) continue;
+    const end = value + duration;
+    if (breakStart !== null && breakEnd !== null && value < breakEnd && end > breakStart) continue;
     candidateTimes.push(timeFromMinutes(value));
   }
 
@@ -115,7 +132,7 @@ export async function getDailySlots(
 
     const snapshots = await Promise.all(
       segments.map((segment) =>
-        getDoc(doc(getFirebaseDb(), "businesses", businessId, "slots", slotId(date, segment, specialistId)))
+        getDoc(doc(getFirebaseDb(), "businesses", businessId, "slots", slotId(date, segment, specialist.id)))
       )
     );
 
