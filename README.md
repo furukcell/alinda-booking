@@ -81,6 +81,10 @@ ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 
 Bu README, projedeki mevcut gerçek durumu takip etmek için güncellendi.
 
+### 2026-10-07 — Çalışma saatleri mobil UX polish
+
+Çalışma saatleri ekranında mobil düzen iyileştirildi. Kaydet aksiyonu küçük ekranlarda görünür ve tam genişlikte; açılış/kapanış alanları mobilde yan yana kullanılabilir; geçersiz saat aralığı kaydetme öncesinde doğrulanıyor.
+
 ### 2026-10-07 — Hizmet paneli mobil UX polish
 
 Hizmet yönetim ekranındaki yeni hizmet aksiyonu mobilde de görünür hale getirildi. Hizmet formu ve silme onayı küçük ekranlarda dikey akışa uyumlu hale getirildi; liste aksiyonlarına keyboard focus durumları eklendi.
