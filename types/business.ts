@@ -7,6 +7,14 @@ export type Service = {
   currency: "TRY";
 };
 
+export type Specialist = {
+  id: string;
+  name: string;
+  title: string;
+  photoUrl: string;
+  serviceIds: string[];
+};
+
 export type Business = {
   id: string;
   name: string;
@@ -21,4 +29,5 @@ export type Business = {
   primaryColor: string;
   primaryColorSoft: string;
   services: Service[];
+  specialists: Specialist[];
 };
