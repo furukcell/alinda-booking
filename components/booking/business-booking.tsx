@@ -32,7 +32,7 @@ const line = "#F0DFDC";
 
 function BookingFooter() {
   return (
-    <footer className="border-t px-5 py-8 sm:px-8" style={{ borderColor: line, background: "#FFFDFC" }}>
+    <footer className="border-t px-5 py-8 sm:px-8" style={{ borderColor: line, background: "linear-gradient(180deg, #FFFDFC 0%, #FBF5F3 100%)" }}>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: roseDark }}>ALINDA Booking · FK Digital</p>
@@ -41,9 +41,9 @@ function BookingFooter() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <a href="/#fiyatlar" className="rounded-full border px-4 py-2 text-xs font-semibold transition hover:bg-white" style={{ borderColor: line, color: text }}>Fiyatlar</a>
-          <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="rounded-full px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90" style={{ background: rose }}>WhatsApp</a>
-          <a href="mailto:kurtulusfaruk94@gmail.com" className="rounded-full border px-4 py-2 text-xs font-semibold transition hover:bg-white" style={{ borderColor: line, color: text }}>E-posta</a>
+          <a href="/#fiyatlar" className="rounded-full border bg-white/70 px-4 py-2 text-xs font-semibold transition hover:-translate-y-0.5 hover:bg-white" style={{ borderColor: line, color: text }}>Fiyatlar</a>
+          <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="rounded-full px-4 py-2 text-xs font-semibold text-white transition hover:-translate-y-0.5" style={{ background: `linear-gradient(135deg, ${rose}, ${roseDark})`, boxShadow: "0 8px 20px rgba(185,104,98,0.18)" }}>WhatsApp</a>
+          <a href="mailto:destek.fkdigital@gmail.com" className="rounded-full border bg-white/70 px-4 py-2 text-xs font-semibold transition hover:-translate-y-0.5 hover:bg-white" style={{ borderColor: line, color: text }}>E-posta</a>
         </div>
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t pt-4 text-[10px]" style={{ borderColor: line, color: muted }}>
