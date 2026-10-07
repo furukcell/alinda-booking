@@ -68,7 +68,7 @@ service cloud.firestore {
         || (signedIn() && resource.data.ownerId == request.auth.uid);
 
       allow update: if isSuperAdmin()
-        || (isOwner(businessId)
+        || (ownerAccessEnabled(businessId)
           && request.resource.data.ownerId == resource.data.ownerId);
       allow delete: if isSuperAdmin() || ownerAccessEnabled(businessId);
       allow create: if isSuperAdmin()
@@ -81,7 +81,7 @@ service cloud.firestore {
 
       match /specialists/{specialistId} {
         allow get, list: if true;
-        allow create, update, delete: if isSuperAdmin() || isOwner(businessId);
+        allow create, update, delete: if isSuperAdmin() || ownerAccessEnabled(businessId);
       }
 
       match /hours/{dayId} {
@@ -97,6 +97,7 @@ service cloud.firestore {
 
       match /slots/{slotId} {
         allow create: if validSlotCreate(businessId, slotId)
+          && publicBookingEnabled(businessId)
           && !exists(/databases/$(database)/documents/businesses/$(businessId)/slots/$(slotId));
         allow get: if true;
         allow list: if false;
