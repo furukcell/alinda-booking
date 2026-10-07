@@ -42,6 +42,9 @@ export const businesses: Business[] = [
       { id: "sac-sakal", name: "Saç + Sakal", description: "Kesim, şekillendirme ve sakal", durationMinutes: 60, price: 550, currency: "TRY" },
       { id: "sac-kesimi", name: "Saç Kesimi", description: "Modern kesim ve şekillendirme", durationMinutes: 40, price: 400, currency: "TRY" },
       { id: "sakal", name: "Sakal Tasarımı", description: "Şekillendirme ve bakım", durationMinutes: 25, price: 250, currency: "TRY" }
+    ],
+    specialists: [
+      { id: "demo-ahmet", name: "Ahmet", title: "Berber", photoUrl: "https://i.pravatar.cc/240?img=12", serviceIds: ["sac-sakal", "sac-kesimi", "sakal"] }
     ]
   }
 ];
