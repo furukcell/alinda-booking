@@ -415,3 +415,6 @@ Henüz doğrulanmamış / yapılmamış kritik noktalar:
 6. Production'a çıkmadan önce Firebase ve güvenlik akışlarını gerçek senaryolarla test et.
 7. GitHub Actions build'i yeşil olmadan production deployment yapma.
 8. Gerçek işletme verisiyle doğrulanmayan bir özelliği "tamamlandı" kabul etme.
+
+
+<!-- ALINDA_APP_HOSTING_ROLLOUT_2026-10-07 -->
