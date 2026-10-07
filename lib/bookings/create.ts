@@ -10,14 +10,25 @@ import type { Service } from "@/types/business";
 export type CreateBookingInput = {
   businessId: string;
   service: Service;
+  specialistId: string;
+  specialistName: string;
   customerName: string;
   customerPhone: string;
   date: string;
   time: string;
 };
 
-function getSlotId(date: string, time: string) {
-  return `${date}_${time}`.replace(/[^a-zA-Z0-9_-]/g, "-");
+function minutes(value: string) {
+  const [hours, mins] = value.split(":").map(Number);
+  return hours * 60 + mins;
+}
+
+function timeFromMinutes(value: number) {
+  return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
+}
+
+function getSlotId(date: string, time: string, specialistId: string) {
+  return `${date}_${time}_${specialistId}`.replace(/[^a-zA-Z0-9_-]/g, "-");
 }
 
 export async function createBooking(input: CreateBookingInput) {
@@ -25,31 +36,38 @@ export async function createBooking(input: CreateBookingInput) {
   const customerPhone = input.customerPhone.trim();
 
   if (!customerName || !customerPhone) throw new Error("MISSING_CUSTOMER");
-  if (!input.businessId || !input.service.id || !input.date || !input.time) {
+  if (!input.businessId || !input.service.id || !input.specialistId || !input.date || !input.time) {
     throw new Error("INVALID_BOOKING");
   }
 
   const db = getFirebaseDb();
   const bookingRef = doc(collection(db, "businesses", input.businessId, "bookings"));
-  const slotId = getSlotId(input.date, input.time);
-  const slotRef = doc(db, "businesses", input.businessId, "slots", slotId);
+  const duration = Math.max(30, Math.ceil(input.service.durationMinutes / 30) * 30);
+  const start = minutes(input.time);
+  const segmentTimes = Array.from({ length: duration / 30 }, (_, index) => timeFromMinutes(start + index * 30));
+  const slotRefs = segmentTimes.map((time) =>
+    doc(db, "businesses", input.businessId, "slots", getSlotId(input.date, time, input.specialistId))
+  );
 
   try {
     await runTransaction(db, async (transaction) => {
-      const slotSnapshot = await transaction.get(slotRef);
+      const snapshots = await Promise.all(slotRefs.map((slotRef) => transaction.get(slotRef)));
 
-      if (slotSnapshot.exists()) {
+      if (snapshots.some((snapshot) => snapshot.exists())) {
         const error = new Error("SLOT_TAKEN") as Error & { code?: string };
         error.code = "already-exists";
         throw error;
       }
 
-      transaction.set(slotRef, {
-        slotId,
-        date: input.date,
-        time: input.time,
-        status: "pending",
-        createdAt: serverTimestamp()
+      slotRefs.forEach((slotRef, index) => {
+        transaction.set(slotRef, {
+          slotId: slotRef.id,
+          date: input.date,
+          time: segmentTimes[index],
+          specialistId: input.specialistId,
+          status: "pending",
+          createdAt: serverTimestamp()
+        });
       });
 
       transaction.set(bookingRef, {
@@ -58,12 +76,14 @@ export async function createBooking(input: CreateBookingInput) {
         serviceName: input.service.name,
         serviceDurationMinutes: input.service.durationMinutes,
         servicePrice: input.service.price,
+        specialistId: input.specialistId,
+        specialistName: input.specialistName,
         customerName,
         customerPhone,
         date: input.date,
         time: input.time,
         status: "pending",
-        slotId,
+        slotId: slotRefs[0].id,
         createdAt: serverTimestamp()
       });
     });
