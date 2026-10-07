@@ -142,7 +142,7 @@ export async function getWhatsAppConnection(businessId: string) {
   const snapshot = await getAdminDb()
     .doc(`businesses/${businessId}/integrations/whatsapp`)
     .get();
-  if (!snapshot.exists()) return null;
+  if (!snapshot.exists) return null;
 
   const data = snapshot.data() as WhatsAppConnection;
   if (!data.encryptedAccessToken || !data.wabaId || !data.phoneNumberId) return null;
