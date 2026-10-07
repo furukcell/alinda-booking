@@ -6,6 +6,11 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isSuperAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/superadmins/$(request.auth.uid));
+    }
+
     function isOwner(businessId) {
       return signedIn()
         && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid;
@@ -40,35 +45,42 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time;
     }
 
+    match /superadmins/{userId} {
+      allow get: if signedIn() && request.auth.uid == userId;
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+
     match /businesses/{businessId} {
       allow get: if true;
-      allow list: if false;
+      allow list: if isSuperAdmin();
 
-      allow update: if isOwner(businessId)
-        && request.resource.data.ownerId == resource.data.ownerId;
-      allow delete: if isOwner(businessId);
-      allow create: if signedIn()
-        && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isSuperAdmin()
+        || (isOwner(businessId)
+          && request.resource.data.ownerId == resource.data.ownerId);
+      allow delete: if isSuperAdmin() || isOwner(businessId);
+      allow create: if isSuperAdmin()
+        || (signedIn() && request.resource.data.ownerId == request.auth.uid);
 
       match /services/{serviceId} {
         allow get, list: if true;
-        allow create, update, delete: if isOwner(businessId);
+        allow create, update, delete: if isSuperAdmin() || isOwner(businessId);
       }
 
       match /specialists/{specialistId} {
         allow get, list: if true;
-        allow create, update, delete: if isOwner(businessId);
+        allow create, update, delete: if isSuperAdmin() || isOwner(businessId);
       }
 
       match /hours/{dayId} {
         allow get, list: if true;
-        allow create, update, delete: if isOwner(businessId);
+        allow create, update, delete: if isSuperAdmin() || isOwner(businessId);
       }
 
       match /bookings/{bookingId} {
         allow create: if validBookingCreate(businessId);
-        allow get, list: if isOwner(businessId);
-        allow update, delete: if isOwner(businessId);
+        allow get, list: if isSuperAdmin() || isOwner(businessId);
+        allow update, delete: if isSuperAdmin() || isOwner(businessId);
       }
 
       match /slots/{slotId} {
@@ -76,7 +88,7 @@ service cloud.firestore {
           && !exists(/databases/$(database)/documents/businesses/$(businessId)/slots/$(slotId));
         allow get: if true;
         allow list: if false;
-        allow update, delete: if isOwner(businessId);
+        allow update, delete: if isSuperAdmin() || isOwner(businessId);
       }
     }
   }
