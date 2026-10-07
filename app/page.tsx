@@ -46,16 +46,36 @@ const benefits = [
 ];
 
 const planFeatures = [
-  "İşletmenize özel online randevu sayfası",
-  "Hizmet ve fiyat yönetimi",
-  "Çalışma saatleri yönetimi",
-  "Uzman / personel yönetimi",
-  "Uzmanlara özel çalışma saatleri",
-  "Randevu takvimi ve dolu saat kontrolü",
-  "Müşteri adı ve telefon bilgileri",
-  "Mobil uyumlu randevu deneyimi",
+  "Size özel online randevu sayfası oluşturma",
+  "Hizmet, fiyat ve süreleri yönetme",
+  "Çalışma gün ve saatlerini belirleme",
+  "Uzman / personel ekleme ve yönetme",
+  "Uzmanlara özel çalışma saatleri tanımlama",
+  "Randevuları tek takvimden takip etme",
+  "Dolu ve uygun saatleri otomatik yönetme",
+  "Müşteri adı ve telefon bilgilerini toplama",
+  "Mobil uyumlu randevu deneyimi sunma",
   "WhatsApp randevu bildirim altyapısı",
-  "İşletme yönetim paneli",
+  "İşletme yönetim panelini kullanma",
+];
+
+const actionFeatures = [
+  {
+    title: "Randevuları otomatik toplayın",
+    text: "Müşteriniz bağlantınıza girsin, hizmeti ve uzmanı seçsin, uygun gün ve saati kendisi belirlesin.",
+  },
+  {
+    title: "Ekibinizi yönetin",
+    text: "Birden fazla uzman çalıştırıyorsanız her uzmanın hangi hizmeti verdiğini ve ne zaman çalıştığını tanımlayın.",
+  },
+  {
+    title: "Boş saatleri satışa açın",
+    text: "Alınan randevular ve mesai saatleri dikkate alınarak müşteriye seçilebilir uygun saatler gösterilsin.",
+  },
+  {
+    title: "Müşteriye anında bilgi verin",
+    text: "Randevu oluşturulduğunda işletme ve izin veren müşteri için WhatsApp bildirim altyapısını kullanın.",
+  },
 ];
 
 export default function Home() {
@@ -84,11 +104,11 @@ export default function Home() {
             ALINDA Booking · FK Digital
           </div>
           <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-semibold tracking-[-0.045em] sm:text-6xl sm:leading-[1.04] lg:text-[72px]">
-            Randevu yönetimini<br />
-            <span className="text-alinda-accent">işletmeniz için kolaylaştırıyoruz.</span>
+            İşletmenizin randevu işini<br />
+            <span className="text-alinda-accent">ALINDA yönetsin.</span>
           </h1>
           <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-alinda-muted sm:text-lg sm:leading-8">
-            ALINDA Booking; güzellik salonu, kuaför, berber, bakım merkezi ve randevu ile çalışan işletmeler için geliştirilmiş online randevu ve işletme yönetim sistemidir.
+            Telefon ve WhatsApp trafiğini azaltın, müşterilerinize 7/24 online randevu verin ve ekibinizin takvimini tek panelden yönetin. ALINDA Booking, güzellik salonu, kuaför, berber ve randevu ile çalışan işletmeler için geliştirilmiştir.
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <a href="#fiyatlar" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-alinda-accent px-6 text-sm font-semibold text-white shadow-[0_10px_28px_rgba(216,137,130,0.2)] transition hover:-translate-y-0.5 hover:opacity-90">
@@ -179,7 +199,7 @@ export default function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">Abonelikler</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">İşletmeniz için ihtiyacınız olan her şey.</h2>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-alinda-muted">
-              Aylık veya yıllık planı seçin. Her iki planda da ALINDA Booking'in tüm temel işletme özellikleri bulunur.
+              Aylık ve yıllık abonelik arasında özellik farkı yoktur. Fark yalnızca ödeme dönemidir; yıllık planda daha avantajlı fiyatla tüm sistemi kullanırsınız.
             </p>
           </div>
 
@@ -220,6 +240,27 @@ export default function Home() {
                 </a>
               </div>
             ))}
+          </div>
+
+          <div className="mt-14 rounded-[30px] border border-alinda-line bg-alinda-cream p-6 sm:p-8">
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-alinda-accent">Abonelikle neler yapabilirsiniz?</p>
+              <h3 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Sadece randevu linki değil, küçük işletmeniz için komple bir yönetim sistemi.</h3>
+              <p className="mt-3 text-sm leading-6 text-alinda-muted">Aylık ve yıllık paketlerin kapsamı aynıdır. İşletmenizi büyütürken kullanacağınız temel özelliklerin tamamı pakete dahildir.</p>
+            </div>
+            <div className="mt-7 grid gap-4 sm:grid-cols-2">
+              {actionFeatures.map((item, index) => (
+                <div key={item.title} className="rounded-[22px] border border-alinda-line bg-white p-5">
+                  <div className="flex items-start gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EAF6EE] text-sm font-bold text-[#4E8762]">{index + 1}</span>
+                    <div>
+                      <h4 className="text-sm font-semibold">{item.title}</h4>
+                      <p className="mt-1.5 text-sm leading-6 text-alinda-muted">{item.text}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <p className="mt-6 text-center text-xs text-alinda-muted">Kurulum ve abonelik hakkında detaylı bilgi için WhatsApp üzerinden bize ulaşabilirsiniz.</p>
