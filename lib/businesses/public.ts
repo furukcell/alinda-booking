@@ -102,6 +102,7 @@ export async function getPublicBusiness(slug: string): Promise<Business | undefi
     const snapshot = await getDoc(doc(getFirebaseDb(), "businesses", slug));
     if (!snapshot.exists()) return undefined;
     const data = snapshot.data();
+    if (data.active === false) return undefined;
     const services = await getBusinessServices(snapshot.id, data.services);
     const specialists = await getBusinessSpecialists(snapshot.id, services, data.specialists);
 
@@ -117,6 +118,7 @@ export async function getPublicBusiness(slug: string): Promise<Business | undefi
       phone: typeof data.phone === "string" ? data.phone : "",
       initials: typeof data.initials === "string" ? data.initials : "AL",
       logoUrl: typeof data.logoUrl === "string" ? data.logoUrl : undefined,
+      active: data.active !== false,
       primaryColor: typeof data.primaryColor === "string" ? data.primaryColor : "#B86F61",
       primaryColorSoft: typeof data.primaryColorSoft === "string" ? data.primaryColorSoft : "#F3E4E0",
       services,
