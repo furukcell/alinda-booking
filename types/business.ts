@@ -7,12 +7,22 @@ export type Service = {
   currency: "TRY";
 };
 
+export type SpecialistWorkingDay = {
+  enabled: boolean;
+  open: string;
+  close: string;
+  breakStart?: string;
+  breakEnd?: string;
+};
+
 export type Specialist = {
   id: string;
   name: string;
   title: string;
   photoUrl: string;
   serviceIds: string[];
+  schedule?: Record<string, SpecialistWorkingDay>;
+  timeOffDates?: string[];
 };
 
 export type Business = {
