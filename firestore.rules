@@ -53,7 +53,9 @@ service cloud.firestore {
 
     match /businesses/{businessId} {
       allow get: if true;
-      allow list: if isSuperAdmin();
+      // Owners may query businesses only when the query is constrained to their own ownerId.
+      allow list: if isSuperAdmin()
+        || (signedIn() && resource.data.ownerId == request.auth.uid);
 
       allow update: if isSuperAdmin()
         || (isOwner(businessId)
