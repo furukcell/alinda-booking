@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Store,
   UserRound,
-} from "@lucide/react";
+} from "lucide-react";
 import { businesses } from "@/lib/mock/businesses";
 
 const features = [
