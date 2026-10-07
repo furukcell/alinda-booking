@@ -3,7 +3,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LogOut, Plus, ShieldCheck, Store, Trash2, Users, X } from "lucide-react";
-import { getDoc, doc } from "firebase/firestore";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 
 type AdminBusiness = {
@@ -72,8 +71,13 @@ export default function AdminPage() {
         return;
       }
       try {
-        const adminDoc = await getDoc(doc(getFirebaseDb(), "superadmins", user.uid));
-        if (!adminDoc.exists()) {
+        const token = await user.getIdToken();
+        const response = await fetch("/api/admin/session", {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        });
+        const data = await response.json().catch(() => ({ authorized: false }));
+        if (!response.ok || !data.authorized) {
           setAuthorized(false);
           setLoading(false);
           return;
