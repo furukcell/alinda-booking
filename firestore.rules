@@ -24,6 +24,7 @@ service cloud.firestore {
         && request.resource.data.date is string
         && request.resource.data.time is string
         && request.resource.data.status == 'pending'
+        && request.resource.data.whatsappOptIn is bool
         && request.resource.data.slotId is string
         && request.resource.data.createdAt == request.time;
     }
