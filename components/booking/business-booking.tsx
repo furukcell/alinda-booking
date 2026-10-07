@@ -19,6 +19,12 @@ const rose = "#D88982";
 const roseDark = "#B96862";
 const roseSoft = "#FBE5E3";
 const rosePale = "#FFF6F4";
+const availableGreen = "#EAF6EE";
+const availableGreenBorder = "#CBE8D4";
+const availableGreenText = "#4E8762";
+const bookedPink = "#FBE8E9";
+const bookedPinkBorder = "#F0C7CA";
+const bookedPinkText = "#B96A70";
 const text = "#2D2625";
 const muted = "#8F817E";
 const line = "#F0DFDC";
@@ -315,8 +321,8 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <h2 className="mt-1 text-xl font-bold">Gün seçin</h2>
               </div>
               <div className="hidden items-center gap-4 text-[11px] sm:flex">
-                <span className="flex items-center gap-1.5" style={{ color: muted }}><span className="h-2.5 w-2.5 rounded-full border" style={{ borderColor: rose }} /> Müsait</span>
-                <span className="flex items-center gap-1.5" style={{ color: muted }}><span className="h-2.5 w-2.5 rounded-full bg-[#EEE8E7]" /> Dolu</span>
+                <span className="flex items-center gap-1.5" style={{ color: availableGreenText }}><span className="h-2.5 w-2.5 rounded-full" style={{ background: availableGreenBorder }} /> Müsait</span>
+                <span className="flex items-center gap-1.5" style={{ color: bookedPinkText }}><span className="h-2.5 w-2.5 rounded-full" style={{ background: bookedPinkBorder }} /> Dolu</span>
               </div>
             </div>
 
@@ -375,7 +381,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                   const booked = slot.status === "booked";
                   const active = slot.time === selectedTime;
                   return (
-                    <button key={slot.time} disabled={booked} onClick={() => { setSelectedTime(slot.time); setError(""); setTimeout(() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); }} className="relative rounded-[17px] border px-3 py-4 text-center transition active:scale-95 disabled:cursor-not-allowed" style={{ borderColor: active ? rose : booked ? "#EEE8E7" : line, background: active ? roseSoft : booked ? "#F5F2F1" : "#fff", color: booked ? "#B8AFAD" : active ? roseDark : text }}>
+                    <button key={slot.time} disabled={booked} onClick={() => { setSelectedTime(slot.time); setError(""); setTimeout(() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); }} className="relative rounded-[17px] border px-3 py-4 text-center transition active:scale-95 disabled:cursor-not-allowed" style={{ borderColor: active ? rose : booked ? bookedPinkBorder : availableGreenBorder, background: active ? roseSoft : booked ? bookedPink : availableGreen, color: booked ? bookedPinkText : active ? roseDark : availableGreenText }}>
                       <span className="flex items-center justify-center gap-1.5 text-sm font-bold"><Clock3 size={14} />{slot.time}</span>
                       <span className="mt-1 block text-[10px] font-semibold">{booked ? "Dolu" : active ? "Seçildi" : "Müsait"}</span>
                     </button>
