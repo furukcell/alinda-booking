@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, Check, Clock3, MapPin, Phone } from "@lucide/react";
+import { ArrowRight, CalendarDays, Check, Clock3, MapPin, Phone } from "lucide-react";
 import type { Business } from "@/types/business";
 import { createBooking } from "@/lib/bookings/create";
 import { getAvailableSlots, getNextDates, type AvailableDate } from "@/lib/bookings/availability";
