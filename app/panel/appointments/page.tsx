@@ -1,7 +1,7 @@
 "use client";
 
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { ArrowLeft, CalendarDays } from "@lucide/react";
+import { ArrowLeft, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
