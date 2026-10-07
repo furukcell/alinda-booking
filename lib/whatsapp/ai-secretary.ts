@@ -32,7 +32,7 @@ export async function interpretSecretaryMessage(input: {
   const user=`İşletme: ${input.businessName}\\nKatalog: ${catalog}\\nMüşteri mesajı: ${input.text}`;
   const response=await fetch("https://api.openai.com/v1/responses",{
     method:"POST",
-    headers:{"Content-Type":"application/json","Authorization:"Bearer "+key},
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
     body:JSON.stringify({
       model,
       instructions:system,
