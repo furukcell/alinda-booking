@@ -10,11 +10,25 @@ import { getFirebaseAuth, getFirebaseDb, getFirebaseStorage } from "@/lib/fireba
 import { getOwnedBusinessId } from "@/lib/businesses/owner";
 import type { Service, Specialist } from "@/types/business";
 
+const dayOptions = [
+  ["monday", "Pazartesi"], ["tuesday", "Salı"], ["wednesday", "Çarşamba"],
+  ["thursday", "Perşembe"], ["friday", "Cuma"], ["saturday", "Cumartesi"], ["sunday", "Pazar"]
+] as const;
+
+type ScheduleDay = { enabled: boolean; open: string; close: string; breakStart: string; breakEnd: string };
+type ScheduleState = Record<string, ScheduleDay>;
+
+const defaultSchedule: ScheduleState = Object.fromEntries(dayOptions.map(([id]) => [id, {
+  enabled: !["saturday", "sunday"].includes(id), open: "09:00", close: "18:00", breakStart: "", breakEnd: ""
+}])) as ScheduleState;
+
 const emptyForm = {
   name: "",
   title: "Uzman",
   serviceIds: [] as string[],
-  photoUrl: ""
+  photoUrl: "",
+  schedule: defaultSchedule,
+  timeOffDates: [] as string[]
 };
 
 export default function SpecialistsPage() {
@@ -62,7 +76,15 @@ export default function SpecialistsPage() {
           name: typeof data.name === "string" ? data.name : "",
           title: typeof data.title === "string" ? data.title : "Uzman",
           photoUrl: typeof data.photoUrl === "string" ? data.photoUrl : "",
-          serviceIds: Array.isArray(data.serviceIds) ? data.serviceIds.filter((value): value is string => typeof value === "string") : []
+          serviceIds: Array.isArray(data.serviceIds) ? data.serviceIds.filter((value): value is string => typeof value === "string") : [],
+          schedule: Object.fromEntries(dayOptions.map(([dayId]) => {
+            const value = data.schedule?.[dayId];
+            return [dayId, {
+              ...defaultSchedule[dayId],
+              ...(value && typeof value === "object" ? value : {})
+            }];
+          })),
+          timeOffDates: Array.isArray(data.timeOffDates) ? data.timeOffDates.filter((value): value is string => typeof value === "string") : []
         };
       }));
     } catch {
@@ -138,6 +160,8 @@ export default function SpecialistsPage() {
         title: form.title.trim() || "Uzman",
         serviceIds: form.serviceIds,
         photoUrl,
+        schedule: form.schedule,
+        timeOffDates: form.timeOffDates,
         updatedAt: serverTimestamp()
       };
 
@@ -179,7 +203,12 @@ export default function SpecialistsPage() {
       name: item.name,
       title: item.title,
       serviceIds: item.serviceIds,
-      photoUrl: item.photoUrl
+      photoUrl: item.photoUrl,
+      schedule: Object.fromEntries(dayOptions.map(([dayId]) => [dayId, {
+        ...defaultSchedule[dayId],
+        ...(item.schedule?.[dayId] ?? {})
+      }])),
+      timeOffDates: item.timeOffDates ?? []
     });
     setPhotoFile(null);
     setError("");
@@ -233,6 +262,44 @@ export default function SpecialistsPage() {
                     <span className="font-medium">{service.name}</span>
                   </label>
                 ))}
+              </div>
+            </div>
+
+            <div className="sm:col-span-2 rounded-2xl border border-alinda-line bg-alinda-cream/40 p-4">
+              <div>
+                <p className="text-sm font-semibold">Uzmanın çalışma saatleri</p>
+                <p className="mt-1 text-xs text-alinda-muted">İşletmenin genel saatlerinden farklıysa burada uzmana özel gün ve saatleri belirleyin. Boş bırakılan mola alanı kullanılmaz.</p>
+              </div>
+              <div className="mt-4 space-y-2">
+                {dayOptions.map(([dayId, label]) => {
+                  const day = form.schedule[dayId];
+                  return <div key={dayId} className="rounded-xl border border-alinda-line bg-white p-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <label className="flex min-w-[130px] items-center gap-2 text-sm font-medium"><input type="checkbox" checked={day.enabled} onChange={(e) => setForm({ ...form, schedule: { ...form.schedule, [dayId]: { ...day, enabled: e.target.checked } } })} className="h-4 w-4 accent-black" />{label}</label>
+                      {day.enabled ? <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <input type="time" value={day.open} onChange={(e) => setForm({ ...form, schedule: { ...form.schedule, [dayId]: { ...day, open: e.target.value } } })} className="h-9 rounded-lg border border-alinda-line px-2 text-sm" />
+                        <span className="text-alinda-muted">—</span>
+                        <input type="time" value={day.close} onChange={(e) => setForm({ ...form, schedule: { ...form.schedule, [dayId]: { ...day, close: e.target.value } } })} className="h-9 rounded-lg border border-alinda-line px-2 text-sm" />
+                        <span className="ml-1 text-alinda-muted">Mola</span>
+                        <input type="time" value={day.breakStart} onChange={(e) => setForm({ ...form, schedule: { ...form.schedule, [dayId]: { ...day, breakStart: e.target.value } } })} className="h-9 rounded-lg border border-alinda-line px-2 text-sm" />
+                        <span className="text-alinda-muted">—</span>
+                        <input type="time" value={day.breakEnd} onChange={(e) => setForm({ ...form, schedule: { ...form.schedule, [dayId]: { ...day, breakEnd: e.target.value } } })} className="h-9 rounded-lg border border-alinda-line px-2 text-sm" />
+                      </div> : <span className="text-xs text-alinda-muted">Çalışmıyor</span>}
+                    </div>
+                  </div>;
+                })}
+              </div>
+              <div className="mt-5">
+                <p className="text-sm font-semibold">İzin / kapalı günler</p>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                  <input id="specialist-timeoff-date" type="date" className="h-10 rounded-xl border border-alinda-line px-3 text-sm" />
+                  <button type="button" onClick={() => {
+                    const input = document.getElementById("specialist-timeoff-date") as HTMLInputElement | null;
+                    if (!input?.value || form.timeOffDates.includes(input.value)) return;
+                    setForm({ ...form, timeOffDates: [...form.timeOffDates, input.value].sort() }); input.value = "";
+                  }} className="h-10 rounded-xl border border-alinda-line px-4 text-sm font-semibold">İzin günü ekle</button>
+                </div>
+                {form.timeOffDates.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{form.timeOffDates.map((date) => <span key={date} className="inline-flex items-center gap-2 rounded-full bg-[#FBEEEE] px-3 py-1.5 text-xs font-medium">{new Date(date + "T12:00:00").toLocaleDateString("tr-TR")}<button type="button" onClick={() => setForm({ ...form, timeOffDates: form.timeOffDates.filter((item) => item !== date) })} aria-label="İzin gününü kaldır"><X size={13} /></button></span>)}</div>}
               </div>
             </div>
 
