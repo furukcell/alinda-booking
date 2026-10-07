@@ -78,6 +78,9 @@ ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 - [x] Phase 8 — Demo, landing page ve satış hazırlığı
 - [x] Phase 9 — Dinamik uygunluk / saat üretimi
 - [x] Phase 10 — İşletme paneli temel geliştirmeleri
+- [x] Phase 11 — Uzman yönetimi ve uzman bazlı uygunluk
+- [x] Phase 12 — WhatsApp bildirim altyapısı
+- [x] Phase 13 — Yeni public randevu deneyimi ve otomatik seans süreleri
 
 ### Phase 10'da yapılanlar
 
@@ -93,6 +96,11 @@ ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 - [x] Loading / boş / hata durumları
 - [x] Başarılı işlem ve hata bildirimleri
 - [x] İşletme sahibi erişim kontrolü
+- [x] Uzman ekleme / düzenleme / silme
+- [x] Uzmanların hizmetlerle eşleştirilmesi
+- [x] Uzman bazlı çalışma saatleri ve izin günleri
+- [x] Hizmetlerde 30 dakikalık seans süresi mantığı
+- [x] Seans süresine göre uygun randevu saatlerinin otomatik hesaplanması
 - [x] Firebase Web App yapılandırmasının repo içinde çalışır hale getirilmesi
 - [x] `.gitignore` ile local/environment dosyalarının korunması
 - [x] GitHub Actions production build workflow'u eklenmesi
@@ -259,8 +267,20 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [x] Firebase bağlantısı ve gerçek proje entegrasyonu
 - [x] GitHub Actions build altyapısı
 - [ ] Mobil panel son incelemesi
+- [x] Uzman yönetimi ve uzman bazlı uygunluk
+- [x] Public booking UX yeniden tasarlandı
+- [x] Hizmet seans süresi 30 dakikalık bloklara standardize edildi
+- [x] WhatsApp bildirim altyapısı kodlandı
 
-### Phase 11 — Randevu Yönetimi
+### Phase 11 — Uzman ve Randevu Yönetimi
+
+- [x] Uzman yönetimi
+- [x] Uzman-hizmet eşleştirmesi
+- [x] Uzman çalışma saatleri
+- [x] Uzman izin günleri
+- [x] Hizmete göre uzman filtreleme
+- [x] Uzman bazlı uygunluk hesabı
+- [x] Hizmet seans süresine göre otomatik saat üretimi
 - [ ] Randevu listesini geliştirme
 - [ ] Randevu detay ekranı
 - [ ] Bekliyor / onaylandı / reddedildi / iptal edildi durumları
@@ -281,6 +301,12 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [ ] Public profil geliştirmeleri
 
 ### Phase 13 — Müşteri Randevu Deneyimi
+
+- [x] Hizmet → uzman → tarih → saat akışı
+- [x] Aylık takvim görünümü
+- [x] Dolu / müsait saatlerin görsel ayrımı
+- [x] Ad soyad + telefon ile hızlı randevu
+- [x] WhatsApp iletişim izni seçeneği
 - [ ] Hizmet seçim UX'i
 - [ ] Tarih seçim UX'i
 - [ ] Saat seçim UX'i
@@ -290,6 +316,18 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [ ] Eski/geçersiz seçimlerin engellenmesi
 - [ ] Mobil deneyimin geliştirilmesi
 - [ ] Slot çakışması hata yönetimi
+
+### WhatsApp bildirimleri
+
+- [x] Meta Embedded Signup altyapısı
+- [x] WhatsApp Business bağlantı ekranı
+- [x] WABA abonelik bağlantısı
+- [x] Şifrelenmiş access token saklama
+- [x] İşletmeye yeni randevu bildirimi altyapısı
+- [x] WhatsApp opt-in alanı
+- [x] Müşteriye randevu bildirimi altyapısı
+- [ ] Meta App Review / production izinleri
+- [ ] Onaylı WhatsApp template'lerinin production'da tanımlanması
 
 ### Phase 14 — Güvenlik ve Edge Case'ler
 - [ ] Firestore Rules tam inceleme
@@ -395,7 +433,7 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 - Firebase Authentication aktif.
 - Firestore'da gerçek işletme kaydı mevcut.
 - Authentication kullanıcısı ile işletme `ownerId` bağlantısı kurulmuş durumda.
-- `services`, `hours` ve `bookings` yapıları hazır.
+- `services`, `hours`, `specialists`, `bookings` ve `slots` yapıları hazır.
 - Firebase Storage bucket ve güvenlik kuralları hazır.
 - Public randevu akışı, dinamik uygunluk ve slot kilitleme altyapısı mevcut.
 - İşletme panelinin temel bölümleri hazır.
@@ -407,6 +445,7 @@ Henüz doğrulanmamış / yapılmamış kritik noktalar:
 - Public tarafta gerçek Firebase verisiyle uçtan uca randevu testi.
 - Panelden gerçek veri ekleme / değiştirme / silme testleri.
 - Randevu onay / red / iptal işlemleri.
+- WhatsApp Meta production yapılandırmasının tamamlanması ve gerçek mesaj testi.
 - Canlı URL üzerinden gerçek müşteri akışının test edilmesi.
 - Custom domain bağlantısı.
 
