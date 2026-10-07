@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { handleSecretaryMessage, sendSecretaryReply } from "@/lib/whatsapp/secretary";
 import { lookupWhatsAppBooking, prepareWhatsAppCancellation, cancelWhatsAppBooking } from "@/lib/whatsapp/booking-lookup";
+import { interpretBusinessMessage } from "@/lib/whatsapp/ai-secretary";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -49,7 +50,12 @@ export async function POST(request: Request) {
           }
           const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
           const name = typeof contacts[0]?.profile?.name === "string" ? contacts[0].profile.name : "WhatsApp müşterisi";
-          const incomingText = String(message.text.body).trim();
+          let incomingText = String(message.text.body).trim();
+          const ai = await interpretBusinessMessage(businessRef.id, incomingText).catch(() => null);
+          if (ai?.intent === "book" && ai.serviceId && ai.date && ai.time) {
+            const service = (await getAdminDb().collection(businessRef.path + "/services").doc(ai.serviceId).get()).data();
+            if (service?.name) incomingText = String(service.name) + " " + ai.date + " " + ai.time;
+          }
           const refMatch = incomingText.toUpperCase().match(/(?:^|\\s)([A-Z0-9]{5})(?:$|\\s)/)?.[1];
           let reply: string;
           const conversationRef = getAdminDb().collection(businessRef.path + "/whatsappConversations").doc(String(message.from));
