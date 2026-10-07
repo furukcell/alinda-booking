@@ -1,12 +1,13 @@
 "use client";
 
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { ArrowLeft, Check, Loader2, MessageCircle, Settings2, Unplug } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
+import { getFirebaseAuth, getFirebaseDb, getFirebaseStorage } from "@/lib/firebase/client";
 import { getOwnedBusinessId } from "@/lib/businesses/owner";
 
 declare global {
@@ -55,6 +56,9 @@ export default function BusinessSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("");
+  const [logoBusy, setLogoBusy] = useState(false);
+  const [logoError, setLogoError] = useState("");
   const [whatsappConnected, setWhatsappConnected] = useState(false);
   const [whatsappPhone, setWhatsappPhone] = useState("");
   const [whatsappName, setWhatsappName] = useState("");
@@ -97,6 +101,7 @@ export default function BusinessSettingsPage() {
             primaryColor: data.primaryColor ?? emptyForm.primaryColor,
             primaryColorSoft: data.primaryColorSoft ?? emptyForm.primaryColorSoft
           });
+          setLogoUrl(typeof data.logoUrl === "string" ? data.logoUrl : "");
         } catch {
           setError("İşletme bilgileri yüklenemedi. Firestore bağlantısını ve kuralları kontrol edin.");
         } finally {
@@ -254,6 +259,53 @@ export default function BusinessSettingsPage() {
     }
   }
 
+  async function handleLogoUpload(file: File) {
+    if (!businessId || logoBusy) return;
+    setLogoError("");
+
+    if (!file.type.startsWith("image/")) {
+      setLogoError("Lütfen bir görsel dosyası seçin.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setLogoError("Logo en fazla 5 MB olabilir.");
+      return;
+    }
+
+    setLogoBusy(true);
+    try {
+      const storage = getFirebaseStorage();
+      const logoRef = ref(storage, `businesses/${businessId}/logo`);
+      await uploadBytes(logoRef, file, { contentType: file.type, cacheControl: "public,max-age=3600" });
+      const url = await getDownloadURL(logoRef);
+      await updateDoc(doc(getFirebaseDb(), "businesses", businessId), { logoUrl: url });
+      setLogoUrl(url);
+      setSaved(true);
+    } catch {
+      setLogoError("Logo yüklenemedi. Storage Rules ve Firebase Storage bağlantısını kontrol edin.");
+    } finally {
+      setLogoBusy(false);
+    }
+  }
+
+  async function removeLogo() {
+    if (!businessId || logoBusy || !logoUrl) return;
+    setLogoBusy(true);
+    setLogoError("");
+
+    try {
+      await deleteObject(ref(getFirebaseStorage(), `businesses/${businessId}/logo`));
+      await updateDoc(doc(getFirebaseDb(), "businesses", businessId), { logoUrl: "" });
+      setLogoUrl("");
+      setSaved(true);
+    } catch {
+      setLogoError("Logo silinemedi. Lütfen tekrar deneyin.");
+    } finally {
+      setLogoBusy(false);
+    }
+  }
+
   function updateField(field: keyof BusinessForm, value: string) {
     setSaved(false);
     setForm((current) => ({ ...current, [field]: value }));
@@ -352,7 +404,48 @@ export default function BusinessSettingsPage() {
             </section>
 
             <section className="rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
-              <div><h2 className="font-semibold">Marka renkleri</h2><p className="mt-1 text-xs text-alinda-muted">Şimdilik temel tema renkleri. Görsel yükleme Phase 12'de eklenecek.</p></div>
+              <div>
+                <h2 className="font-semibold">İşletme logosu</h2>
+                <p className="mt-1 text-xs text-alinda-muted">Müşteriler randevu sayfanızda bu logoyu görecek. PNG, JPG veya WEBP kullanabilirsiniz; maksimum 5 MB.</p>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-center">
+                <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[24px] border border-alinda-line bg-alinda-cream">
+                  {logoUrl ? (
+                    <img src={logoUrl} alt={form.name || "İşletme logosu"} className="h-full w-full object-contain p-3" />
+                  ) : (
+                    <span className="text-2xl font-semibold text-alinda-accent">{form.initials || "LOGO"}</span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">
+                    {logoBusy ? "İşleniyor…" : logoUrl ? "Logoyu değiştir" : "Logo yükle"}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      disabled={logoBusy}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        event.currentTarget.value = "";
+                        if (file) void handleLogoUpload(file);
+                      }}
+                    />
+                  </label>
+                  {logoUrl && (
+                    <button type="button" onClick={() => void removeLogo()} disabled={logoBusy} className="rounded-xl border border-alinda-line bg-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50">
+                      Logoyu sil
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {logoError && <div role="alert" className="mt-4 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-xs text-alinda-danger">{logoError}</div>}
+            </section>
+
+            <section className="rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
+              <div><h2 className="font-semibold">Marka renkleri</h2><p className="mt-1 text-xs text-alinda-muted">Temel tema renklerinizi buradan yönetin.</p></div>
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
                 <ColorField label="Ana renk" value={form.primaryColor} onChange={(value) => updateField("primaryColor", value)} />
                 <ColorField label="Yumuşak renk" value={form.primaryColorSoft} onChange={(value) => updateField("primaryColorSoft", value)} />
