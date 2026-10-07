@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, CalendarDays, Clock3, Scissors, Settings2, Store } from "@lucide/react";
+import { ArrowLeft, ArrowUpRight, CalendarDays, Clock3, Scissors, Settings2, Store } from "lucide-react";
 
 const content = {
   appointments: {
