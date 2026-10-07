@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowUpRight, CalendarDays, Clock3, Scissors, Settings2, Store, Users } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { getPublicBusiness } from "@/lib/businesses/public";
-import Image from "next/image";
 
 const stats = [
   { label: "Bugünkü randevu", value: "8", detail: "+2 dünden", icon: CalendarDays },
@@ -35,7 +34,7 @@ export default async function PanelPage() {
         <aside className="hidden w-64 shrink-0 border-r border-alinda-line bg-white px-5 py-6 lg:block">
           <div className="flex items-center gap-3 px-2">
             {business?.logoUrl ? (
-              <Image src={business.logoUrl} alt={business.name} width={36} height={36} className="h-9 w-9 rounded-xl object-contain" />
+              <img src={business.logoUrl} alt={business.name} className="h-9 w-9 rounded-xl object-contain" />
             ) : (
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-alinda-accent-soft text-sm font-semibold text-alinda-accent">{business?.initials ?? "MB"}</div>
             )}
