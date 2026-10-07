@@ -102,7 +102,7 @@ export async function getPublicBusiness(slug: string): Promise<Business | undefi
     const snapshot = await getDoc(doc(getFirebaseDb(), "businesses", slug));
     if (!snapshot.exists()) return undefined;
     const data = snapshot.data();
-    if (data.active === false) return undefined;
+    if (data.active === false || data.accessEnabled === false) return undefined;
     const services = await getBusinessServices(snapshot.id, data.services);
     const specialists = await getBusinessSpecialists(snapshot.id, services, data.specialists);
 
