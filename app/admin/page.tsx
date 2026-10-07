@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LogOut, Plus, ShieldCheck, Store, Trash2, Users, X } from "lucide-react";
+import { CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LayoutDashboard, LogOut, Plus, ShieldCheck, Store, Trash2, Users, X } from "lucide-react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 
 type AdminBusiness = {
@@ -200,6 +200,7 @@ export default function AdminPage() {
             <p className="mt-2 text-xs leading-5 text-white/60">Plan, durum, işletme bilgileri ve owner hesapları tek panelde.</p>
           </div>
           <nav className="mt-7 space-y-1">
+            <a href="/admin/dashboard" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><LayoutDashboard size={18} /> Dashboard</a>
             <div className="flex items-center gap-3 rounded-xl bg-alinda-cream px-3 py-2.5 text-sm font-medium"><Store size={18} /> İşletmeler</div>
           </nav>
           <div className="mt-auto">
