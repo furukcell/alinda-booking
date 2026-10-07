@@ -244,9 +244,14 @@ export function BusinessBooking({ business }: { business: Business }) {
               <Check size={30} />
             </div>
             <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: muted }}>Randevu talebi alındı</p>
-            <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border px-4 py-2" style={{ borderColor: line, background: rosePale }}>
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: muted }}>Randevu referansı</span>
-              <span className="font-mono text-sm font-bold tracking-[0.18em]" style={{ color: roseDark }}>{confirmedReference}</span>
+            <div className="mx-auto mt-4 max-w-sm rounded-[18px] border px-4 py-3 text-left" style={{ borderColor: line, background: rosePale }}>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: muted }}>Randevu referansı</span>
+                <span className="font-mono text-sm font-bold tracking-[0.18em]" style={{ color: roseDark }}>{confirmedReference}</span>
+              </div>
+              <p className="mt-2 text-xs leading-5" style={{ color: muted }}>
+                <strong style={{ color: text }}>Bu referans numarasını saklayın.</strong> Randevunuzla ilgili işlem gerektiğinde bu numara ile randevunuzu bulabilirsiniz.
+              </p>
             </div>
             <h1 className="mt-2 text-3xl font-bold tracking-tight">Görüşmek üzere, {name.split(" ")[0]}.</h1>
             <p className="mx-auto mt-3 max-w-sm text-sm leading-6" style={{ color: muted }}>{business.name} için randevu talebiniz oluşturuldu.</p>
