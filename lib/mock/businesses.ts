@@ -18,6 +18,11 @@ export const businesses: Business[] = [
       { id: "signature-sac-kesimi", name: "Signature Saç Kesimi", description: "Kesim + şekillendirme", durationMinutes: 45, price: 600, currency: "TRY" },
       { id: "hydra-cilt-bakimi", name: "Hydra Cilt Bakımı", description: "Derin temizlik + nemlendirme", durationMinutes: 60, price: 900, currency: "TRY" },
       { id: "manikur", name: "Manikür", description: "Klasik manikür", durationMinutes: 35, price: 450, currency: "TRY" }
+    ],
+    specialists: [
+      { id: "demo-aylin", name: "Aylin", title: "Saç & Stil Uzmanı", photoUrl: "https://i.pravatar.cc/240?img=47", serviceIds: ["signature-sac-kesimi"] },
+      { id: "demo-melisa", name: "Melisa", title: "Cilt Bakım Uzmanı", photoUrl: "https://i.pravatar.cc/240?img=32", serviceIds: ["hydra-cilt-bakimi"] },
+      { id: "demo-derya", name: "Derya", title: "Nail Artist", photoUrl: "https://i.pravatar.cc/240?img=44", serviceIds: ["manikur"] }
     ]
   },
   {
