@@ -81,6 +81,12 @@ ALINDA şu anda **Firebase App Hosting** üzerinde yayınlanmaktadır.
 
 Bu README, projedeki mevcut gerçek durumu takip etmek için güncellendi.
 
+### 2026-10-07 — Owner tabanlı multi-tenant panel
+
+Ana işletme dashboard'u artık sabit `meltem-guzellik` işletmesine bağlı değil. Giriş yapan Firebase kullanıcısının `ownerId` alanı üzerinden kendi işletmesi bulunuyor; işletme adı, logo, şehir/ilçe, slug, public randevu bağlantısı ve günlük randevular gerçek Firestore verisinden yükleniyor. Hizmetler, uzmanlar, çalışma saatleri, randevular ve ayarlar ekranları da `getOwnedBusinessId()` ile giriş yapan owner'ın işletmesine bağlanıyor.
+
+Firestore Rules'a owner kullanıcıların kendi `ownerId` kayıtlarını kontrollü şekilde çözebilmesi için business query erişimi eklendi.
+
 ### 2026-10-07 — Super Admin işletme yönetimi
 
 Super Admin artık işletme listesinden işletme bilgilerini düzenleyebilir, Starter / Pro planını değiştirebilir, işletmeyi aktif / pasif yapabilir, owner e-posta adresini görebilir, güvenli şifre sıfırlama bağlantısı üretebilir ve işletmeyi alt koleksiyonlarıyla birlikte kalıcı olarak silebilir. Pasif işletmelerin public randevu sayfası erişimi kapatılır.
@@ -581,8 +587,8 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 ### 🎯 Bundan sonra yapılacak sıra
 
 1. **App Hosting rollout'unu doğrula ve `/admin` sayfasını canlıda aç.**
-2. **Paneldeki hardcoded Meltem Beauty Studio bağlantılarını kaldır.**
-3. **Paneli Auth `ownerId` üzerinden tamamen multi-tenant yap.**
+2. **Yeni işletme owner login → panel testini yap.**
+3. **Tüm panel alt sayfalarında tenant izolasyonunu test et.**
 4. **Super Admin'den test işletmesi oluştur.**
 5. **Test işletmesi owner hesabıyla login → panel testini yap.**
 6. **Test işletmesinin public randevu sayfasını test et.**
@@ -604,6 +610,7 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 - `app/api/admin/businesses/reset-password/route.ts` — Owner şifre sıfırlama bağlantısı API'si
 - `lib/whatsapp/server.ts` — WhatsApp server entegrasyonu
 - `lib/firebase/admin.ts` — Firebase Admin SDK
+- `lib/businesses/owner.ts` — Owner kullanıcının işletmesini çözümleme yardımcı fonksiyonu
 
 ---
 
@@ -620,7 +627,7 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 | Pro günlük WhatsApp özeti | 🟡 Kod hazır / Meta template + env + test bekliyor |
 | AI WhatsApp sekreteri | 🔴 Planlandı / yapılacak |
 | Super Admin | 🟢 İşletme yönetimi hazır / rollout doğrulama bekliyor |
-| Multi-tenant panel | 🟡 Geliştirme devam ediyor |
+| Multi-tenant panel | 🟢 Owner tabanlı temel panel hazır / tenant testleri devam ediyor |
 | Randevu durum yönetimi | 🟢 Onay / iptal hazır |
 | Güvenlik audit | 🟡 Yapılacak |
 | E2E test | 🔴 Yapılacak |
