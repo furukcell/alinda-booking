@@ -145,7 +145,7 @@ export function BusinessBooking({ business }: { business: Business }) {
     setError("");
 
     try {
-      await createBooking({
+      const bookingRef = await createBooking({
         businessId: business.id,
         service,
         specialistId: specialist.id,
@@ -155,7 +155,16 @@ export function BusinessBooking({ business }: { business: Business }) {
         date: selectedDateInfo.id,
         time: selectedTime
       });
+
       setConfirmed(true);
+
+      // WhatsApp bildirimi randevuyu geciktirmemeli; bağlantı hazır değilse
+      // randevu yine başarıyla oluşturulmuş olarak kalır.
+      void fetch("/api/whatsapp/booking-notification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessId: business.id, bookingId: bookingRef.id })
+      }).catch(() => undefined);
     } catch (bookingError) {
       if (bookingError instanceof Error && bookingError.message === "SLOT_TAKEN") {
         setSlots((current) => current.map((slot) => slot.time === selectedTime ? { ...slot, status: "booked" } : slot));
