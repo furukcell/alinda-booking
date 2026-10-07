@@ -208,6 +208,7 @@ export function getWhatsAppTemplateConfig() {
   return {
     ownerTemplate: process.env.WHATSAPP_OWNER_BOOKING_TEMPLATE || "",
     customerTemplate: process.env.WHATSAPP_CUSTOMER_BOOKING_TEMPLATE || "",
+    dailySummaryTemplate: process.env.WHATSAPP_DAILY_SUMMARY_TEMPLATE || "",
     language: process.env.WHATSAPP_TEMPLATE_LANGUAGE || "tr"
   };
 }
