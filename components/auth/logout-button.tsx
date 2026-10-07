@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "firebase/auth";
-import { LogOut } from "@lucide/react";
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { getFirebaseAuth } from "@/lib/firebase/client";
