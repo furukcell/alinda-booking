@@ -724,6 +724,61 @@ Secret değerleri repository içine yazılmamalıdır.
 
 ---
 
+## 🆕 Son Eklenen Yönetim Özellikleri
+
+### Super Admin Yönetimi
+
+- [x] İşletme detay ekranında manuel abonelik başlatma
+- [x] Starter / Pro plan seçimi
+- [x] Aylık / yıllık faturalama seçimi
+- [x] Ödeme durumu yönetimi
+- [x] Abonelik durumu yönetimi
+- [x] Abonelik başlangıç / bitiş / trial tarihleri
+- [x] Manuel erişim açma / kapatma
+- [x] Erişim kapatıldığında işletme paneli ve public booking sayfasının engellenmesi
+- [x] Aktivite logları
+- [x] Super Admin tarafından yapılan kritik işlemlerin kayıt altına alınması
+
+### AI Sekreter / İstatistikler
+
+- [x] Super Admin AI Sekreter paneli
+- [x] Toplam / tamamlanan / bekleyen / iptal randevu analizi
+- [x] Randevu geliri analizi
+- [x] İptal oranı
+- [x] En yoğun saat analizi
+- [x] En çok tercih edilen hizmetler
+- [x] En aktif işletmeler
+- [x] Otomatik işletme içgörüleri ve önerileri
+
+### Kupon Sistemi
+
+- [x] Super Admin kupon yönetimi
+- [x] Yüzde veya sabit tutarlı indirim
+- [x] Tüm işletmelere veya belirli işletmeye özel kupon
+- [x] Başlangıç / bitiş tarihi
+- [x] Kullanım limiti
+- [x] Kullanım sayısı takibi
+- [x] Kuponu aktif / pasif yapma
+- [x] Public booking sayfasında kupon uygulama
+- [x] İndirimli toplam fiyat gösterimi
+- [x] Kupon kullanımının transaction ile kaydedilmesi
+
+### Duyuru Sistemi
+
+- [x] Super Admin duyuru yönetimi
+- [x] Yeni duyuru oluşturma
+- [x] Duyuru düzenleme / silme
+- [x] Aktif / pasif duyuru
+- [x] Bilgi / başarılı / uyarı duyuru tipleri
+- [x] Tüm işletmelere veya belirli işletmeye özel duyuru
+- [x] Başlangıç / bitiş tarihi
+- [x] Duyuruların aktivite loglarına kaydedilmesi
+- [x] İşletme tarafının aktif duyuruları çekebilmesi için API
+
+> Not: **Çoklu Super Admin yapılmayacaktır.** ALINDA'nın yönetimi tek Super Admin hesabı üzerinden sürdürülecektir.
+
+---
+
 # 🟡 Sırada Ne Var?
 
 ## 1. Multi-Tenant Uçtan Uca Test
@@ -854,6 +909,10 @@ Secret değerleri repository içine yazılmamalıdır.
 | Destek görünümü | 🟢 Hazır |
 | Manuel abonelik | 🟢 Hazır |
 | Manuel erişim aç/kapat | 🟢 Hazır |
+| Aktivite logları | 🟢 Hazır |
+| AI Sekreter / istatistikler | 🟢 Hazır |
+| Kupon sistemi | 🟢 Hazır |
+| Duyuru sistemi | 🟢 Hazır |
 | WhatsApp Merkezi | 🟢 Kodlandı / canlı doğrulama bekliyor |
 | Logo / branding | 🟢 Hazır |
 | WhatsApp altyapısı | 🟢 Kod hazır / Meta production bekliyor |
@@ -931,7 +990,7 @@ Super Admin şifresi güvenlik nedeniyle repository içinde tutulmaz.
 
 **ALINDA artık yalnızca bir booking prototipi değildir.**
 
-Core booking, multi-tenant yapı, işletme paneli, Super Admin, işletme detayları, salt okunur destek görünümü, manuel abonelik yönetimi, erişim kontrolü, WhatsApp altyapısı, WhatsApp secretary, randevu sorgulama/iptal, AI intent katmanı ve Pro günlük özet altyapısı kurulmuştur.
+Core booking, multi-tenant yapı, işletme paneli, Super Admin, işletme detayları, salt okunur destek görünümü, manuel abonelik yönetimi, erişim kontrolü, aktivite logları, AI Sekreter/istatistikler, kupon sistemi, duyuru sistemi, WhatsApp altyapısı, WhatsApp secretary, randevu sorgulama/iptal, AI intent katmanı ve Pro günlük özet altyapısı kurulmuştur.
 
 Core randevu sistemi, işletme paneli, owner tabanlı multi-tenant yapı, Super Admin, WhatsApp server/webhook altyapısı, gerçek WhatsApp randevu akışı, randevu sorgulama/iptal ve AI intent katmanı kurulmuş durumdadır.
 
