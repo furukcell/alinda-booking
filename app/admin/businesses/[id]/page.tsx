@@ -10,6 +10,7 @@ type Detail = {
   owner: { uid: string; email: string; emailVerified: boolean; disabled: boolean; createdAt: string | null; lastSignInAt: string | null } | null;
   counts: { services: number; specialists: number; bookings: number; activeBookings: number; cancelledBookings: number };
   whatsapp: { connected: boolean; phoneNumber: string; phoneNumberId: string; wabaId: string };
+  accessEnabled: boolean;
   recentBookings: Array<{ id: string; referenceNo: string; customerName: string; customerPhone: string; serviceName: string; specialistName: string; date: string; time: string; status: string; total: number; createdAt: string | null }>;
 };
 
@@ -26,6 +27,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
   const [data, setData] = useState<Detail | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [accessBusy, setAccessBusy] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -68,6 +70,36 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         <header className="mt-7 rounded-[28px] bg-alinda-ink p-6 text-white shadow-card sm:p-8">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div>
+              <p className="text-sm font-semibold">İşletme erişimi</p>
+              <p className="mt-1 text-xs text-white/50">{data.accessEnabled ? "Panel ve public randevu sayfası açık." : "Panel ve public randevu sayfası kapalı."}</p>
+            </div>
+            <button
+              type="button"
+              disabled={accessBusy}
+              onClick={async () => {
+                const user = getFirebaseAuth().currentUser;
+                if (!user) return;
+                setAccessBusy(true);
+                try {
+                  const token = await user.getIdToken();
+                  const response = await fetch("/api/admin/businesses", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ businessId: b.id, accessEnabled: !data.accessEnabled }),
+                  });
+                  if (!response.ok) throw new Error();
+                  setData((current) => current ? { ...current, accessEnabled: !current.accessEnabled } : current);
+                } finally {
+                  setAccessBusy(false);
+                }
+              }}
+              className={`rounded-full px-4 py-2 text-xs font-semibold ${data.accessEnabled ? "bg-white text-alinda-ink" : "bg-[#B96862] text-white"} disabled:opacity-50`}
+            >
+              {accessBusy ? "İşleniyor…" : data.accessEnabled ? "Erişimi kes" : "Erişimi aç"}
+            </button>
+          </div>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="flex flex-wrap items-center gap-2">
