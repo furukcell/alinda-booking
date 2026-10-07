@@ -112,7 +112,7 @@ export function BusinessBooking({ business }: { business: Business }) {
           business.id,
           selectedDateInfo.id,
           selectedDateInfo.dayId,
-          specialist.id,
+          specialist,
           service.durationMinutes
         );
         if (cancelled) return;
