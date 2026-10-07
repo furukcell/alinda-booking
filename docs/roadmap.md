@@ -49,7 +49,7 @@ This roadmap is the working implementation plan for taking ALINDA from the curre
 **Goal:** Turn incoming bookings into a usable appointment management workflow.
 
 - [x] Appointment list refinement
-- [ ] Appointment detail view
+- [x] Appointment detail view
 - [ ] Pending / confirmed / rejected / cancelled statuses
 - [ ] Confirm appointment
 - [ ] Reject appointment
@@ -57,7 +57,7 @@ This roadmap is the working implementation plan for taking ALINDA from the curre
 - [x] Date filtering
 - [x] Status filtering
 - [x] Customer search
-- [ ] Appointment history
+- [x] Appointment history
 - [x] Empty states and operational feedback
 
 ## Phase 12 — Business Profile & Media
