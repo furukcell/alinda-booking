@@ -3,21 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --alinda-ink: #181614;
-  --alinda-ink-soft: #3a3733;
-  --alinda-cream: #faf8f5;
+  --alinda-ink: #2d2625;
+  --alinda-ink-soft: #574a47;
+  --alinda-cream: #fff8f6;
   --alinda-surface: #ffffff;
-  --alinda-line: #e8e2da;
-  --alinda-muted: #8a847c;
-  --alinda-accent: #b86f61;
-  --alinda-accent-soft: #f3e4e0;
-  --alinda-success: #3e7a5c;
-  --alinda-danger: #b64c4c;
+  --alinda-line: #f0dfdc;
+  --alinda-muted: #8f817e;
+  --alinda-accent: #d88982;
+  --alinda-accent-soft: #fbe5e3;
+  --alinda-success: #5e8c74;
+  --alinda-danger: #b64f49;
 }
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  background: var(--alinda-cream);
+}
 
 body {
   margin: 0;
@@ -25,6 +28,7 @@ body {
   color: var(--alinda-ink);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button, input, textarea, select { font: inherit; }
@@ -36,7 +40,7 @@ button { cursor: pointer; }
 }
 
 :focus-visible {
-  outline: 3px solid rgba(184, 111, 97, 0.35);
+  outline: 3px solid rgba(216, 137, 130, 0.35);
   outline-offset: 3px;
 }
 
