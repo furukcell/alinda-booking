@@ -1,97 +1,58 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
-import { getWhatsAppConnection, getWhatsAppTemplateConfig, sendWhatsAppTemplate } from "@/lib/whatsapp/server";
+import { handleSecretaryMessage, sendSecretaryReply } from "@/lib/whatsapp/secretary";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const mode = url.searchParams.get("hub.mode");
   const token = url.searchParams.get("hub.verify_token");
   const challenge = url.searchParams.get("hub.challenge");
-  if (mode === "subscribe" && token === process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN && challenge) {
-    return new Response(challenge, { status: 200 });
-  }
+  const verifyToken = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN;
+  if (verifyToken && mode === "subscribe" && token === verifyToken && challenge) return new Response(challenge, { status: 200 });
   return NextResponse.json({ error: "Webhook doğrulaması başarısız." }, { status: 403 });
 }
 
-function normalize(value: string) {
-  return value.trim().toLocaleLowerCase("tr-TR");
-}
-
-function buildReply(text: string, businessName: string) {
-  const value = normalize(text);
-  if (value.includes("merhaba") || value === "selam" || value === "slm") {
-    return `Merhaba 👋 ${businessName} için yardımcı olabilirim. Randevu almak için “randevu”, mevcut randevunuz için “randevum” yazabilirsiniz.`;
-  }
-  if (value.includes("randevum") || value.includes("randevu sorgu")) {
-    return "Randevunuzu kontrol edebilmem için randevu referans numaranızı (5 karakter) yazabilirsiniz.";
-  }
-  if (value.includes("iptal")) {
-    return "Randevu iptali için 5 karakterli randevu referans numaranızı yazabilirsiniz. İşletme ekibi gerekli işlemi yapacaktır.";
-  }
-  if (value.includes("randevu")) {
-    return "Randevu için hizmet adını ve tercih ettiğiniz günü yazabilirsiniz. Örn: “Manikür için yarın randevu”.";
-  }
-  return "Size yardımcı olmak için “randevu”, “randevum” veya “iptal” yazabilirsiniz. 😊";
+function verifySignature(body: string, signature: string) {
+  const secret = process.env.META_APP_SECRET;
+  if (!secret || !signature.startsWith("sha256=")) return false;
+  const expected = "sha256=" + createHmac("sha256", secret).update(body).digest("hex");
+  const a = Buffer.from(signature), b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
-    const signature = request.headers.get("x-hub-signature-256") || "";
-    const appSecret = process.env.META_APP_SECRET || "";
-    if (appSecret) {
-      const expected = "sha256=" + createHmac("sha256", appSecret).update(rawBody).digest("hex");
-      const a = Buffer.from(signature);
-      const b = Buffer.from(expected);
-      if (a.length !== b.length || !timingSafeEqual(a, b)) return NextResponse.json({ error: "Geçersiz imza." }, { status: 401 });
-    }
+    if (!verifySignature(rawBody, request.headers.get("x-hub-signature-256") || "")) return NextResponse.json({ error: "Geçersiz webhook imzası." }, { status: 401 });
     const payload = JSON.parse(rawBody);
-    const entry = Array.isArray(payload?.entry) ? payload.entry : [];
-
-    for (const item of entry) {
-      const changes = Array.isArray(item?.changes) ? item.changes : [];
-      for (const change of changes) {
-        const value = change?.value;
-        const messages = Array.isArray(value?.messages) ? value.messages : [];
+    for (const entry of Array.isArray(payload?.entry) ? payload.entry : []) {
+      for (const change of Array.isArray(entry?.changes) ? entry.changes : []) {
+        const value = change?.value, messages = Array.isArray(value?.messages) ? value.messages : [];
         const phoneNumberId = typeof value?.metadata?.phone_number_id === "string" ? value.metadata.phone_number_id : "";
         if (!phoneNumberId) continue;
-
-        const connectionSnapshot = await getAdminDb().collectionGroup("integrations").where("phoneNumberId", "==", phoneNumberId).limit(1).get();
-        if (connectionSnapshot.empty) continue;
-
-        const integration = connectionSnapshot.docs[0];
-        const businessRef = integration.ref.parent.parent;
+        const found = await getAdminDb().collectionGroup("integrations").where("phoneNumberId", "==", phoneNumberId).limit(1).get();
+        if (found.empty) continue;
+        const businessRef = found.docs[0].ref.parent.parent;
         if (!businessRef) continue;
-
-        const businessSnapshot = await businessRef.get();
-        const business = businessSnapshot.data() as { name?: string } | undefined;
-        const connection = await getWhatsAppConnection(businessRef.id);
-
+        const connection = await import("@/lib/whatsapp/server").then(m => m.getWhatsAppConnection(businessRef.id));
+        if (!connection) continue;
         for (const message of messages) {
-          if (message?.type !== "text" || !message?.from || !message?.text?.body || !connection) continue;
-          const incoming = String(message.text.body);
-          await getAdminDb().collection(businessRef.path + "/whatsappMessages").add({
-            direction: "inbound",
-            from: String(message.from),
-            text: incoming,
-            messageId: typeof message.id === "string" ? message.id : "",
-            createdAt: new Date().toISOString()
-          });
-
-          const reply = buildReply(incoming, business?.name || "İşletme");
-          await sendWhatsAppTemplate(
-            connection.phoneNumberId,
-            connection.accessToken,
-            String(message.from),
-            process.env.WHATSAPP_SECRETARY_REPLY_TEMPLATE || getWhatsAppTemplateConfig().customerTemplate,
-            getWhatsAppTemplateConfig().language,
-            [reply]
-          );
+          if (message?.type !== "text" || !message?.from || !message?.text?.body) continue;
+          const id = typeof message.id === "string" ? message.id : "";
+          const log = getAdminDb().collection(businessRef.path + "/whatsappMessages");
+          if (id) {
+            const old = await log.doc(id).get();
+            if (old.exists) continue;
+            await log.doc(id).set({ direction: "inbound", from: String(message.from), text: String(message.text.body), messageId: id, createdAt: new Date().toISOString() });
+          }
+          const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
+          const name = typeof contacts[0]?.profile?.name === "string" ? contacts[0].profile.name : "WhatsApp müşterisi";
+          const reply = await handleSecretaryMessage(businessRef.id, String(message.from), String(message.text.body), name);
+          await sendSecretaryReply(businessRef.id, String(message.from), reply);
         }
       }
     }
-
     return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "Webhook işlenemedi." }, { status: 200 });
