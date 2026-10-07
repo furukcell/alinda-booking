@@ -42,6 +42,7 @@ Her işletmenin kendi markasına ait profesyonel bir randevu sayfasına sahip ol
 - WhatsApp bildirim altyapısı
 - WhatsApp randevu durum bildirimleri
 - WhatsApp sekreter webhook altyapısı
+- WhatsApp üzerinden gerçek müsaitlik sorgulama ve randevu onay akışı
 - Super Admin işletme yönetimi altyapısı
 
 ---
@@ -459,7 +460,9 @@ WhatsApp erişim tokenı kod tabanına yazılmaz; sunucu tarafında şifrelenere
 - [x] Müşteriye randevu bildirimi altyapısı
 - [x] Müşteriye onay / iptal durum bildirimi altyapısı
 - [x] WhatsApp webhook ve temel sekreter yanıt altyapısı
-- [ ] AI destekli müsaitlik sorgulama ve randevu oluşturma
+- [x] WhatsApp gerçek müsaitlik sorgulama ve randevu onaylama
+- [x] WhatsApp konuşma state ve webhook duplicate koruması
+- [ ] AI destekli doğal dil kapsamının genişletilmesi
 - [ ] Meta App Review / production izinleri
 - [ ] Onaylı WhatsApp template'lerinin production'da tanımlanması
 - [ ] `WHATSAPP_DAILY_SUMMARY_TEMPLATE` Meta template'inin oluşturulması
@@ -638,7 +641,7 @@ Bunlar ürünün temel randevu akışı çalıştıktan ve ilk gerçek müşteri
 | Firebase | 🟢 Bağlı |
 | WhatsApp kod altyapısı | 🟡 Hazır / production bekliyor |
 | Pro günlük WhatsApp özeti | 🟡 Kod hazır / Meta template + env + test bekliyor |
-| AI WhatsApp sekreteri | 🟡 Webhook + temel yanıt hazır / AI randevu akışı yapılacak |
+| AI WhatsApp sekreteri | 🟡 Gerçek randevu akışı hazır / doğal dil + sorgu/iptal genişletilecek |
 | Super Admin | 🟢 İşletme yönetimi hazır / rollout doğrulama bekliyor |
 | Multi-tenant panel | 🟢 Owner tabanlı temel panel hazır / tenant testleri devam ediyor |
 | Randevu durum yönetimi | 🟢 Onay / iptal hazır |
