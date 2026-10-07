@@ -18,6 +18,12 @@ type AdminBusiness = {
   ownerEmail: string;
   plan: "starter" | "pro";
   active: boolean;
+  billingCycle: "monthly" | "annual";
+  subscriptionStatus: "active" | "trialing" | "past_due" | "cancelled" | "expired";
+  paymentStatus: "paid" | "pending" | "failed" | "comped";
+  subscriptionStartDate: string | null;
+  subscriptionEndDate: string | null;
+  trialEndDate: string | null;
 };
 
 const emptyForm = {
@@ -28,6 +34,11 @@ const emptyForm = {
 const emptyEdit = {
   name: "", category: "", phone: "", city: "", district: "", address: "",
   plan: "starter" as "starter" | "pro", active: true,
+  billingCycle: "monthly" as "monthly" | "annual",
+  subscriptionStatus: "active" as AdminBusiness["subscriptionStatus"],
+  paymentStatus: "comped" as AdminBusiness["paymentStatus"],
+  subscriptionStartDate: new Date().toISOString().slice(0, 10),
+  subscriptionEndDate: "", trialEndDate: "",
 };
 
 export default function AdminPage() {
@@ -119,6 +130,9 @@ export default function AdminPage() {
       name: business.name, category: business.category, phone: business.phone,
       city: business.city, district: business.district, address: business.address,
       plan: business.plan, active: business.active,
+      billingCycle: business.billingCycle, subscriptionStatus: business.subscriptionStatus,
+      paymentStatus: business.paymentStatus, subscriptionStartDate: business.subscriptionStartDate || "",
+      subscriptionEndDate: business.subscriptionEndDate || "", trialEndDate: business.trialEndDate || "",
     });
     clearMessages();
   }
