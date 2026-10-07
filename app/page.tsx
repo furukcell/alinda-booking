@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -61,11 +62,13 @@ function BookingPreview() {
         <p className="text-xs font-semibold text-[#4E8762]">✓ Uygulama indirmeye gerek yok</p>
       </div>
       <div className="overflow-hidden rounded-[34px] border border-white/80 bg-white shadow-[0_30px_90px_rgba(45,38,37,0.18)]">
-        <img
+        <Image
           src="/alinda-salon-hero.png"
           alt="ALINDA online randevu deneyimi"
+          width={1536}
+          height={1024}
+          priority
           className="h-auto w-full object-cover"
-          priority="true"
         />
       </div>
     </div>
@@ -78,7 +81,7 @@ export default function Home() {
       <header className="sticky top-0 z-30 border-b border-alinda-line/80 bg-alinda-cream/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center" aria-label="ALINDA ana sayfa">
-            <img src="/alinda-logo.png" alt="ALINDA" className="h-10 w-10 object-contain" />
+            <Image src="/alinda-logo.png" alt="ALINDA" width={40} height={40} className="h-10 w-10 object-contain" priority />
           </Link>
           <nav className="flex items-center gap-1 sm:gap-3" aria-label="Ana navigasyon">
             <a href="#neden-alinda" className="hidden rounded-full px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">Neden ALINDA?</a>
