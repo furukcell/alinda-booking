@@ -291,7 +291,8 @@ export default function BusinessSettingsPage() {
   }
 
   return (
-    <Script
+    <>
+      <Script
       src="https://connect.facebook.net/en_US/sdk.js"
       strategy="afterInteractive"
       onLoad={() => {
@@ -300,9 +301,9 @@ export default function BusinessSettingsPage() {
         window.FB.init({ appId, cookie: true, xfbml: true, version: "v25.0" });
         setFacebookReady(true);
       }}
-    />
+      />
 
-    <main className="min-h-screen bg-alinda-cream">
+      <main className="min-h-screen bg-alinda-cream">
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:py-10">
         <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-alinda-muted hover:text-alinda-ink">
           <ArrowLeft size={16} /> Dashboard
@@ -401,7 +402,8 @@ export default function BusinessSettingsPage() {
           </form>
         )}
       </div>
-    </main>
+      </main>
+    </>
   );
 }
 
