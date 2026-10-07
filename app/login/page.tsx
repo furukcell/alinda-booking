@@ -1,7 +1,7 @@
 "use client";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { ArrowRight, CalendarDays, Eye, EyeOff } from "@lucide/react";
+import { ArrowRight, CalendarDays, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
