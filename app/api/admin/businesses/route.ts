@@ -103,6 +103,8 @@ export async function POST(request: NextRequest) {
       primaryColor: "#B86F61",
       primaryColorSoft: "#F3E4E0",
       ownerId: ownerUid,
+      plan: "starter",
+      whatsappDailySummaryEnabled: false,
       createdAt: new Date(),
     });
 
