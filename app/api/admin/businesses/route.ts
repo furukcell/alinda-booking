@@ -47,6 +47,12 @@ export async function GET(request: NextRequest) {
         ownerEmail,
         plan: data.plan === "pro" ? "pro" : "starter",
         active: data.active !== false,
+        billingCycle: data.billingCycle === "annual" ? "annual" : "monthly",
+        subscriptionStatus: ["active", "trialing", "past_due", "cancelled", "expired"].includes(data.subscriptionStatus) ? data.subscriptionStatus : "active",
+        paymentStatus: ["paid", "pending", "failed", "comped"].includes(data.paymentStatus) ? data.paymentStatus : "comped",
+        subscriptionStartDate: typeof data.subscriptionStartDate === "string" ? data.subscriptionStartDate : null,
+        subscriptionEndDate: typeof data.subscriptionEndDate === "string" ? data.subscriptionEndDate : null,
+        trialEndDate: typeof data.trialEndDate === "string" ? data.trialEndDate : null,
         createdAt: data.createdAt?.toDate?.()?.toISOString?.() || null,
       };
     }));
@@ -104,7 +110,7 @@ export async function POST(request: NextRequest) {
     await businessRef.set({
       name, slug, category, description: "", city, district, address: "", phone, initials,
       primaryColor: "#B86F61", primaryColorSoft: "#F3E4E0", ownerId: ownerUid,
-      plan: "starter", active: true, whatsappDailySummaryEnabled: false, createdAt: new Date(),
+      plan: "starter", active: true, billingCycle: "monthly", subscriptionStatus: "active", paymentStatus: "comped", subscriptionStartDate: new Date().toISOString().slice(0, 10), subscriptionEndDate: null, trialEndDate: null, whatsappDailySummaryEnabled: false, createdAt: new Date(),
     });
 
     return NextResponse.json({
@@ -137,6 +143,12 @@ export async function PATCH(request: NextRequest) {
     if (typeof body.address === "string") updates.address = clean(body.address);
     if (typeof body.phone === "string") updates.phone = clean(body.phone);
     if (body.plan === "starter" || body.plan === "pro") updates.plan = body.plan;
+    if (body.billingCycle === "monthly" || body.billingCycle === "annual") updates.billingCycle = body.billingCycle;
+    if (["active", "trialing", "past_due", "cancelled", "expired"].includes(body.subscriptionStatus)) updates.subscriptionStatus = body.subscriptionStatus;
+    if (["paid", "pending", "failed", "comped"].includes(body.paymentStatus)) updates.paymentStatus = body.paymentStatus;
+    if (typeof body.subscriptionStartDate === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(body.subscriptionStartDate)) updates.subscriptionStartDate = body.subscriptionStartDate;
+    if (typeof body.subscriptionEndDate === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(body.subscriptionEndDate)) updates.subscriptionEndDate = body.subscriptionEndDate;
+    if (typeof body.trialEndDate === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(body.trialEndDate)) updates.trialEndDate = body.trialEndDate;
     if (typeof body.active === "boolean") updates.active = body.active;
 
     if (typeof updates.name === "string" && updates.name) {
