@@ -150,6 +150,7 @@ export async function PATCH(request: NextRequest) {
     if (typeof body.subscriptionEndDate === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(body.subscriptionEndDate)) updates.subscriptionEndDate = body.subscriptionEndDate;
     if (typeof body.trialEndDate === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(body.trialEndDate)) updates.trialEndDate = body.trialEndDate;
     if (typeof body.active === "boolean") updates.active = body.active;
+    if (typeof body.accessEnabled === "boolean") updates.accessEnabled = body.accessEnabled;
 
     if (typeof updates.name === "string" && updates.name) {
       updates.initials = updates.name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase() || "").join("") || "AL";
