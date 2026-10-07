@@ -1,7 +1,6 @@
 import "server-only";
 
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
-import { doc, getDoc, setDoc } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 
 const GRAPH_VERSION = process.env.WHATSAPP_GRAPH_VERSION || "v25.0";
@@ -129,8 +128,7 @@ export async function saveWhatsAppConnection(
   accessToken: string
 ) {
   const db = getAdminDb();
-  await setDoc(
-    doc(db, "businesses", businessId, "integrations", "whatsapp"),
+  await db.doc(`businesses/${businessId}/integrations/whatsapp`).set(
     {
       ...connection,
       encryptedAccessToken: encrypt(accessToken),
@@ -141,9 +139,9 @@ export async function saveWhatsAppConnection(
 }
 
 export async function getWhatsAppConnection(businessId: string) {
-  const snapshot = await getDoc(
-    doc(getAdminDb(), "businesses", businessId, "integrations", "whatsapp")
-  );
+  const snapshot = await getAdminDb()
+    .doc(`businesses/${businessId}/integrations/whatsapp`)
+    .get();
   if (!snapshot.exists()) return null;
 
   const data = snapshot.data() as WhatsAppConnection;
@@ -155,8 +153,7 @@ export async function getWhatsAppConnection(businessId: string) {
 
 export async function deleteWhatsAppConnection(businessId: string) {
   const db = getAdminDb();
-  await setDoc(
-    doc(db, "businesses", businessId, "integrations", "whatsapp"),
+  await db.doc(`businesses/${businessId}/integrations/whatsapp`).set(
     {
       connected: false,
       disconnectedAt: new Date().toISOString(),
