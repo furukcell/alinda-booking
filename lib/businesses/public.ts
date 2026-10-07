@@ -20,6 +20,8 @@ function parseServices(rawServices: unknown): Service[] {
   });
 }
 
+const dayOptions = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
+
 function parseSpecialists(raw: unknown): Specialist[] {
   if (!Array.isArray(raw)) return [];
   return raw.flatMap((item) => {
@@ -31,7 +33,11 @@ function parseSpecialists(raw: unknown): Specialist[] {
       name: value.name,
       title: typeof value.title === "string" ? value.title : "Uzman",
       photoUrl: typeof value.photoUrl === "string" ? value.photoUrl : "",
-      serviceIds: Array.isArray(value.serviceIds) ? value.serviceIds.filter((id): id is string => typeof id === "string") : []
+      serviceIds: Array.isArray(value.serviceIds) ? value.serviceIds.filter((id): id is string => typeof id === "string") : [],
+      schedule: value.schedule && typeof value.schedule === "object" ? Object.fromEntries(
+        Object.entries(value.schedule as Record<string, unknown>).filter(([dayId, day]) => dayOptions.includes(dayId as typeof dayOptions[number]) && day && typeof day === "object")
+      ) as Specialist["schedule"] : undefined,
+      timeOffDates: Array.isArray(value.timeOffDates) ? value.timeOffDates.filter((date): date is string => typeof date === "string") : []
     }];
   });
 }
