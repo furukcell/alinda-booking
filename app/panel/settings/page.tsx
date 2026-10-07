@@ -1,12 +1,22 @@
 "use client";
 
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { ArrowLeft, Check, Loader2, Settings2 } from "lucide-react";
+import { ArrowLeft, Check, Loader2, MessageCircle, Settings2, Unplug } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import Script from "next/script";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 import { getOwnedBusinessId } from "@/lib/businesses/owner";
+
+declare global {
+  interface Window {
+    FB?: {
+      init: (options: { appId: string; cookie?: boolean; xfbml?: boolean; version: string }) => void;
+      login: (callback: (response: { authResponse?: { code?: string } }) => void, options: Record<string, unknown>) => void;
+    };
+  }
+}
 
 type BusinessForm = {
   name: string;
@@ -43,6 +53,14 @@ export default function BusinessSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [whatsappConnected, setWhatsappConnected] = useState(false);
+  const [whatsappPhone, setWhatsappPhone] = useState("");
+  const [whatsappName, setWhatsappName] = useState("");
+  const [whatsappLoading, setWhatsappLoading] = useState(true);
+  const [whatsappBusy, setWhatsappBusy] = useState(false);
+  const [whatsappError, setWhatsappError] = useState("");
+  const [facebookReady, setFacebookReady] = useState(false);
+  const signupData = useRef<{ code?: string; wabaId?: string; phoneNumberId?: string }>({});
 
   useEffect(() => {
     let unsubscribe = () => {};
@@ -90,6 +108,149 @@ export default function BusinessSettingsPage() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadWhatsApp() {
+      try {
+        const user = getFirebaseAuth().currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        const response = await fetch("/api/whatsapp/status", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (!active) return;
+        setWhatsappConnected(Boolean(data.connected));
+        setWhatsappPhone(data.displayPhoneNumber || "");
+        setWhatsappName(data.verifiedName || "");
+      } catch {
+        if (active) setWhatsappError("WhatsApp bağlantı durumu okunamadı.");
+      } finally {
+        if (active) setWhatsappLoading(false);
+      }
+    }
+
+    void loadWhatsApp();
+
+    function onMessage(event: MessageEvent) {
+      if (!event.origin.endsWith("facebook.com")) return;
+      try {
+        const data = JSON.parse(event.data);
+        if (data?.type !== "WA_EMBEDDED_SIGNUP") return;
+        const payload = data.data || {};
+        signupData.current = {
+          ...signupData.current,
+          wabaId: payload.waba_id || payload.wabaId,
+          phoneNumberId: payload.phone_number_id || payload.phoneNumberId
+        };
+        void finishWhatsAppSignup();
+      } catch {
+        // Meta sends non-JSON messages as well; ignore them.
+      }
+    }
+
+    window.addEventListener("message", onMessage);
+    return () => {
+      active = false;
+      window.removeEventListener("message", onMessage);
+    };
+  }, []);
+
+  async function finishWhatsAppSignup() {
+    const { code, wabaId, phoneNumberId } = signupData.current;
+    if (!code || !wabaId || !phoneNumberId || whatsappBusy) return;
+
+    const user = getFirebaseAuth().currentUser;
+    if (!user) return;
+
+    setWhatsappBusy(true);
+    setWhatsappError("");
+
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch("/api/whatsapp/connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ code, wabaId, phoneNumberId })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "WhatsApp bağlantısı kurulamadı.");
+
+      setWhatsappConnected(true);
+      setWhatsappPhone(data.displayPhoneNumber || "");
+      setWhatsappName(data.verifiedName || "");
+      signupData.current = {};
+    } catch (error) {
+      setWhatsappError(error instanceof Error ? error.message : "WhatsApp bağlantısı kurulamadı.");
+    } finally {
+      setWhatsappBusy(false);
+    }
+  }
+
+  function launchWhatsAppSignup() {
+    const appId = process.env.NEXT_PUBLIC_META_APP_ID;
+    const configId = process.env.NEXT_PUBLIC_META_CONFIG_ID;
+
+    if (!appId || !configId) {
+      setWhatsappError("WhatsApp bağlantısı için Meta App ID ve Embedded Signup Config ID henüz tanımlanmamış.");
+      return;
+    }
+
+    if (!window.FB || !facebookReady) {
+      setWhatsappError("WhatsApp bağlantısı hazırlanıyor. Birkaç saniye sonra tekrar deneyin.");
+      return;
+    }
+
+    signupData.current = {};
+    window.FB.login(
+      (response) => {
+        const code = response.authResponse?.code;
+        if (!code) {
+          setWhatsappError("WhatsApp bağlantısı iptal edildi veya tamamlanmadı.");
+          return;
+        }
+        signupData.current = { ...signupData.current, code };
+        void finishWhatsAppSignup();
+      },
+      {
+        config_id: configId,
+        response_type: "code",
+        override_default_response_type: true,
+        extras: {
+          setup: {},
+          sessionInfoVersion: "3"
+        }
+      }
+    );
+  }
+
+  async function disconnectWhatsApp() {
+    const user = getFirebaseAuth().currentUser;
+    if (!user) return;
+    setWhatsappBusy(true);
+    setWhatsappError("");
+
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch("/api/whatsapp/status", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error("WhatsApp bağlantısı kaldırılamadı.");
+      setWhatsappConnected(false);
+      setWhatsappPhone("");
+      setWhatsappName("");
+    } catch (error) {
+      setWhatsappError(error instanceof Error ? error.message : "WhatsApp bağlantısı kaldırılamadı.");
+    } finally {
+      setWhatsappBusy(false);
+    }
+  }
+
   function updateField(field: keyof BusinessForm, value: string) {
     setSaved(false);
     setForm((current) => ({ ...current, [field]: value }));
@@ -126,6 +287,17 @@ export default function BusinessSettingsPage() {
   }
 
   return (
+    <Script
+      src="https://connect.facebook.net/en_US/sdk.js"
+      strategy="afterInteractive"
+      onLoad={() => {
+        const appId = process.env.NEXT_PUBLIC_META_APP_ID;
+        if (!appId || !window.FB) return;
+        window.FB.init({ appId, cookie: true, xfbml: true, version: "v25.0" });
+        setFacebookReady(true);
+      }}
+    />
+
     <main className="min-h-screen bg-alinda-cream">
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:py-10">
         <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-alinda-muted hover:text-alinda-ink">
@@ -179,6 +351,39 @@ export default function BusinessSettingsPage() {
                 <ColorField label="Ana renk" value={form.primaryColor} onChange={(value) => updateField("primaryColor", value)} />
                 <ColorField label="Yumuşak renk" value={form.primaryColorSoft} onChange={(value) => updateField("primaryColorSoft", value)} />
               </div>
+            </section>
+
+            <section className="rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="flex items-center gap-2 font-semibold"><MessageCircle size={18} /> WhatsApp bildirimleri</h2>
+                  <p className="mt-1 text-xs text-alinda-muted">Randevu geldiğinde salonu ve müşteriyi WhatsApp üzerinden otomatik bilgilendirin.</p>
+                </div>
+                <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${whatsappConnected ? "bg-[#E8F5EC] text-[#4E8762]" : "bg-[#F5F1F0] text-alinda-muted"}`}>
+                  {whatsappConnected ? "Bağlı" : "Bağlı değil"}
+                </span>
+              </div>
+
+              {whatsappConnected ? (
+                <div className="mt-5 flex flex-col gap-4 rounded-2xl bg-alinda-cream p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold">{whatsappName || "WhatsApp Business"}</p>
+                    <p className="mt-1 text-xs text-alinda-muted">{whatsappPhone || "Numara bağlı"}</p>
+                  </div>
+                  <button type="button" onClick={() => void disconnectWhatsApp()} disabled={whatsappBusy} className="inline-flex items-center justify-center gap-2 rounded-xl border border-alinda-line bg-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50">
+                    <Unplug size={16} /> Bağlantıyı kaldır
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-5">
+                  <button type="button" onClick={launchWhatsAppSignup} disabled={whatsappBusy || whatsappLoading} className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50">
+                    <MessageCircle size={17} /> {whatsappBusy ? "Bağlanıyor…" : "WhatsApp'ı Bağla"}
+                  </button>
+                  <p className="mt-2 text-xs text-alinda-muted">Meta'nın güvenli bağlantı ekranı açılır. İşletme WhatsApp hesabınızı seçip birkaç adımda tamamlayabilirsiniz.</p>
+                </div>
+              )}
+
+              {whatsappError && <div role="alert" className="mt-4 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-xs text-alinda-danger">{whatsappError}</div>}
             </section>
 
             <div className="sticky bottom-4 flex items-center justify-end gap-3 rounded-2xl border border-alinda-line bg-white/95 p-3 shadow-card backdrop-blur">
