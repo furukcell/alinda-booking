@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
@@ -278,10 +279,14 @@ export function BusinessBooking({ business }: { business: Business }) {
         <header className="sticky top-0 z-30 border-b bg-[#FFFDFC]/95 px-5 py-4 backdrop-blur-xl sm:px-8" style={{ borderColor: line }}>
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-bold text-white" style={{ background: rose }}>A</div>
+              {business.logoUrl ? (
+                <Image src={business.logoUrl} alt={business.name} width={40} height={40} className="h-10 w-10 rounded-[14px] object-contain" />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-bold" style={{ background: roseSoft, color: roseDark }}>{business.initials}</div>
+              )}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: muted }}>ALINDA</p>
                 <p className="text-xs font-semibold">{business.name}</p>
+                <p className="mt-0.5 text-[10px]" style={{ color: muted }}>{business.category}</p>
               </div>
             </div>
             <span className="rounded-full px-3 py-1.5 text-[11px] font-bold" style={{ background: roseSoft, color: roseDark }}>Online Randevu</span>
@@ -297,7 +302,11 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <p className="mt-2 max-w-xl text-xs leading-5 sm:text-sm sm:leading-6" style={{ color: muted }}>Hizmeti ve uzmanı seçin. Ardından takvimden uygun gün ve saati seçerek randevunuzu oluşturun.</p>
               </div>
               <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-[15px]" style={{ background: roseSoft, color: roseDark }}>{business.initials}</div>
+                {business.logoUrl ? (
+                  <Image src={business.logoUrl} alt={business.name} width={44} height={44} className="h-11 w-11 rounded-[15px] object-contain" />
+                ) : (
+                  <div className="flex h-11 w-11 items-center justify-center rounded-[15px]" style={{ background: roseSoft, color: roseDark }}>{business.initials}</div>
+                )}
                 <div>
                   <p className="text-sm font-bold">{business.name}</p>
                   <p className="mt-0.5 text-xs" style={{ color: muted }}>{business.district}, {business.city}</p>
