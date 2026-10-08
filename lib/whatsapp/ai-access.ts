@@ -5,6 +5,11 @@ type Preference = {
   consentAt?: string;
   disabledAt?: string;
   offerSentAt?: string;
+  offerBlockedUntil?: string;
+  initialPromptSentAt?: string;
+  lastInboundAt?: string;
+  lastInboundText?: string;
+  lastOutboundAt?: string;
   declineCount?: number;
 };
 
