@@ -147,8 +147,10 @@ export function BusinessBooking({ business }: { business: Business }) {
   useEffect(() => {
     setSelectedSpecialist(specialists[0]?.id ?? "");
     setSelectedTime("");
+    setCouponCode("");
     setCoupon(null);
     setCouponError("");
+    setPrivacyAccepted(false);
   }, [selectedService, specialists]);
 
   useEffect(() => {
@@ -308,6 +310,11 @@ export function BusinessBooking({ business }: { business: Business }) {
   function chooseService(id: string) {
     setSelectedService(id);
     setError("");
+    setSelectedTime("");
+    setCouponCode("");
+    setCoupon(null);
+    setCouponError("");
+    setPrivacyAccepted(false);
     const first = business.specialists.find((item) => item.serviceIds.includes(id));
     setSelectedSpecialist(first?.id ?? "");
   }
@@ -318,6 +325,9 @@ export function BusinessBooking({ business }: { business: Business }) {
     setSelectedMonth(id.slice(0, 7));
     setSelectedTime("");
     setError("");
+    setCouponCode("");
+    setCoupon(null);
+    setCouponError("");
     if (scroll) {
       document.getElementById("alinda-hours")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -627,7 +637,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                     {couponLoading ? "Kontrol…" : "Uygula"}
                   </button>
                 </div>
-                {couponError && <p className="mt-2 text-xs font-medium" style={{ color: "#A54D47" }}>{couponError}</p>}
+                {couponError && <p role="alert" className="mt-2 text-xs font-medium" style={{ color: "#A54D47" }}>{couponError}</p>}
                 {coupon && <div className="mt-3 flex items-center justify-between rounded-[14px] px-3 py-2 text-xs" style={{ background: availableGreen, color: availableGreenText }}>
                   <span><strong>{coupon.code}</strong> uygulandı · ₺{coupon.discount.toLocaleString("tr-TR")} indirim</span>
                   <strong>₺{coupon.total.toLocaleString("tr-TR")}</strong>
