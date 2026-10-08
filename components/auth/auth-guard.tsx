@@ -1,13 +1,14 @@
 "use client";
 
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 import { collection, getDocs, limit, query, where } from "firebase/firestore";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
 
@@ -38,6 +39,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
             router.replace("/access-suspended");
             return;
           }
+          if (business.onboardingCompleted === false && pathname !== "/panel/onboarding") {
+            setChecking(false);
+            router.replace("/panel/onboarding");
+            return;
+          }
         } catch {
           // Keep the normal authenticated panel flow if the access check cannot be read.
         }
@@ -50,7 +56,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     return () => unsubscribe();
-  }, [router]);
+  }, [pathname, router]);
 
   if (checking || !user) {
     return (
