@@ -49,8 +49,6 @@ export async function POST(request: Request) {
             if (old.exists) continue;
             await log.doc(id).set({ direction: "inbound", from: String(message.from), text: String(message.text.body), messageId: id, createdAt: new Date().toISOString() });
           }
-          const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
-          const name = typeof contacts[0]?.profile?.name === "string" ? contacts[0].profile.name : "WhatsApp müşterisi";
           const phone = String(message.from);
           const incomingText = String(message.text.body).trim();
           const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
