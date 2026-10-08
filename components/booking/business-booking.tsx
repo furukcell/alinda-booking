@@ -30,6 +30,18 @@ const text = "#2D2625";
 const muted = "#8F817E";
 const line = "#F0DFDC";
 
+function formatTurkishPhone(value: string) {
+  let digits = value.replace(/\D/g, "");
+  if (digits.startsWith("90")) digits = "0" + digits.slice(2);
+  if (digits.startsWith("5")) digits = "0" + digits;
+  digits = digits.slice(0, 11);
+  if (digits.length <= 4) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+  if (digits.length <= 9) return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+  return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 9)} ${digits.slice(9, 11)}`;
+}
+
+
 function BookingFooter() {
   return (
     <footer className="border-t px-5 py-8 sm:px-8" style={{ borderColor: line, background: "linear-gradient(180deg, #FFFDFC 0%, #FBF5F3 100%)" }}>
@@ -526,7 +538,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 </label>
                 <label className="block text-sm font-bold">
                   <span className="flex items-center gap-2"><Phone size={15} /> Telefon</span>
-                  <input value={phone} onChange={(event) => setPhone(event.target.value)} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-sm outline-none" style={{ borderColor: line }} placeholder="05xx xxx xx xx" inputMode="tel" />
+                  <input value={phone} onChange={(event) => setPhone(formatTurkishPhone(event.target.value))} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-sm outline-none" style={{ borderColor: line }} placeholder="05xx xxx xx xx" inputMode="tel" autoComplete="tel" maxLength={14} />
                 </label>
               </div>
               <div className="mt-4 rounded-[18px] border bg-white p-4" style={{ borderColor: line }}>
