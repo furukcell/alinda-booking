@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { type DocumentData } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 
 function clean(value: unknown) {
@@ -34,7 +35,7 @@ function getSlotId(date: string, time: string, specialistId: string) {
   return `${date}_${time}_${specialistId}`.replace(/[^a-zA-Z0-9_-]/g, "-");
 }
 
-function responseData(data: FirebaseFirestore.DocumentData) {
+function responseData(data: DocumentData) {
   return {
     referenceNo: data.referenceNo || "",
     serviceName: data.serviceName || "",
