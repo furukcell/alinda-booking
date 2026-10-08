@@ -10,6 +10,7 @@ export type CreateBookingInput = {
   time: string;
   whatsappOptIn: boolean;
   couponCode?: string;
+  privacyAccepted: boolean;
 };
 
 export type CreatedBooking = {
@@ -31,7 +32,8 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
       date: input.date,
       time: input.time,
       whatsappOptIn: input.whatsappOptIn,
-      couponCode: input.couponCode?.trim().toUpperCase() || ""
+      couponCode: input.couponCode?.trim().toUpperCase() || "",
+      privacyAccepted: input.privacyAccepted
     })
   });
 
