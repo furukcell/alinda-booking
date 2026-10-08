@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
           date,
           time: segmentTimes[index],
           specialistId,
-          status: "pending",
+          status: "confirmed",
           createdAt: new Date()
         });
       });
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
         whatsappOptIn,
         privacyAccepted: true,
         privacyConsentAt: new Date(),
-        status: "pending",
+        status: "confirmed",
         slotId: slotRefs[0].id,
         createdAt: new Date()
       });
