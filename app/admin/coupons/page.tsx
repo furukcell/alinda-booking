@@ -25,6 +25,7 @@ export default function AdminCouponsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   async function authFetch(url: string, options: RequestInit = {}) {
     const user = await waitForFirebaseUser();
@@ -73,20 +74,24 @@ export default function AdminCouponsPage() {
   }
 
   async function toggle(coupon: Coupon) {
+    setBusyId(coupon.id); setError("");
     try {
       const response = await authFetch("/api/admin/coupons", { method: "PATCH", body: JSON.stringify({ id: coupon.id, active: !coupon.active }) });
       if (!response.ok) throw new Error("Kupon durumu değiştirilemedi.");
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "İşlem başarısız."); }
+    finally { setBusyId(null); }
   }
 
   async function remove(coupon: Coupon) {
     if (!window.confirm(`“${coupon.code}” kuponu silinsin mi?`)) return;
+    setBusyId(coupon.id); setError("");
     try {
       const response = await authFetch("/api/admin/coupons", { method: "DELETE", body: JSON.stringify({ id: coupon.id }) });
       if (!response.ok) { const data = await response.json(); throw new Error(data.error || "Kupon silinemedi."); }
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Kupon silinemedi."); }
+    finally { setBusyId(null); }
   }
 
   function businessName(id: string | null) { return id ? businesses.find((x) => x.id === id)?.name || id : "Tüm işletmeler"; }
@@ -103,7 +108,7 @@ export default function AdminCouponsPage() {
 
       <section className="mt-6 overflow-hidden rounded-[26px] border border-alinda-line bg-white shadow-card">
         {loading ? <div className="p-10 text-center text-sm text-alinda-muted">Kuponlar yükleniyor…</div> : coupons.length === 0 ? <div className="p-12 text-center"><Ticket size={30} className="mx-auto text-alinda-muted"/><p className="mt-4 font-semibold">Henüz kupon yok.</p><p className="mt-2 text-sm text-alinda-muted">İlk kampanyanızı oluşturabilirsiniz.</p></div> :
-        <div className="divide-y divide-alinda-line">{coupons.map((coupon) => <div key={coupon.id} className="p-5 sm:p-6"><div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"><div className="flex min-w-0 items-center gap-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-alinda-cream text-alinda-accent"><Ticket size={20}/></div><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><p className="font-mono font-bold tracking-wider">{coupon.code}</p><span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${coupon.active ? "bg-[#EAF6EE] text-[#4E8762]" : "bg-[#F4EAEA] text-[#A55E63]"}`}>{coupon.active ? "Aktif" : "Pasif"}</span></div><p className="mt-1 text-xs text-alinda-muted">{coupon.name} · {businessName(coupon.businessId)}</p></div></div><div className="flex flex-wrap items-center gap-2 text-xs"><span className="rounded-xl border border-alinda-line px-3 py-2 font-semibold">{coupon.type === "percent" ? `%${coupon.value}` : `₺${coupon.value.toLocaleString("tr-TR")}`} indirim</span><span className="rounded-xl border border-alinda-line px-3 py-2">{coupon.usageCount || 0}{coupon.usageLimit ? ` / ${coupon.usageLimit}` : ""} kullanım</span><button onClick={() => void toggle(coupon)} className="rounded-xl border border-alinda-line px-3 py-2 font-semibold">{coupon.active ? "Pasifleştir" : "Aktifleştir"}</button><button onClick={() => openEdit(coupon)} className="rounded-xl border border-alinda-line px-3 py-2"><Edit3 size={14}/></button><button onClick={() => void remove(coupon)} className="rounded-xl border border-alinda-line px-3 py-2 text-alinda-danger"><Trash2 size={14}/></button></div></div></div>)}</div>}
+        <div className="divide-y divide-alinda-line">{coupons.map((coupon) => <div key={coupon.id} className="p-5 sm:p-6"><div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"><div className="flex min-w-0 items-center gap-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-alinda-cream text-alinda-accent"><Ticket size={20}/></div><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><p className="font-mono font-bold tracking-wider">{coupon.code}</p><span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${coupon.active ? "bg-[#EAF6EE] text-[#4E8762]" : "bg-[#F4EAEA] text-[#A55E63]"}`}>{coupon.active ? "Aktif" : "Pasif"}</span></div><p className="mt-1 text-xs text-alinda-muted">{coupon.name} · {businessName(coupon.businessId)}</p></div></div><div className="flex flex-wrap items-center gap-2 text-xs"><span className="rounded-xl border border-alinda-line px-3 py-2 font-semibold">{coupon.type === "percent" ? `%${coupon.value}` : `₺${coupon.value.toLocaleString("tr-TR")}`} indirim</span><span className="rounded-xl border border-alinda-line px-3 py-2">{coupon.usageCount || 0}{coupon.usageLimit ? ` / ${coupon.usageLimit}` : ""} kullanım</span><button onClick={() => void toggle(coupon)} className="rounded-xl border border-alinda-line px-3 py-2 font-semibold">{busyId === coupon.id && <Loader2 size={14} className="mr-1 inline animate-spin" />}{coupon.active ? "Pasifleştir" : "Aktifleştir"}</button><button onClick={() => openEdit(coupon)} className="rounded-xl border border-alinda-line px-3 py-2"><Edit3 size={14}/></button><button disabled={busyId === coupon.id} onClick={() => void remove(coupon)} className="rounded-xl border border-alinda-line px-3 py-2 text-alinda-danger disabled:opacity-50">{busyId === coupon.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14}/>}</button></div></div></div>)}</div>}
       </section>
 
       {showForm && <div className="fixed inset-0 z-50 flex items-center justify-center bg-alinda-ink/30 p-4 backdrop-blur-sm"><section className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[30px] border border-alinda-line bg-white p-6 shadow-elevated sm:p-8"><div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-alinda-accent">Kupon</p><h2 className="mt-2 text-2xl font-semibold">{editing ? "Kuponu düzenle" : "Yeni kupon"}</h2></div><button onClick={() => setShowForm(false)} className="rounded-full p-2 text-alinda-muted hover:bg-alinda-cream"><X size={18}/></button></div><div className="mt-7 grid gap-4 sm:grid-cols-2">
@@ -115,7 +120,7 @@ export default function AdminCouponsPage() {
         <Field label="Başlangıç" type="date" value={form.startDate} onChange={(v) => setForm({ ...form, startDate: v })}/>
         <Field label="Bitiş" type="date" value={form.endDate} onChange={(v) => setForm({ ...form, endDate: v })}/>
         <Field label="Kullanım limiti" type="number" value={form.usageLimit} onChange={(v) => setForm({ ...form, usageLimit: v })} placeholder="Sınırsız"/>
-      </div><button onClick={() => void save()} disabled={saving} className="mt-6 h-12 w-full rounded-2xl bg-alinda-ink text-sm font-semibold text-white disabled:opacity-50">{saving ? "Kaydediliyor…" : editing ? "Değişiklikleri kaydet" : "Kupon oluştur"}</button></section></div>}
+      </div><button onClick={() => void save()} disabled={saving} className="mt-6 h-12 w-full rounded-2xl bg-alinda-ink text-sm font-semibold text-white disabled:opacity-50">{saving && <Loader2 size={16} className="mr-2 inline animate-spin" />}{saving ? "Kaydediliyor…" : editing ? "Değişiklikleri kaydet" : "Kupon oluştur"}</button></section></div>}
     </div>
   </main>;
 }
