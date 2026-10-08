@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
+import { rateLimit, rateLimitResponse } from "@/lib/security/rate-limit";
 
 function clean(v: unknown) { return typeof v === "string" ? v.trim() : ""; }
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(request, "coupon-validate", 30, 60000);
+  if (!limited.allowed) return rateLimitResponse(limited.retryAfterSeconds);
   try {
     const businessId = clean(request.nextUrl.searchParams.get("businessId"));
     const code = clean(request.nextUrl.searchParams.get("code")).toUpperCase();
