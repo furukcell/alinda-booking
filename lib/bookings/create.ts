@@ -1,116 +1,50 @@
-import {
-  collection,
-  doc,
-  runTransaction,
-  serverTimestamp
-} from "firebase/firestore";
-import { getFirebaseDb } from "@/lib/firebase/client";
 import type { Service } from "@/types/business";
 
 export type CreateBookingInput = {
   businessId: string;
   service: Service;
   specialistId: string;
-  specialistName: string;
   customerName: string;
   customerPhone: string;
   date: string;
   time: string;
   whatsappOptIn: boolean;
+  couponCode?: string;
 };
 
-function minutes(value: string) {
-  const [hours, mins] = value.split(":").map(Number);
-  return hours * 60 + mins;
-}
+export type CreatedBooking = {
+  id: string;
+  discount: number;
+  totalPrice: number;
+};
 
-function timeFromMinutes(value: number) {
-  return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
-}
+export async function createBooking(input: CreateBookingInput): Promise<CreatedBooking> {
+  const response = await fetch("/api/bookings", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      businessId: input.businessId,
+      serviceId: input.service.id,
+      specialistId: input.specialistId,
+      customerName: input.customerName,
+      customerPhone: input.customerPhone,
+      date: input.date,
+      time: input.time,
+      whatsappOptIn: input.whatsappOptIn,
+      couponCode: input.couponCode?.trim().toUpperCase() || ""
+    })
+  });
 
-function generateReferenceNo() {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const values = new Uint32Array(5);
-  crypto.getRandomValues(values);
-  return Array.from(values, (value) => alphabet[value % alphabet.length]).join("");
-}
-
-function getSlotId(date: string, time: string, specialistId: string) {
-  return `${date}_${time}_${specialistId}`.replace(/[^a-zA-Z0-9_-]/g, "-");
-}
-
-export async function createBooking(input: CreateBookingInput) {
-  const customerName = input.customerName.trim();
-  const customerPhone = input.customerPhone.trim();
-
-  if (!customerName || !customerPhone) throw new Error("MISSING_CUSTOMER");
-  if (!input.businessId || !input.service.id || !input.specialistId || !input.date || !input.time) {
-    throw new Error("INVALID_BOOKING");
-  }
-
-  const db = getFirebaseDb();
-  const referenceNo = generateReferenceNo();
-  const bookingRef = doc(db, "businesses", input.businessId, "bookings", referenceNo);
-  const duration = Math.max(30, Math.ceil(input.service.durationMinutes / 30) * 30);
-  const start = minutes(input.time);
-  const segmentTimes = Array.from({ length: duration / 30 }, (_, index) => timeFromMinutes(start + index * 30));
-  const slotRefs = segmentTimes.map((time) =>
-    doc(db, "businesses", input.businessId, "slots", getSlotId(input.date, time, input.specialistId))
-  );
-
-  try {
-    await runTransaction(db, async (transaction) => {
-      const [bookingSnapshot, ...snapshots] = await Promise.all([transaction.get(bookingRef), ...slotRefs.map((slotRef) => transaction.get(slotRef))]);
-
-      if (bookingSnapshot.exists()) {
-        throw new Error("REFERENCE_COLLISION");
-      }
-
-      if (snapshots.some((snapshot) => snapshot.exists())) {
-        const error = new Error("SLOT_TAKEN") as Error & { code?: string };
-        error.code = "already-exists";
-        throw error;
-      }
-
-      slotRefs.forEach((slotRef, index) => {
-        transaction.set(slotRef, {
-          slotId: slotRef.id,
-          date: input.date,
-          time: segmentTimes[index],
-          specialistId: input.specialistId,
-          status: "pending",
-          createdAt: serverTimestamp()
-        });
-      });
-
-      transaction.set(bookingRef, {
-        businessId: input.businessId,
-        referenceNo,
-        serviceId: input.service.id,
-        serviceName: input.service.name,
-        serviceDurationMinutes: input.service.durationMinutes,
-        servicePrice: input.service.price,
-        specialistId: input.specialistId,
-        specialistName: input.specialistName,
-        customerName,
-        customerPhone,
-        date: input.date,
-        time: input.time,
-        whatsappOptIn: input.whatsappOptIn,
-        status: "pending",
-        slotId: slotRefs[0].id,
-        createdAt: serverTimestamp()
-      });
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message === "REFERENCE_COLLISION") {
-      throw new Error("REFERENCE_COLLISION");
-    }
-    if (typeof error === "object" && error !== null && "code" in error && error.code === "already-exists") {
-      throw new Error("SLOT_TAKEN");
-    }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data.error || "Randevu oluşturulamadı.");
+    if (response.status === 409) error.message = "SLOT_TAKEN";
     throw error;
   }
 
-  return bookingRef;
+  return {
+    id: data.referenceNo,
+    discount: Number(data.discount || 0),
+    totalPrice: Number(data.totalPrice ?? input.service.price)
+  };
 }
