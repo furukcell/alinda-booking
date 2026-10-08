@@ -15,7 +15,7 @@ type AiInput = {
   specialists: Array<{ id: string; name: string; serviceIds: string[] }>;
 };
 
-const MODEL = process.env.GEMINI_SECRETARY_MODEL || "gemini-3.8-flash";
+const MODEL = process.env.GEMINI_SECRETARY_MODEL || "gemini-2.5-flash-lite";
 
 function todayIstanbul() {
   return new Intl.DateTimeFormat("en-CA", {
