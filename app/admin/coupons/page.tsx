@@ -78,6 +78,7 @@ export default function AdminCouponsPage() {
     try {
       const response = await authFetch("/api/admin/coupons", { method: "PATCH", body: JSON.stringify({ id: coupon.id, active: !coupon.active }) });
       if (!response.ok) throw new Error("Kupon durumu değiştirilemedi.");
+      setSuccess(coupon.active ? "Kupon pasifleştirildi." : "Kupon aktifleştirildi.");
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "İşlem başarısız."); }
     finally { setBusyId(null); }
@@ -89,6 +90,7 @@ export default function AdminCouponsPage() {
     try {
       const response = await authFetch("/api/admin/coupons", { method: "DELETE", body: JSON.stringify({ id: coupon.id }) });
       if (!response.ok) { const data = await response.json(); throw new Error(data.error || "Kupon silinemedi."); }
+      setSuccess("Kupon silindi.");
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Kupon silinemedi."); }
     finally { setBusyId(null); }
