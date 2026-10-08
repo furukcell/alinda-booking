@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
         time: stringValue(value.time),
         customerName: stringValue(value.customerName),
         serviceName: stringValue(value.serviceName),
+        specialistName: stringValue(value.specialistName),
         status: value.status === "confirmed" || value.status === "cancelled" ? value.status : "pending",
         serviceDurationMinutes: Number(value.serviceDurationMinutes || 30),
         servicePrice: Number(value.servicePrice || 0),
