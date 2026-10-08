@@ -25,6 +25,9 @@ type DashboardBooking = {
   customerName: string;
   serviceName: string;
   status: "pending" | "confirmed" | "cancelled";
+  serviceDurationMinutes: number;
+  servicePrice: number;
+  totalPrice: number;
 };
 
 const nav = [
@@ -42,6 +45,7 @@ export default function PanelPage() {
   const [serviceCount, setServiceCount] = useState(0);
   const [specialistCount, setSpecialistCount] = useState(0);
   const [customerCount, setCustomerCount] = useState(0);
+  const [todaySummary, setTodaySummary] = useState({ total: 0, pending: 0, confirmed: 0, estimatedRevenue: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -68,6 +72,12 @@ export default function PanelPage() {
       setServiceCount(typeof result.serviceCount === "number" ? result.serviceCount : 0);
       setSpecialistCount(typeof result.specialistCount === "number" ? result.specialistCount : 0);
       setCustomerCount(typeof result.customerCount === "number" ? result.customerCount : 0);
+      setTodaySummary({
+        total: Number(result.todaySummary?.total || 0),
+        pending: Number(result.todaySummary?.pending || 0),
+        confirmed: Number(result.todaySummary?.confirmed || 0),
+        estimatedRevenue: Number(result.todaySummary?.estimatedRevenue || 0),
+      });
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "İşletme paneli verileri yüklenemedi.");
     } finally {
@@ -93,6 +103,7 @@ export default function PanelPage() {
     { label: "Randevu sayfanızı kontrol edin", done: true, href: "/" + business.slug },
   ] : [];
   const setupDone = setupSteps.filter((item) => item.done).length;
+  const nextBooking = bookings[0];
 
   async function copyBookingLink() {
     try {
@@ -280,11 +291,35 @@ export default function PanelPage() {
           </section>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <DashboardStat label="Bugünkü randevu" value={bookings.length} detail="İptal edilmeyen randevular" icon={CalendarDays} />
-            <DashboardStat label="Bekleyen" value={pendingCount} detail="Onay bekliyor" icon={Clock3} />
-            <DashboardStat label="Hizmet" value={serviceCount} detail="Tanımlı hizmet" icon={Scissors} />
-            <DashboardStat label="Müşteri" value={customerCount} detail="Kayıtlı randevulardaki müşteriler" icon={Users} />
+            <DashboardStat label="Bugünkü randevu" value={todaySummary.total} detail="İptal edilmeyen randevular" icon={CalendarDays} />
+            <DashboardStat label="Bekleyen" value={todaySummary.pending} detail="Onay bekliyor" icon={Clock3} />
+            <DashboardStat label="Onaylanan" value={todaySummary.confirmed} detail="Bugün kesinleşen" icon={Check} />
+            <DashboardStat label="Tahmini ciro" value={todaySummary.estimatedRevenue} detail="Onaylanan randevular" icon={Scissors} currency />
           </div>
+
+          <section className="mt-5 rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-alinda-accent-soft text-alinda-accent">
+                  <Clock3 size={20} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-alinda-accent">Sıradaki randevu</p>
+                  {nextBooking ? (
+                    <>
+                      <p className="mt-1 truncate text-base font-semibold">{nextBooking.time} · {nextBooking.customerName}</p>
+                      <p className="mt-1 truncate text-xs text-alinda-muted">{nextBooking.serviceName} · {nextBooking.specialistName || "Uzman seçilmedi"}</p>
+                    </>
+                  ) : (
+                    <p className="mt-1 text-sm font-semibold">Bugün için sırada randevu yok.</p>
+                  )}
+                </div>
+              </div>
+              <Link href="/panel/appointments" className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-alinda-line px-4 text-sm font-semibold hover:border-alinda-ink">
+                Randevuları aç
+              </Link>
+            </div>
+          </section>
 
           <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_320px]">
             <section className="rounded-[24px] border border-alinda-line bg-white shadow-card">
@@ -329,6 +364,7 @@ export default function PanelPage() {
   );
 }
 
-function DashboardStat({ label, value, detail, icon: Icon }: { label: string; value: number; detail: string; icon: typeof CalendarDays }) {
-  return <div className="rounded-2xl border border-alinda-line bg-white p-5 shadow-card"><div className="flex items-center justify-between"><span className="text-sm text-alinda-muted">{label}</span><Icon size={18} className="text-alinda-muted" /></div><p className="mt-4 text-3xl font-semibold tracking-tight">{value}</p><p className="mt-1 text-xs text-alinda-muted">{detail}</p></div>;
+function DashboardStat({ label, value, detail, icon: Icon, currency = false }: { label: string; value: number; detail: string; icon: typeof CalendarDays; currency?: boolean }) {
+  const displayValue = currency ? "₺" + new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 0 }).format(value) : value;
+  return <div className="rounded-2xl border border-alinda-line bg-white p-5 shadow-card"><div className="flex items-center justify-between"><span className="text-sm text-alinda-muted">{label}</span><Icon size={18} className="text-alinda-muted" /></div><p className="mt-4 text-3xl font-semibold tracking-tight">{displayValue}</p><p className="mt-1 text-xs text-alinda-muted">{detail}</p></div>;
 }
