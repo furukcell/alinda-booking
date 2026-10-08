@@ -48,17 +48,21 @@ export default function SpecialistsPage() {
     setLoading(true);
     setError("");
     try {
-      const id = await getOwnedBusinessId(uid);
-      setBusinessId(id);
-      if (!id) throw new Error("NO_BUSINESS");
-
-      const [serviceSnapshot, specialistSnapshot] = await Promise.all([
-        getDocs(collection(getFirebaseDb(), "businesses", id, "services")),
-        getDocs(collection(getFirebaseDb(), "businesses", id, "specialists"))
+      const user = getFirebaseAuth().currentUser;
+      const token = await user?.getIdToken();
+      if (!token) throw new Error("Oturum doğrulanamadı.");
+      const headers = { Authorization: `Bearer ${token}` };
+      const [serviceResponse, specialistResponse] = await Promise.all([
+        fetch("/api/panel/resources?type=services", { headers, cache: "no-store" }),
+        fetch("/api/panel/resources?type=specialists", { headers, cache: "no-store" })
       ]);
-
-      setServices(serviceSnapshot.docs.map((item) => {
-        const data = item.data();
+      const serviceResult = await serviceResponse.json().catch(() => ({}));
+      const specialistResult = await specialistResponse.json().catch(() => ({}));
+      if (!serviceResponse.ok) throw new Error(serviceResult.error || "Hizmetler alınamadı.");
+      if (!specialistResponse.ok) throw new Error(specialistResult.error || "Uzmanlar alınamadı.");
+      setBusinessId(specialistResult.businessId || serviceResult.businessId);
+      setServices((serviceResult.items || []).map((item: any) => {
+        const data = item;
         return {
           id: item.id,
           name: typeof data.name === "string" ? data.name : "",
