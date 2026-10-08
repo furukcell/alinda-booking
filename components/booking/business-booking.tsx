@@ -514,6 +514,47 @@ export function BusinessBooking({ business }: { business: Business }) {
             </div>
           </section>
 
+          <section className="mt-6 overflow-hidden rounded-[24px] border bg-white" style={{ borderColor: line }}>
+            <div className="flex items-center justify-between gap-3 px-5 py-4 sm:px-6">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>KONUM</p>
+                <h2 className="mt-1 text-base font-bold">Bizi nerede bulabilirsiniz?</h2>
+                <p className="mt-1 text-xs leading-5" style={{ color: muted }}>{business.address || [business.district, business.city].filter(Boolean).join(", ")}</p>
+              </div>
+              <MapPin size={20} style={{ color: roseDark }} />
+            </div>
+
+            {business.latitude != null && business.longitude != null ? (
+              <div className="overflow-hidden border-t" style={{ borderColor: line }}>
+                <iframe
+                  title={business.name + " konumu"}
+                  src={"https://www.openstreetmap.org/export/embed.html?bbox=" + (Number(business.longitude) - 0.01) + "," + (Number(business.latitude) - 0.01) + "," + (Number(business.longitude) + 0.01) + "," + (Number(business.latitude) + 0.01) + "&layer=mapnik&marker=" + String(business.latitude) + "," + String(business.longitude)}
+                  className="h-64 w-full border-0 sm:h-72"
+                  loading="lazy"
+                />
+                <a
+                  href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(String(business.latitude) + "," + String(business.longitude))}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex min-h-12 items-center justify-center gap-2 border-t bg-white px-4 py-3 text-xs font-bold"
+                  style={{ borderColor: line, color: roseDark }}
+                >
+                  <MapPin size={14} /> Google Maps'te yol tarifi al
+                </a>
+              </div>
+            ) : (
+              <a
+                href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([business.address, business.district, business.city].filter(Boolean).join(", "))}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 border-t bg-rose-50 px-5 py-4 text-xs font-bold"
+                style={{ borderColor: line, color: roseDark }}
+              >
+                <MapPin size={14} /> Konumu Google Maps'te aç
+              </a>
+            )}
+          </section>
+
           <section className="mt-8">
             <div className="flex items-end justify-between gap-3">
               <div>
@@ -761,25 +802,6 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <span className="flex items-center gap-1.5"><Phone size={13} />{business.phone}</span>
               </div>
 
-              {business.latitude && business.longitude && (
-                <div className="mt-5 overflow-hidden rounded-[20px] border" style={{ borderColor: line }}>
-                  <iframe
-                    title={business.name + " konumu"}
-                    src={"https://www.openstreetmap.org/export/embed.html?bbox=" + (Number(business.longitude) - 0.01) + "," + (Number(business.latitude) - 0.01) + "," + (Number(business.longitude) + 0.01) + "," + (Number(business.latitude) + 0.01) + "&layer=mapnik&marker=" + String(business.latitude) + "," + String(business.longitude)}
-                    className="h-56 w-full border-0"
-                    loading="lazy"
-                  />
-                  <a
-                    href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(String(business.latitude) + "," + String(business.longitude))}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center justify-center gap-2 border-t bg-white px-4 py-3 text-xs font-bold"
-                    style={{ borderColor: line, color: roseDark }}
-                  >
-                    <MapPin size={14} /> Google Maps'te yol tarifi al
-                  </a>
-                </div>
-              )}
             </section>
           )}
 
