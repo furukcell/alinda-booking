@@ -64,10 +64,9 @@ service cloud.firestore {
     match /businesses/{businessId} {
       // Business documents contain private owner/subscription/WhatsApp fields and are never publicly readable from the client.
       // Public booking pages load a sanitized view through the server API.
-      allow get: if isSuperAdmin() || (signedIn() && resource.data.ownerId == request.auth.uid);
+      allow get: if isSuperAdmin() || ownerAccessEnabled(businessId);
       // Owners may query businesses only when the query is constrained to their own ownerId.
-      allow list: if isSuperAdmin()
-        || (signedIn() && resource.data.ownerId == request.auth.uid);
+      allow list: if isSuperAdmin() || ownerAccessEnabled(businessId);
 
       allow update: if isSuperAdmin()
         || (ownerAccessEnabled(businessId)
