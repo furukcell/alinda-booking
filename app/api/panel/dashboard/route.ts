@@ -28,6 +28,9 @@ export async function GET(request: NextRequest) {
     const businessDoc = businessSnapshot.docs[0];
     const businessId = businessDoc.id;
     const data = businessDoc.data();
+    if (data.accessEnabled === false || data.active === false) {
+      return NextResponse.json({ error: "İşletme erişimi şu anda aktif değil." }, { status: 403 });
+    }
 
     const [bookingsSnapshot, servicesSnapshot, specialistsSnapshot] = await Promise.all([
       db.collection("businesses").doc(businessId).collection("bookings").get(),
