@@ -118,9 +118,12 @@ export default function PanelPage() {
   }
 
   async function shareBookingPage() {
+    const currentBusiness = business;
+    if (!currentBusiness) return;
+
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: business.name + " · Online Randevu", text: "Online randevu almak için bağlantıya dokunun.", url: bookingUrl });
+        await navigator.share({ title: currentBusiness.name + " · Online Randevu", text: "Online randevu almak için bağlantıya dokunun.", url: bookingUrl });
         return;
       } catch {
         return;
