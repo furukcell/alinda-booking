@@ -50,7 +50,7 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json();
     const allowed = [
-      "name", "category", "description", "city", "district", "address",
+      "name", "slug", "category", "description", "city", "district", "address",
       "latitude", "longitude", "phone", "whatsappNotificationPhone",
       "initials", "primaryColor", "primaryColorSoft", "whatsappDailySummaryEnabled", "logoUrl"
     ] as const;
@@ -60,20 +60,20 @@ export async function PATCH(request: NextRequest) {
       if (Object.prototype.hasOwnProperty.call(body, key)) updates[key] = body[key];
     }
 
-    if (typeof updates.name !== "string" || !updates.name.trim()) {
-      return NextResponse.json({ error: "İşletme adı zorunludur." }, { status: 400 });
+    for (const field of ["name", "category", "city", "district"] as const) {
+      if (updates[field] !== undefined && (typeof updates[field] !== "string" || !updates[field].trim())) {
+        return NextResponse.json({ error: `${field} alanı boş bırakılamaz.` }, { status: 400 });
+      }
     }
 
-    if (typeof updates.category !== "string" || !updates.category.trim()) {
-      return NextResponse.json({ error: "Kategori zorunludur." }, { status: 400 });
-    }
-
-    if (typeof updates.city !== "string" || !updates.city.trim()) {
-      return NextResponse.json({ error: "Şehir zorunludur." }, { status: 400 });
-    }
-
-    if (typeof updates.district !== "string" || !updates.district.trim()) {
-      return NextResponse.json({ error: "İlçe zorunludur." }, { status: 400 });
+    if (updates.slug !== undefined) {
+      if (typeof updates.slug !== "string" || !updates.slug.trim()) {
+        return NextResponse.json({ error: "Randevu adresi boş bırakılamaz." }, { status: 400 });
+      }
+      if (updates.slug.trim().toLowerCase() !== businessDoc.id) {
+        return NextResponse.json({ error: "Randevu adresi (slug) bu işletme için sabittir." }, { status: 400 });
+      }
+      delete updates.slug;
     }
 
     if (updates.latitude !== null && updates.latitude !== undefined && typeof updates.latitude !== "number") {
