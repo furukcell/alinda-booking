@@ -40,7 +40,7 @@ service cloud.firestore {
         && request.resource.data.customerPhone is string
         && request.resource.data.date is string
         && request.resource.data.time is string
-        && request.resource.data.status == 'pending'
+        && request.resource.data.status == 'confirmed'
         && request.resource.data.whatsappOptIn is bool
         && request.resource.data.slotId is string
         && request.resource.data.createdAt == request.time;
@@ -51,7 +51,7 @@ service cloud.firestore {
         && request.resource.data.date is string
         && request.resource.data.time is string
         && request.resource.data.specialistId is string
-        && request.resource.data.status == 'pending'
+        && request.resource.data.status == 'confirmed'
         && request.resource.data.createdAt == request.time;
     }
 
@@ -62,7 +62,9 @@ service cloud.firestore {
     }
 
     match /businesses/{businessId} {
-      allow get: if true;
+      // Business documents contain private owner/subscription/WhatsApp fields and are never publicly readable from the client.
+      // Public booking pages load a sanitized view through the server API.
+      allow get: if isSuperAdmin() || (signedIn() && resource.data.ownerId == request.auth.uid);
       // Owners may query businesses only when the query is constrained to their own ownerId.
       allow list: if isSuperAdmin()
         || (signedIn() && resource.data.ownerId == request.auth.uid);
