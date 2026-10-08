@@ -575,6 +575,26 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <span className="flex items-center gap-1.5"><MapPin size={13} />{business.address}</span>
                 <span className="flex items-center gap-1.5"><Phone size={13} />{business.phone}</span>
               </div>
+
+              {business.latitude && business.longitude && (
+                <div className="mt-5 overflow-hidden rounded-[20px] border" style={{ borderColor: line }}>
+                  <iframe
+                    title={`${business.name} konumu`}
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(business.latitude + "," + business.longitude)}&z=16&output=embed`}
+                    className="h-56 w-full border-0"
+                    loading="lazy"
+                  />
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.latitude + "," + business.longitude)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-2 border-t bg-white px-4 py-3 text-xs font-bold"
+                    style={{ borderColor: line, color: roseDark }}
+                  >
+                    <MapPin size={14} /> Google Maps'te yol tarifi al
+                  </a>
+                </div>
+              )}
             </section>
           )}
 
