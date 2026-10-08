@@ -279,9 +279,24 @@ export function BusinessBooking({ business }: { business: Business }) {
       }).catch(() => undefined);
     } catch (bookingError) {
       if (bookingError instanceof Error && bookingError.message === "SLOT_TAKEN") {
-        setSlots((current) => current.map((slot) => slot.time === selectedTime ? { ...slot, status: "booked" } : slot));
         setSelectedTime("");
-        setError("Bu saat az önce başka bir müşteri tarafından alındı. Lütfen başka bir saat seçin.");
+        setError("Bu saat az önce başka bir müşteri tarafından alındı. Uygun saatler yenileniyor…");
+        try {
+          const refreshed = await getDailySlots(
+            business.id,
+            selectedDateInfo.id,
+            selectedDateInfo.dayId,
+            specialist,
+            service.durationMinutes
+          );
+          setSlots(refreshed.slots);
+          setWorking(refreshed.working);
+          setOpenTime(refreshed.open);
+          setCloseTime(refreshed.close);
+          setError("Bu saat az önce başka bir müşteri tarafından alındı. Lütfen başka bir saat seçin.");
+        } catch {
+          setError("Bu saat az önce başka bir müşteri tarafından alındı. Lütfen sayfayı yenileyip tekrar deneyin.");
+        }
       } else {
         setError(bookingError instanceof Error ? bookingError.message : "Randevu oluşturulamadı. Lütfen bilgilerinizi ve bağlantınızı kontrol edip tekrar deneyin.");
       }
