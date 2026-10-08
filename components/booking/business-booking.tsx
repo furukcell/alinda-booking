@@ -211,21 +211,13 @@ export function BusinessBooking({ business }: { business: Business }) {
         businessId: business.id,
         service,
         specialistId: specialist.id,
-        specialistName: specialist.name,
         customerName: name,
         customerPhone: phone,
         whatsappOptIn,
         date: selectedDateInfo.id,
-        time: selectedTime
+        time: selectedTime,
+        couponCode: coupon?.code || couponCode.trim().toUpperCase()
       });
-
-      if (coupon) {
-        void fetch("/api/coupons/redeem", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ couponId: coupon.couponId, businessId: business.id, bookingId: bookingRef.id })
-        }).catch(() => undefined);
-      }
 
       setConfirmedReference(bookingRef.id);
       setConfirmed(true);
@@ -243,7 +235,7 @@ export function BusinessBooking({ business }: { business: Business }) {
         setSelectedTime("");
         setError("Bu saat az önce başka bir müşteri tarafından alındı. Lütfen başka bir saat seçin.");
       } else {
-        setError("Randevu oluşturulamadı. Lütfen bilgilerinizi ve bağlantınızı kontrol edip tekrar deneyin.");
+        setError(bookingError instanceof Error ? bookingError.message : "Randevu oluşturulamadı. Lütfen bilgilerinizi ve bağlantınızı kontrol edip tekrar deneyin.");
       }
     } finally {
       setSaving(false);
