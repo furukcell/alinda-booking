@@ -122,15 +122,17 @@ Bu faz, mevcut güzellik merkezi ürününün kullanılabilir ve satışa hazır
 ### 1. Randevular V2 ✅
 - [x] Randevu listesi, filtreler, detay ve durum işlemleri
 
-### 2. İşletme Onboarding
-- [ ] İlk giriş kurulum sihirbazı
-- [ ] İşletme bilgileri
-- [ ] Hizmet ekleme
-- [ ] Uzman ekleme
-- [ ] Çalışma saatleri
-- [ ] Randevu sayfası kontrolü
-- [ ] QR / paylaşım adımı
-- [ ] Kurulum tamamlandı durumu
+### 2. İşletme Onboarding ✅
+- [x] Yeni işletmeler için onboarding başlangıç durumu
+- [x] İlk girişte onboarding sayfasına yönlendirme
+- [x] İşletme bilgileri kontrolü
+- [x] Hizmet ekleme kontrolü
+- [x] Uzman ekleme kontrolü
+- [x] Çalışma saatleri kontrolü
+- [x] Randevu sayfası kontrolü
+- [x] QR / paylaşım adımı
+- [x] Kurulum tamamlandı kaydı
+- [x] Onboarding tamamlanınca normal panele dönüş
 
 ### 3. Müşteri Yönetimi
 - [ ] Müşteri listesi
@@ -302,7 +304,7 @@ Randevu motoru ortak kalacak; sektör özellikleri modüler olacak.
 
     Randevular V2 ✅
          ↓
-    İşletme onboarding
+    İşletme onboarding ✅
          ↓
     Müşteri yönetimi
          ↓
