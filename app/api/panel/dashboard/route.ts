@@ -44,6 +44,9 @@ export async function GET(request: NextRequest) {
         customerName: stringValue(value.customerName),
         serviceName: stringValue(value.serviceName),
         status: value.status === "confirmed" || value.status === "cancelled" ? value.status : "pending",
+        serviceDurationMinutes: Number(value.serviceDurationMinutes || 30),
+        servicePrice: Number(value.servicePrice || 0),
+        totalPrice: Number(value.totalPrice ?? value.servicePrice ?? 0),
       };
     });
 
@@ -66,6 +69,14 @@ export async function GET(request: NextRequest) {
       serviceCount: servicesSnapshot.size,
       specialistCount: specialistsSnapshot.size,
       customerCount: new Set(bookings.map((item) => item.customerName.trim()).filter(Boolean)).size,
+      todaySummary: {
+        total: todayBookings.length,
+        pending: todayBookings.filter((item) => item.status === "pending").length,
+        confirmed: todayBookings.filter((item) => item.status === "confirmed").length,
+        estimatedRevenue: todayBookings
+          .filter((item) => item.status === "confirmed")
+          .reduce((sum, item) => sum + item.totalPrice, 0),
+      },
     });
   } catch (error) {
     console.error("Panel dashboard failed", error);
