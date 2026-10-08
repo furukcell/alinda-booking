@@ -88,7 +88,7 @@ service cloud.firestore {
 
       match /hours/{dayId} {
         allow get, list: if true;
-        allow create, update, delete: if isSuperAdmin() || isOwner(businessId);
+        allow create, update, delete: if isSuperAdmin() || ownerAccessEnabled(businessId);
       }
 
       match /bookings/{bookingId} {
