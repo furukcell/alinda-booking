@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
       const bookingExisting = await transaction.get(bookingRef);
       const slotSnapshots = await Promise.all(slotRefs.map((ref) => transaction.get(ref)));
 
-      if (bookingExisting.exists || slotSnapshots.some((snapshot) => snapshot.exists())) throw new Error("SLOT_TAKEN");
+      if (bookingExisting.exists || slotSnapshots.some((snapshot) => snapshot.exists)) throw new Error("SLOT_TAKEN");
 
       let discount = 0;
       let couponId = "";
