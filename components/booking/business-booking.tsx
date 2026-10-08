@@ -453,11 +453,11 @@ export function BusinessBooking({ business }: { business: Business }) {
               </div>
               <span className="text-xs" style={{ color: muted }}>{business.services.length} hizmet</span>
             </div>
-            <div className="mt-4 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {business.services.map((item) => {
                 const active = item.id === selectedService;
                 return (
-                  <button key={item.id} onClick={() => chooseService(item.id)} className="min-w-[190px] sm:min-w-[220px] rounded-[22px] border p-4 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff", boxShadow: active ? "0 10px 30px rgba(216,137,130,0.12)" : "0 3px 14px rgba(45,38,37,0.035)" }}>
+                  <button key={item.id} onClick={() => chooseService(item.id)} className="min-w-[190px] snap-start sm:min-w-[220px] rounded-[22px] border p-4 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff", boxShadow: active ? "0 10px 30px rgba(216,137,130,0.12)" : "0 3px 14px rgba(45,38,37,0.035)" }}>
                     <div className="flex items-start justify-between gap-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-[14px]" style={{ background: active ? "#fff" : rosePale, color: roseDark }}><Sparkles size={17} /></span>
                       {active && <Check size={18} style={{ color: roseDark }} />}
@@ -484,7 +484,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 {specialists.map((item: Specialist) => {
                   const active = item.id === specialist?.id;
                   return (
-                    <button key={item.id} onClick={() => { setSelectedSpecialist(item.id); setSelectedTime(""); }} className="flex items-center gap-3 rounded-[22px] border p-3 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff" }}>
+                    <button key={item.id} onClick={() => { setSelectedSpecialist(item.id); setSelectedTime(""); }} className="flex min-h-[82px] items-center gap-3 rounded-[22px] border p-3 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff" }}>
                       {item.photoUrl ? (
                         <img src={item.photoUrl} alt={item.name} className="h-16 w-16 shrink-0 rounded-[18px] object-cover" />
                       ) : (
