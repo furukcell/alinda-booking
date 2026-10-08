@@ -25,7 +25,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Bu kullanıcıya bağlı işletme bulunamadı." }, { status: 404 });
     }
 
-    const businessId = businessSnapshot.docs[0].id;
+    const businessDoc = businessSnapshot.docs[0];
+    const businessData = businessDoc.data();
+    if (businessData.accessEnabled === false || businessData.active === false) {
+      return NextResponse.json({ error: "İşletme erişimi şu anda aktif değil." }, { status: 403 });
+    }
+    const businessId = businessDoc.id;
     const requestedPhone = normalizePhone(request.nextUrl.searchParams.get("phone"));
     const snapshot = await getAdminDb().collection("businesses").doc(businessId).collection("bookings").get();
 
