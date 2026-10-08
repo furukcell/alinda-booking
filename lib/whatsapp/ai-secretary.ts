@@ -282,3 +282,33 @@ export async function loadSecretaryCatalog(businessId: string) {
     specialists
   };
 }
+
+
+export async function interpretSecretaryMessage(input: {
+  businessName: string;
+  text: string;
+  services: Array<{id:string;name:string;durationMinutes:number;price:number}>;
+  specialists: Array<{id:string;name:string;serviceIds:string[]}>;
+}) {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) return null;
+  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":generateContent", {
+    method: "POST",
+    headers: {"Content-Type":"application/json","x-goog-api-key":key},
+    body: JSON.stringify({
+      contents: [{role:"user",parts:[{text:JSON.stringify({
+        task:"JSON olarak niyet çıkar",
+        message:input.text,
+        today:todayIstanbul(),
+        services:input.services,
+        specialists:input.specialists
+      })]} }],
+      systemInstruction:{parts:[{text:"Türkçe WhatsApp randevu niyetini JSON olarak çıkar. intent book, lookup, cancel, help veya unknown olabilir. Tarih YYYY-MM-DD, saat HH:MM. Sadece JSON."}]},
+      generationConfig:{temperature:0.1,maxOutputTokens:300,responseMimeType:"application/json"}
+    })
+  });
+  if(!response.ok) return null;
+  const data=await response.json().catch(()=>({}));
+  const raw=data?.candidates?.[0]?.content?.parts?.map((p:any)=>p.text||"").join("")||"";
+  try{return JSON.parse(raw);}catch{return null;}
+}
