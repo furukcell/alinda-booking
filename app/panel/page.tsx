@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Clock3, Menu, Scissors, Settings2, Store, Users, X } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Check, Clock3, Copy, ExternalLink, Menu, Scissors, Settings2, Store, Users, X } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useMemo, useState } from "react";
@@ -44,7 +44,7 @@ export default function PanelPage() {
   const [customerCount, setCustomerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);\n  const [copied, setCopied] = useState(false);
 
   async function loadDashboard(uid: string) {
     setLoading(true);
@@ -85,6 +85,23 @@ export default function PanelPage() {
   }, []);
 
   const pendingCount = useMemo(() => bookings.filter((item) => item.status === "pending").length, [bookings]);
+  const bookingUrl = typeof window !== "undefined" ? window.location.origin + "/" + business.slug : "/" + business.slug;
+  const setupSteps = [
+    { label: "En az bir hizmet ekleyin", done: serviceCount > 0, href: "/panel/services" },
+    { label: "En az bir uzman ekleyin", done: specialistCount > 0, href: "/panel/specialists" },
+    { label: "Randevu sayfanızı kontrol edin", done: true, href: "/" + business.slug },
+  ];
+  const setupDone = setupSteps.filter((item) => item.done).length;
+
+  async function copyBookingLink() {
+    try {
+      await navigator.clipboard.writeText(bookingUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   if (loading) {
     return <main className="flex min-h-screen items-center justify-center bg-alinda-cream text-sm text-alinda-muted">İşletme paneli hazırlanıyor…</main>;
@@ -214,6 +231,52 @@ export default function PanelPage() {
           </header>
 
           {error && <div role="alert" className="mt-6 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-sm text-alinda-danger">{error}</div>}
+
+          <section className="mt-6 rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-alinda-accent">Randevu sayfanız</p>
+                  <span className="rounded-full bg-[#E8F0EB] px-2 py-1 text-[10px] font-bold text-alinda-success">Aktif</span>
+                </div>
+                <p className="mt-2 truncate text-sm font-semibold">{bookingUrl}</p>
+                <p className="mt-1 text-xs text-alinda-muted">Bu bağlantıyı Instagram, WhatsApp veya Google işletme profilinizde paylaşabilirsiniz.</p>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <button type="button" onClick={() => void copyBookingLink()} className="inline-flex h-11 items-center gap-2 rounded-xl border border-alinda-line bg-white px-4 text-sm font-semibold hover:border-alinda-ink">
+                  {copied ? <Check size={16} /> : <Copy size={16} />}
+                  {copied ? "Kopyalandı" : "Linki kopyala"}
+                </button>
+                <Link href={"/" + business.slug} target="_blank" className="inline-flex h-11 items-center gap-2 rounded-xl bg-alinda-ink px-4 text-sm font-semibold text-white hover:opacity-90">
+                  <ExternalLink size={16} /> Sayfayı aç
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-5 rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-alinda-accent">Kuruluma hazır mısınız?</p>
+                <h2 className="mt-1 text-lg font-semibold">İlk randevuyu almaya hazırlayın.</h2>
+                <p className="mt-1 text-xs text-alinda-muted">{setupDone} / {setupSteps.length} adım tamamlandı</p>
+              </div>
+              <div className="h-2 w-full max-w-48 overflow-hidden rounded-full bg-alinda-line">
+                <div className="h-full rounded-full bg-alinda-accent transition-all" style={{ width: ((setupDone / setupSteps.length) * 100) + "%" }} />
+              </div>
+            </div>
+            <div className="mt-5 grid gap-2 sm:grid-cols-3">
+              {setupSteps.map((step) => (
+                <Link key={step.label} href={step.href} className="flex items-center gap-3 rounded-2xl border border-alinda-line px-4 py-3 transition hover:border-alinda-accent hover:bg-alinda-cream">
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${step.done ? "bg-[#E8F0EB] text-alinda-success" : "bg-alinda-accent-soft text-alinda-accent"}`}>
+                    {step.done ? <Check size={15} /> : <span className="text-xs font-bold">!</span>}
+                  </span>
+                  <span className="text-xs font-semibold">{step.label}</span>
+                  <ArrowUpRight size={14} className="ml-auto shrink-0 text-alinda-muted" />
+                </Link>
+              ))}
+            </div>
+          </section>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <DashboardStat label="Bugünkü randevu" value={bookings.length} detail="İptal edilmeyen randevular" icon={CalendarDays} />
