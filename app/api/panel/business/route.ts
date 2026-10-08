@@ -28,8 +28,12 @@ export async function GET(request: NextRequest) {
     if (!doc) {
       return NextResponse.json({ error: "Bu kullanıcıya bağlı işletme bulunamadı." }, { status: 404 });
     }
+    const businessData = doc.data();
+    if (businessData.accessEnabled === false || businessData.active === false) {
+      return NextResponse.json({ error: "İşletme erişimi şu anda aktif değil." }, { status: 403 });
+    }
 
-    return NextResponse.json({ businessId: doc.id, business: { id: doc.id, ...doc.data() } });
+    return NextResponse.json({ businessId: doc.id, business: { id: doc.id, ...businessData } });
   } catch (error) {
     const status = error instanceof Error && error.message === "UNAUTHORIZED" ? 401 : 500;
     console.error("Panel business lookup failed", error);
@@ -46,6 +50,10 @@ export async function PATCH(request: NextRequest) {
 
     if (!businessDoc) {
       return NextResponse.json({ error: "Bu kullanıcıya bağlı işletme bulunamadı." }, { status: 404 });
+    }
+    const currentData = businessDoc.data();
+    if (currentData.accessEnabled === false || currentData.active === false) {
+      return NextResponse.json({ error: "İşletme erişimi şu anda aktif değil." }, { status: 403 });
     }
 
     const body = await request.json();
