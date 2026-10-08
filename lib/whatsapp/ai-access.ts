@@ -71,6 +71,7 @@ export async function enableAi(businessId: string, phone: string) {
       aiEnabled: true,
       consentAt: new Date().toISOString(),
       offerSentAt: null,
+      offerBlockedUntil: null,
       disabledAt: null
     },
     { merge: true }
@@ -81,12 +82,16 @@ export async function disableAi(businessId: string, phone: string) {
   const current = await getAiPreference(businessId, phone);
   const declineCount = Number(current?.declineCount || 0) + 1;
 
+  const now = new Date();
+  const offerBlockedUntil = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
   await ref(businessId, phone).set(
     {
       aiEnabled: false,
-      disabledAt: new Date().toISOString(),
+      disabledAt: now.toISOString(),
       declineCount,
-      offerSentAt: null
+      offerSentAt: now.toISOString(),
+      offerBlockedUntil
     },
     { merge: true }
   );
@@ -143,10 +148,14 @@ export function shouldOfferAiAfterDelay(preference: Preference | null) {
   const offerAt = preference.offerSentAt
     ? new Date(preference.offerSentAt).getTime()
     : 0;
+  const blockedUntil = preference.offerBlockedUntil
+    ? new Date(preference.offerBlockedUntil).getTime()
+    : 0;
 
   if (!Number.isFinite(inboundAt)) return false;
   if (outboundAt > inboundAt) return false;
   if (offerAt > inboundAt) return false;
+  if (blockedUntil > Date.now()) return false;
 
   return Date.now() - inboundAt >= 10 * 60 * 1000;
 }
