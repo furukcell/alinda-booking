@@ -230,7 +230,7 @@ export default function Home() {
                   suffix: "/ ay",
                   badge: "PRO",
                   description: "AI destekli WhatsApp sekreteri ve işletme özetleriyle randevu işini daha da otomatikleştirin.",
-                  features: [...planFeatures, "AI destekli WhatsApp randevu sekreteri", "WhatsApp üzerinden randevu sorgulama ve iptal", "Günlük WhatsApp randevu özeti", "Doğal dil ile randevu talebi anlama"],
+                  features: [...planFeatures, "AI destekli WhatsApp randevu sekreteri", "WhatsApp üzerinden randevu sorgulama ve iptal", "Günlük WhatsApp randevu özeti", "24 saat önce otomatik WhatsApp randevu hatırlatması", "Doğal dil ile randevu talebi anlama"],
                 },
                 {
                   name: "Starter Yıllık",
@@ -251,7 +251,7 @@ export default function Home() {
                   features: [...planFeatures, "AI destekli WhatsApp randevu sekreteri", "WhatsApp üzerinden randevu sorgulama ve iptal", "Günlük WhatsApp randevu özeti", "Doğal dil ile randevu talebi anlama"],
                 },
               ].map((plan) => (
-                <div key={plan.name} className={`relative rounded-[30px] border p-7 shadow-card sm:p-8 ${plan.name === "Yıllık" ? "border-alinda-accent bg-[#FFF8F6] shadow-[0_18px_55px_rgba(216,137,130,0.13)]" : "border-alinda-line bg-alinda-cream"}`}>
+                <div key={plan.name} className={`relative rounded-[30px] border p-7 shadow-card sm:p-8 ${plan.name.includes("Yıllık") ? "border-alinda-accent bg-[#FFF8F6] shadow-[0_18px_55px_rgba(216,137,130,0.13)]" : "border-alinda-line bg-alinda-cream"}`}>
                   <span className="absolute right-5 top-5 rounded-full bg-[#EAF6EE] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.08em] text-[#4E8762]">{plan.badge}</span>
                   <p className="text-sm font-semibold text-alinda-muted">{plan.name}</p>
                   <div className="mt-3 flex flex-wrap items-end gap-2">
