@@ -2,8 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { handleSecretaryMessage, sendSecretaryReply } from "@/lib/whatsapp/secretary";
-import { lookupWhatsAppBooking, prepareWhatsAppCancellation, cancelWhatsAppBooking } from "@/lib/whatsapp/booking-lookup";
-import { interpretBusinessMessage } from "@/lib/whatsapp/ai-secretary";
+import { interpretBusinessMessage, getSecretaryHistory, loadSecretaryCatalog } from "@/lib/whatsapp/ai-secretary";
+import { getWhatsAppConnection } from "@/lib/whatsapp/server";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -37,8 +37,9 @@ export async function POST(request: Request) {
         if (found.empty) continue;
         const businessRef = found.docs[0].ref.parent.parent;
         if (!businessRef) continue;
-        const connection = await import("@/lib/whatsapp/server").then(m => m.getWhatsAppConnection(businessRef.id));
+        const connection = await getWhatsAppConnection(businessRef.id);
         if (!connection) continue;
+        const catalog = await loadSecretaryCatalog(businessRef.id);
         for (const message of messages) {
           if (message?.type !== "text" || !message?.from || !message?.text?.body) continue;
           const id = typeof message.id === "string" ? message.id : "";
@@ -50,35 +51,22 @@ export async function POST(request: Request) {
           }
           const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
           const name = typeof contacts[0]?.profile?.name === "string" ? contacts[0].profile.name : "WhatsApp müşterisi";
-          let incomingText = String(message.text.body).trim();
-          const history = await (await import("@/lib/whatsapp/ai-secretary")).getSecretaryHistory(businessRef.id, String(message.from));
-          const ai = await interpretBusinessMessage(businessRef.id, incomingText, history).catch(() => null);
-          if (ai?.intent === "book" && ai.serviceId && ai.date && ai.time) {
-            const service = (await getAdminDb().collection(businessRef.path + "/services").doc(ai.serviceId).get()).data();
-            if (service?.name) incomingText = String(service.name) + " " + ai.date + " " + ai.time;
-          } else if (ai?.intent === "lookup" && ai.referenceNo) {
-            incomingText = "randevum " + ai.referenceNo;
-          } else if (ai?.intent === "cancel" && ai.referenceNo) {
-            incomingText = "randevu iptal " + ai.referenceNo;
-          }
-          const refMatch = incomingText.toUpperCase().match(/(?:^|\\s)([A-Z0-9]{5})(?:$|\\s)/)?.[1];
-          let reply: string;
-          const conversationRef = getAdminDb().collection(businessRef.path + "/whatsappConversations").doc(String(message.from));
-          const conversation = await conversationRef.get();
-          const pending = conversation.data();
-          const yes = ["evet","onay","onayla","tamam","olur"].includes(incomingText.toLocaleLowerCase("tr-TR").trim());
-          if (pending?.action === "cancel" && Number(pending.expiresAt) > Date.now() && yes) {
-            reply = await cancelWhatsAppBooking(businessRef.id, String(pending.referenceNo), String(message.from));
-            await conversationRef.delete();
-          } else if (refMatch && /randevum|randevu sorgu|randevu kontrol/i.test(incomingText)) {
-            reply = await lookupWhatsAppBooking(businessRef.id, refMatch, String(message.from));
-          } else if (refMatch && /randevu iptal|iptal/i.test(incomingText)) {
-            const prepared = await prepareWhatsAppCancellation(businessRef.id, refMatch, String(message.from));
-            reply = prepared.message;
-            if (prepared.state) await conversationRef.set(prepared.state);
-          } else {
-            reply = ai?.reply || await handleSecretaryMessage(businessRef.id, String(message.from), incomingText, name);
-          }
+          const phone = String(message.from);
+          const incomingText = String(message.text.body).trim();
+          const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
+          const customerName = typeof contacts[0]?.profile?.name === "string" ? contacts[0].profile.name : "WhatsApp müşterisi";
+          const history = await getSecretaryHistory(businessRef.id, phone);
+          const aiReply = await interpretBusinessMessage({
+            businessId: businessRef.id,
+            businessName: catalog.businessName,
+            text: incomingText,
+            phone,
+            customerName,
+            history,
+            services: catalog.services,
+            specialists: catalog.specialists
+          }).catch(() => null);
+          const reply = aiReply || await handleSecretaryMessage(businessRef.id, phone, incomingText, customerName);
           await sendSecretaryReply(businessRef.id, String(message.from), reply);
         }
       }
