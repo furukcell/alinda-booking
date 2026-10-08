@@ -215,3 +215,28 @@ export function getWhatsAppTemplateConfig() {
     language: process.env.WHATSAPP_TEMPLATE_LANGUAGE || "tr"
   };
 }
+
+
+export async function sendWhatsAppText(
+  phoneNumberId: string,
+  accessToken: string,
+  recipientPhone: string,
+  body: string
+) {
+  const to = normalizeWhatsAppPhone(recipientPhone);
+  if (!to) throw new Error("INVALID_WHATSAPP_RECIPIENT");
+
+  return graph<{ messages?: Array<{ id: string }> }>(
+    `${phoneNumberId}/messages`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to,
+        type: "text",
+        text: { preview_url: false, body }
+      })
+    },
+    accessToken
+  );
+}
