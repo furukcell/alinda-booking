@@ -20,6 +20,10 @@ export async function POST(request: Request) {
     const businessQuery = await db.collection("businesses").where("ownerId", "==", decoded.uid).limit(1).get();
     if (businessQuery.empty) return NextResponse.json({ ok: true, sent: false, reason: "NO_BUSINESS" });
     const businessDoc = businessQuery.docs[0];
+    const businessData = businessDoc.data();
+    if (businessData.accessEnabled === false || businessData.active === false) {
+      return NextResponse.json({ ok: false, sent: false, reason: "BUSINESS_UNAVAILABLE" }, { status: 403 });
+    }
     const bookingRefDoc = db.doc(`businesses/${businessDoc.id}/bookings/${bookingId}`);
     const snapshot = await bookingRefDoc.get();
     if (!snapshot.exists) return NextResponse.json({ ok: true, sent: false, reason: "BOOKING_NOT_FOUND" });
