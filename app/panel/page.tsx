@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowUpRight, CalendarDays, Clock3, Scissors, Settings2, Store, Users } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 
@@ -53,60 +52,20 @@ export default function PanelPage() {
     try {
       const auth = getFirebaseAuth();
       const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error("NO_AUTH");
+      if (!token) throw new Error("Oturum doğrulanamadı.");
 
-      const ownerResponse = await fetch("/api/panel/business", {
+      const response = await fetch("/api/panel/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
       });
-      const ownerData = await ownerResponse.json().catch(() => ({}));
-      if (!ownerResponse.ok || !ownerData.businessId) {
-        throw new Error(ownerData.error || "NO_BUSINESS");
-      }
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "İşletme paneli verileri yüklenemedi.");
 
-      const businessId = ownerData.businessId;
-      const db = getFirebaseDb();
-      const [businessSnapshot, bookingsSnapshot, servicesSnapshot, specialistsSnapshot] = await Promise.all([
-        getDoc(doc(db, "businesses", businessId)),
-        getDocs(collection(db, "businesses", businessId, "bookings")),
-        getDocs(collection(db, "businesses", businessId, "services")),
-        getDocs(collection(db, "businesses", businessId, "specialists"))
-      ]);
-
-      if (!businessSnapshot.exists()) throw new Error("BUSINESS_NOT_FOUND");
-
-      const data = businessSnapshot.data();
-      setBusiness({
-        id: businessId,
-        name: typeof data.name === "string" ? data.name : "İşletme",
-        slug: typeof data.slug === "string" ? data.slug : businessId,
-        city: typeof data.city === "string" ? data.city : "",
-        district: typeof data.district === "string" ? data.district : "",
-        initials: typeof data.initials === "string" ? data.initials : "AL",
-        logoUrl: typeof data.logoUrl === "string" ? data.logoUrl : undefined
-      });
-
-      const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul" }).format(new Date());
-      const parsedBookings = bookingsSnapshot.docs.map((item) => {
-        const value = item.data();
-        return {
-          id: item.id,
-          date: typeof value.date === "string" ? value.date : "",
-          time: typeof value.time === "string" ? value.time : "",
-          customerName: typeof value.customerName === "string" ? value.customerName : "",
-          serviceName: typeof value.serviceName === "string" ? value.serviceName : "",
-          status: value.status === "confirmed" || value.status === "cancelled" ? value.status : "pending"
-        } as DashboardBooking;
-      });
-
-      const todayBookings = parsedBookings
-        .filter((item) => item.date === today && item.status !== "cancelled")
-        .sort((a, b) => a.time.localeCompare(b.time));
-
-      setBookings(todayBookings);
-      setServiceCount(servicesSnapshot.size);
-      setSpecialistCount(specialistsSnapshot.size);
-      setCustomerCount(new Set(parsedBookings.map((item) => item.customerName.trim()).filter(Boolean)).size);
+      setBusiness(result.business);
+      setBookings(Array.isArray(result.bookings) ? result.bookings : []);
+      setServiceCount(typeof result.serviceCount === "number" ? result.serviceCount : 0);
+      setSpecialistCount(typeof result.specialistCount === "number" ? result.specialistCount : 0);
+      setCustomerCount(typeof result.customerCount === "number" ? result.customerCount : 0);
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "İşletme paneli verileri yüklenemedi.");
     } finally {
