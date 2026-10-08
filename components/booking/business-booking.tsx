@@ -523,7 +523,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                   {activeMonthDates.map((date) => {
                     const active = date.id === selectedDate;
                     return (
-                      <button key={date.id} onClick={() = disabled={loadingDates || !selectableDateIds.has(date.id)}> chooseDate(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
+                      <button key={date.id} onClick={() => chooseDate(date.id)} disabled={loadingDates || !selectableDateIds.has(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-35" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
                         <span className="block text-[9px] font-semibold uppercase" style={{ color: active ? "rgba(255,255,255,.72)" : muted }}>{date.label}</span>
                         <span className="mt-0.5 block text-sm font-bold">{Number(date.id.slice(8))}</span>
                         {active && <span className="mt-1 block text-[8px] font-bold uppercase tracking-wide text-white/90">Seçildi</span>}
