@@ -29,10 +29,14 @@ export default function AppointmentsPage() {
 
   async function loadBookings() {
     const user = getFirebaseAuth().currentUser; if (!user) return;
-    const businessId = await getOwnedBusinessId(user.uid); if (!businessId) throw new Error("NO_BUSINESS");
-    const ref = collection(getFirebaseDb(), "businesses", businessId, "bookings");
-    const snapshot = await getDocs(query(ref, orderBy("date", "asc")));
-    setBookings(snapshot.docs.map((item) => ({ id: item.id, ...item.data() } as Booking)));
+    const token = await user.getIdToken();
+    const response = await fetch("/api/panel/resources?type=bookings", {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store"
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "Randevular alınamadı.");
+    setBookings((result.items || []).sort((a: any, b: any) => String(a.date || "").localeCompare(String(b.date || ""))) as Booking[]);
   }
 
   async function searchByReference() {
