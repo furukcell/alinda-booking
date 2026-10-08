@@ -503,6 +503,8 @@ AI müşterinin onayı olmadan sessizce konuşmaya başlamaz. Müşteri kabul ed
 
 Bu teklif aynı konuşmada tekrar tekrar gönderilmez. Teklif gönderildiği kayıt altına alınır.
 
+WhatsApp Business uygulamasından işletme sahibinin manuel cevap verebildiği Coexistence kullanımında `smb_message_echoes` webhook'u da takip edilir. Böylece işletme sahibi telefondan cevap verdiğinde 10 dakikalık AI yardım teklifi beklemeden durdurulur. Meta tarafında bu webhook alanının ilgili WABA/numara için etkin olması gerekir.
+
 ## AI'ın yapabildiği işlemler
 
 AI aktif olan müşteriler için:
