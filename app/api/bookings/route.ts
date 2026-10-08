@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
 
       const segmentTimes = Array.from({ length: duration / 30 }, (_, index) => {
         const value = requestedTime + index * 30;
-        return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
+        return [String(Math.floor(value / 60)).padStart(2, "0"), String(value % 60).padStart(2, "0")].join(":");
       });
       const slotRefs = segmentTimes.map((segment) => businessRef.collection("slots").doc(getSlotId(date, segment, specialistId)));
       const bookingExisting = await transaction.get(bookingRef);
