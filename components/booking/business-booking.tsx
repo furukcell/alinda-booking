@@ -312,9 +312,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <span className="text-sm font-bold">{selectedTime}</span>
               </div>
             </div>
-            <button onClick={() => { setConfirmed(false); setConfirmedReference(""); setSelectedTime(""); setName(""); setPhone(""); setPrivacyAccepted(false); }} className="mt-6 text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>
-              Yeni randevu oluştur
-            </button>
+            <div className="mt-6 flex flex-col items-center gap-3"><ManageBooking businessId={business.id} /><button onClick={() => { setConfirmed(false); setConfirmedReference(""); setSelectedTime(""); setName(""); setPhone(""); setPrivacyAccepted(false); }} className="text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>Yeni randevu oluştur</button></div>
           </section>
         </div>
         <BookingFooter />
