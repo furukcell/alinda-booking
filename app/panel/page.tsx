@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Check, Clock3, Copy, ExternalLink, Menu, Scissors, Settings2, Store, Users, X } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Check, Clock3, Copy, ExternalLink, Menu, QrCode, Scissors, Settings2, Share2, Store, Users, X } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useMemo, useState } from "react";
@@ -51,6 +51,7 @@ export default function PanelPage() {
   const [error, setError] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
 
   async function loadDashboard(uid: string) {
     setLoading(true);
@@ -114,6 +115,18 @@ export default function PanelPage() {
     } catch {
       setCopied(false);
     }
+  }
+
+  async function shareBookingPage() {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: business.name + " · Online Randevu", text: "Online randevu almak için bağlantıya dokunun.", url: bookingUrl });
+        return;
+      } catch {
+        return;
+      }
+    }
+    await copyBookingLink();
   }
 
   if (loading) {
@@ -260,6 +273,12 @@ export default function PanelPage() {
                   {copied ? <Check size={16} /> : <Copy size={16} />}
                   {copied ? "Kopyalandı" : "Linki kopyala"}
                 </button>
+                <button type="button" onClick={() => setQrOpen(true)} className="inline-flex h-11 items-center gap-2 rounded-xl border border-alinda-line bg-white px-4 text-sm font-semibold hover:border-alinda-ink">
+                  <QrCode size={16} /> QR Kod
+                </button>
+                <button type="button" onClick={() => void shareBookingPage()} className="inline-flex h-11 items-center gap-2 rounded-xl border border-alinda-line bg-white px-4 text-sm font-semibold hover:border-alinda-ink">
+                  <Share2 size={16} /> Paylaş
+                </button>
                 <Link href={"/" + business.slug} target="_blank" className="inline-flex h-11 items-center gap-2 rounded-xl bg-alinda-ink px-4 text-sm font-semibold text-white hover:opacity-90">
                   <ExternalLink size={16} /> Sayfayı aç
                 </Link>
@@ -361,6 +380,39 @@ export default function PanelPage() {
           </div>
         </section>
       </div>
+
+      {qrOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Randevu QR kodu">
+          <div className="w-full max-w-sm rounded-[28px] border border-alinda-line bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-alinda-accent">QR Kod</p>
+                <h2 className="mt-1 text-xl font-semibold">Randevu sayfanızı paylaşın</h2>
+                <p className="mt-1 text-xs leading-5 text-alinda-muted">Müşteriler telefon kamerasıyla okutup doğrudan randevu sayfanıza ulaşabilir.</p>
+              </div>
+              <button type="button" onClick={() => setQrOpen(false)} aria-label="QR kod penceresini kapat" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-alinda-line text-alinda-muted hover:text-alinda-ink">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="mt-5 flex justify-center rounded-2xl border border-alinda-line bg-white p-4">
+              <img
+                src={"https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data=" + encodeURIComponent(bookingUrl)}
+                alt={business.name + " randevu QR kodu"}
+                className="h-64 w-64 max-w-full rounded-xl"
+              />
+            </div>
+            <p className="mt-4 break-all rounded-xl bg-alinda-cream px-3 py-2.5 text-center text-xs text-alinda-muted">{bookingUrl}</p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => void shareBookingPage()} className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-alinda-line text-sm font-semibold hover:border-alinda-ink">
+                <Share2 size={16} /> Paylaş
+              </button>
+              <button type="button" onClick={() => void copyBookingLink()} className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-alinda-ink text-sm font-semibold text-white hover:opacity-90">
+                <Copy size={16} /> {copied ? "Kopyalandı" : "Linki kopyala"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
