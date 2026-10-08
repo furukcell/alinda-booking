@@ -13,6 +13,12 @@ type Preference = {
   declineCount?: number;
 };
 
+export async function isProAiEligible(businessId: string) {
+  const snapshot = await getAdminDb().collection("businesses").doc(businessId).get();
+  const data = snapshot.data();
+  return snapshot.exists && data?.plan === "pro" && data?.accessEnabled !== false && data?.active !== false;
+}
+
 function ref(businessId: string, phone: string) {
   return getAdminDb()
     .collection("businesses")
