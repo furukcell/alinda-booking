@@ -90,7 +90,7 @@ export default function SpecialistsPage() {
           })),
           timeOffDates: Array.isArray(data.timeOffDates) ? data.timeOffDates.filter((value: unknown): value is string => typeof value === "string") : []
         };
-      }).filter((item) => item.id));
+      }).filter((item: Specialist) => item.id));
     } catch {
       setError("Uzmanlar yüklenemedi. Firebase ve Firestore ayarlarınızı kontrol edin.");
     } finally {
