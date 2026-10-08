@@ -139,7 +139,8 @@ export function BusinessBooking({ business }: { business: Business }) {
     if (!nextMonth) return;
     setSelectedMonth(nextMonth.key);
     if (!nextMonth.dates.some((item) => item.id === selectedDate)) {
-      chooseDate(nextMonth.dates[0].id, false);
+      const nextAvailable = nextMonth.dates.find((item) => selectableDateIds.has(item.id));
+      if (nextAvailable) chooseDate(nextAvailable.id, false);
     }
   }
 
