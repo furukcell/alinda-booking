@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
+import { rateLimit, rateLimitResponse } from "@/lib/security/rate-limit";
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -49,6 +50,8 @@ function generateReferenceNo() {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request, "booking-create", 10, 60_000);
+  if (!limited.allowed) return rateLimitResponse(limited.retryAfterSeconds);
   try {
     const body = await request.json();
     const businessId = clean(body.businessId);
