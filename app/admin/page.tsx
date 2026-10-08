@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { Activity, Bot, CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LayoutDashboard, LogOut, Megaphone, Menu, MessageCircle, Plus, ShieldCheck, Store, Ticket, Trash2, Users, X } from "lucide-react";
+import { Activity, Bot, CheckCircle2, ChevronRight, Edit3, Loader2, ExternalLink, KeyRound, LayoutDashboard, LogOut, Megaphone, Menu, MessageCircle, Plus, ShieldCheck, Store, Ticket, Trash2, Users, X } from "lucide-react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 
 type AdminBusiness = {
