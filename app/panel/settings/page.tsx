@@ -640,6 +640,17 @@ export default function BusinessSettingsPage() {
               )}
             </section>
 
+            <section className="rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
+              <div>
+                <h2 className="font-semibold">Yasal metinler</h2>
+                <p className="mt-1 text-xs leading-5 text-alinda-muted">ALINDA kullanım koşulları ve gizlilik/KVKK metinlerini buradan inceleyebilirsiniz.</p>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Link href="/kosullar" target="_blank" className="rounded-xl border border-alinda-line bg-white px-4 py-2.5 text-sm font-semibold">ALINDA Kullanım Koşulları</Link>
+                <Link href="/gizlilik" target="_blank" className="rounded-xl border border-alinda-line bg-white px-4 py-2.5 text-sm font-semibold">ALINDA Gizlilik ve KVKK</Link>
+              </div>
+            </section>
+
             <div className="sticky bottom-4 flex items-center justify-end gap-3 rounded-2xl border border-alinda-line bg-white/95 p-3 shadow-card backdrop-blur">
               {saved && <span className="mr-auto inline-flex items-center gap-1.5 text-sm font-medium text-alinda-success"><Check size={16} /> Kaydedildi</span>}
               <button type="submit" disabled={saving || loading} className="inline-flex items-center gap-2 rounded-xl bg-alinda-ink px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
