@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Bot, CalendarDays, CircleDollarSign, Clock3, RefreshCw, TrendingUp } from "lucide-react";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { waitForFirebaseUser } from "@/lib/firebase/auth-ready";
 
 type Data = {
   businesses: number; total: number; completed: number; pending: number; cancelled: number;
@@ -34,7 +34,7 @@ export default function AdminAiPage() {
 
   async function load() {
     try {
-      const user = getFirebaseAuth().currentUser;
+      const user = await waitForFirebaseUser();
       if (!user) { window.location.href = "/login"; return; }
       const token = await user.getIdToken();
       const response = await fetch("/api/admin/ai-insights", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
