@@ -47,7 +47,10 @@ export async function POST(request: Request) {
     const payload = JSON.parse(rawBody);
     for (const entry of Array.isArray(payload?.entry) ? payload.entry : []) {
       for (const change of Array.isArray(entry?.changes) ? entry.changes : []) {
-        const value = change?.value, messages = Array.isArray(value?.messages) ? value.messages : [];
+        const value = change?.value;
+        const field = String(change?.field || "");
+        const messages = Array.isArray(value?.messages) ? value.messages : [];
+        const messageEchoes = Array.isArray(value?.message_echoes) ? value.message_echoes : [];
         const phoneNumberId = typeof value?.metadata?.phone_number_id === "string" ? value.metadata.phone_number_id : "";
         if (!phoneNumberId) continue;
         const found = await getAdminDb().collectionGroup("integrations").where("phoneNumberId", "==", phoneNumberId).limit(1).get();
@@ -56,6 +59,15 @@ export async function POST(request: Request) {
         if (!businessRef) continue;
         const connection = await getWhatsAppConnection(businessRef.id);
         if (!connection) continue;
+
+        if (field === "smb_message_echoes") {
+          for (const echo of messageEchoes) {
+            const recipient = typeof echo?.to === "string" ? echo.to : "";
+            if (recipient) await markOutbound(businessRef.id, recipient);
+          }
+          continue;
+        }
+
         if (!(await isProAiEligible(businessRef.id))) continue;
         const catalog = await loadSecretaryCatalog(businessRef.id);
         for (const message of messages) {
