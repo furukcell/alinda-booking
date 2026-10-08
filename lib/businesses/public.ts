@@ -115,6 +115,8 @@ export async function getPublicBusiness(slug: string): Promise<Business | undefi
       city: typeof data.city === "string" ? data.city : "",
       district: typeof data.district === "string" ? data.district : "",
       address: typeof data.address === "string" ? data.address : "",
+      latitude: typeof data.latitude === "number" ? data.latitude : undefined,
+      longitude: typeof data.longitude === "number" ? data.longitude : undefined,
       phone: typeof data.phone === "string" ? data.phone : "",
       initials: typeof data.initials === "string" ? data.initials : "AL",
       logoUrl: typeof data.logoUrl === "string" ? data.logoUrl : undefined,
