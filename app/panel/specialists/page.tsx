@@ -3,7 +3,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { ArrowLeft, Check, ImagePlus, Pencil, Plus, Trash2, UserRound, X } from "lucide-react";
+import { ArrowLeft, Check, ImagePlus, Loader2, Pencil, Plus, Trash2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getFirebaseAuth, getFirebaseDb, getFirebaseStorage } from "@/lib/firebase/client";
@@ -43,6 +43,7 @@ export default function SpecialistsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   async function loadData(uid: string) {
     setLoading(true);
@@ -190,7 +191,8 @@ export default function SpecialistsPage() {
   }
 
   async function removeSpecialist() {
-    if (!businessId || !deletingId) return;
+    if (!businessId || !deletingId || deleting) return;
+    setDeleting(true);
     try {
       await deleteDoc(doc(getFirebaseDb(), "businesses", businessId, "specialists", deletingId));
       setSpecialists((items) => items.filter((item) => item.id !== deletingId));
@@ -198,6 +200,8 @@ export default function SpecialistsPage() {
       setSuccess("Uzman silindi.");
     } catch {
       setError("Uzman silinemedi.");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -238,6 +242,7 @@ export default function SpecialistsPage() {
           {!editingId && <a href="#specialist-form" className="hidden shrink-0 items-center gap-2 rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white sm:inline-flex"><Plus size={16} /> Yeni uzman</a>}
         </header>
 
+        {success && <div role="status" className="mt-6 flex items-center gap-2 rounded-xl border border-[#CFE4D5] bg-[#F0F8F2] px-4 py-3 text-sm text-[#39704A]"><Check size={16} /> {success}</div>}
         {error && <div role="alert" className="mt-6 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-sm text-alinda-danger">{error}</div>}
         {success && <div role="status" className="mt-6 flex items-center gap-2 rounded-xl border border-[#CFE4D5] bg-[#EEF7F0] px-4 py-3 text-sm text-[#39704A]"><Check size={16} /> {success}</div>}
 
@@ -320,7 +325,7 @@ export default function SpecialistsPage() {
             </label>
 
             <div className="flex gap-2 sm:col-span-2">
-              <button disabled={saving || !businessId} className="inline-flex h-11 items-center justify-center rounded-xl bg-alinda-ink px-5 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Kaydediliyor…" : editingId ? "Değişiklikleri kaydet" : "Uzmanı ekle"}</button>
+              <button disabled={saving || !businessId} className="inline-flex h-11 items-center justify-center rounded-xl bg-alinda-ink px-5 text-sm font-semibold text-white disabled:opacity-50">{saving && <Loader2 size={16} className="animate-spin" />}{saving ? "Kaydediliyor…" : editingId ? "Değişiklikleri kaydet" : "Uzmanı ekle"}</button>
               {editingId && <button type="button" onClick={resetForm} className="h-11 rounded-xl border border-alinda-line px-5 text-sm font-semibold">İptal</button>}
             </div>
           </form>
@@ -348,8 +353,8 @@ export default function SpecialistsPage() {
             <h2 className="text-lg font-semibold">Uzman silinsin mi?</h2>
             <p className="mt-2 text-sm leading-6 text-alinda-muted">Uzman yeni randevu ekranında görünmeyecek. Eski randevuların kayıtları silinmez.</p>
             <div className="mt-6 flex gap-2">
-              <button onClick={() => setDeletingId(null)} className="h-11 flex-1 rounded-xl border border-alinda-line text-sm font-semibold">Vazgeç</button>
-              <button onClick={() => void removeSpecialist()} className="h-11 flex-1 rounded-xl bg-alinda-danger text-sm font-semibold text-white">Evet, sil</button>
+              <button disabled={deleting} onClick={() => setDeletingId(null)} className="h-11 flex-1 rounded-xl border border-alinda-line text-sm font-semibold disabled:opacity-50">Vazgeç</button>
+              <button disabled={deleting} onClick={() => void removeSpecialist()} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-alinda-danger text-sm font-semibold text-white disabled:opacity-50">{deleting && <Loader2 size={16} className="animate-spin" />}{deleting ? "Siliniyor…" : "Evet, sil"}</button>
             </div>
           </div>
         </div>
