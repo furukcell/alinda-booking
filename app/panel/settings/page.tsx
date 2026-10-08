@@ -1,14 +1,13 @@
 "use client";
 
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+
+import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { ArrowLeft, Check, Loader2, MessageCircle, Settings2, Unplug, MapPinned } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseAuth, getFirebaseDb, getFirebaseStorage } from "@/lib/firebase/client";
-import { getOwnedBusinessId } from "@/lib/businesses/owner";
 
 declare global {
   interface Window {
@@ -62,6 +61,7 @@ export default function BusinessSettingsPage() {
   const [saved, setSaved] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
   const [logoBusy, setLogoBusy] = useState(false);
+  const [logoProgress, setLogoProgress] = useState(0);
   const [logoError, setLogoError] = useState("");
   const [whatsappConnected, setWhatsappConnected] = useState(false);
   const [whatsappPhone, setWhatsappPhone] = useState("");
@@ -85,13 +85,16 @@ export default function BusinessSettingsPage() {
         }
 
         try {
-          const id = await getOwnedBusinessId(user.uid);
-          if (!id) throw new Error("NO_BUSINESS");
+          const token = await user.getIdToken();
+          const response = await fetch("/api/panel/business", {
+            headers: { Authorization: `Bearer ${token}` },
+            cache: "no-store"
+          });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(result.error || "İşletme bilgileri alınamadı.");
 
-          const snapshot = await getDoc(doc(getFirebaseDb(), "businesses", id));
-          if (!snapshot.exists()) throw new Error("BUSINESS_NOT_FOUND");
-
-          const data = snapshot.data();
+          const id = result.businessId;
+          const data = result.business || {};
           setBusinessId(id);
           setPlan(data.plan === "pro" ? "pro" : "starter");
           setDailySummaryEnabled(data.whatsappDailySummaryEnabled === true);
@@ -284,16 +287,46 @@ export default function BusinessSettingsPage() {
     }
 
     setLogoBusy(true);
+    setLogoProgress(0);
+    setSaved(false);
     try {
       const storage = getFirebaseStorage();
       const logoRef = ref(storage, `businesses/${businessId}/logo`);
-      await uploadBytes(logoRef, file, { contentType: file.type, cacheControl: "public,max-age=3600" });
+      const uploadTask = uploadBytesResumable(logoRef, file, {
+        contentType: file.type,
+        cacheControl: "public,max-age=3600"
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            setLogoProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100));
+          },
+          reject,
+          resolve
+        );
+      });
+
+      setLogoProgress(100);
       const url = await getDownloadURL(logoRef);
-      await updateDoc(doc(getFirebaseDb(), "businesses", businessId), { logoUrl: url });
+      const user = getFirebaseAuth().currentUser;
+      const token = await user?.getIdToken();
+      if (!token) throw new Error("Oturum doğrulanamadı.");
+
+      const response = await fetch("/api/panel/business", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ logoUrl: url })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Logo adresi kaydedilemedi.");
+
       setLogoUrl(url);
       setSaved(true);
-    } catch {
-      setLogoError("Logo yüklenemedi. Storage Rules ve Firebase Storage bağlantısını kontrol edin.");
+    } catch (uploadError) {
+      const message = uploadError instanceof Error ? uploadError.message : "Bilinmeyen yükleme hatası.";
+      setLogoError(`Logo yüklenemedi: ${message}`);
     } finally {
       setLogoBusy(false);
     }
@@ -306,11 +339,22 @@ export default function BusinessSettingsPage() {
 
     try {
       await deleteObject(ref(getFirebaseStorage(), `businesses/${businessId}/logo`));
-      await updateDoc(doc(getFirebaseDb(), "businesses", businessId), { logoUrl: "" });
+      const user = getFirebaseAuth().currentUser;
+      const token = await user?.getIdToken();
+      if (!token) throw new Error("Oturum doğrulanamadı.");
+
+      const response = await fetch("/api/panel/business", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ logoUrl: "" })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Logo bilgisi silinemedi.");
+
       setLogoUrl("");
       setSaved(true);
-    } catch {
-      setLogoError("Logo silinemedi. Lütfen tekrar deneyin.");
+    } catch (removeError) {
+      setLogoError(`Logo silinemedi: ${removeError instanceof Error ? removeError.message : "Bilinmeyen hata."}`);
     } finally {
       setLogoBusy(false);
     }
@@ -330,26 +374,37 @@ export default function BusinessSettingsPage() {
     setError("");
 
     try {
-      await updateDoc(doc(getFirebaseDb(), "businesses", businessId), {
-        name: form.name.trim(),
-        slug: form.slug.trim().toLowerCase(),
-        category: form.category.trim(),
-        description: form.description.trim(),
-        city: form.city.trim(),
-        district: form.district.trim(),
-        address: form.address.trim(),
-        latitude: form.latitude ? Number(form.latitude) : null,
-        longitude: form.longitude ? Number(form.longitude) : null,
-        phone: form.phone.trim(),
-        whatsappNotificationPhone: form.whatsappNotificationPhone.trim(),
-        initials: form.initials.trim().slice(0, 3).toUpperCase(),
-        primaryColor: form.primaryColor,
-        primaryColorSoft: form.primaryColorSoft,
-        whatsappDailySummaryEnabled: plan === "pro" && dailySummaryEnabled
+      const user = getFirebaseAuth().currentUser;
+      const token = await user?.getIdToken();
+      if (!token) throw new Error("Oturum doğrulanamadı.");
+
+      const response = await fetch("/api/panel/business", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          slug: form.slug.trim().toLowerCase(),
+          category: form.category.trim(),
+          description: form.description.trim(),
+          city: form.city.trim(),
+          district: form.district.trim(),
+          address: form.address.trim(),
+          latitude: form.latitude ? Number(form.latitude) : null,
+          longitude: form.longitude ? Number(form.longitude) : null,
+          phone: form.phone.trim(),
+          whatsappNotificationPhone: form.whatsappNotificationPhone.trim(),
+          initials: form.initials.trim().slice(0, 3).toUpperCase(),
+          primaryColor: form.primaryColor,
+          primaryColorSoft: form.primaryColorSoft,
+          whatsappDailySummaryEnabled: plan === "pro" && dailySummaryEnabled
+        })
       });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Değişiklikler kaydedilemedi.");
+
       setSaved(true);
-    } catch {
-      setError("Değişiklikler kaydedilemedi. Firestore Rules ve sahiplik bilgisini kontrol edin.");
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Değişiklikler kaydedilemedi.");
     } finally {
       setSaving(false);
     }
@@ -484,7 +539,7 @@ export default function BusinessSettingsPage() {
 
                 <div className="flex flex-wrap gap-2">
                   <label className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">
-                    {logoBusy ? "İşleniyor…" : logoUrl ? "Logoyu değiştir" : "Logo yükle"}
+                    {logoBusy ? `Yükleniyor… ${logoProgress}%` : logoUrl ? "Logoyu değiştir" : "Logo yükle"}
                     <input
                       type="file"
                       accept="image/png,image/jpeg,image/webp"
@@ -504,6 +559,8 @@ export default function BusinessSettingsPage() {
                   )}
                 </div>
               </div>
+
+              {logoBusy && <div className="mt-4 h-2 overflow-hidden rounded-full bg-alinda-cream"><div className="h-full rounded-full bg-alinda-ink transition-all" style={{ width: `${logoProgress}%` }} /></div>}
 
               {logoError && <div role="alert" className="mt-4 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-xs text-alinda-danger">{logoError}</div>}
             </section>
