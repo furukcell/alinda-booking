@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { Activity, Bot, CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LayoutDashboard, LogOut, Megaphone, MessageCircle, Plus, ShieldCheck, Store, Ticket, Trash2, Users, X } from "lucide-react";
+import { Activity, Bot, CheckCircle2, ChevronRight, Edit3, ExternalLink, KeyRound, LayoutDashboard, LogOut, Megaphone, Menu, MessageCircle, Plus, ShieldCheck, Store, Ticket, Trash2, Users, X } from "lucide-react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 
 type AdminBusiness = {
@@ -53,6 +53,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [editForm, setEditForm] = useState(emptyEdit);
 
@@ -202,6 +203,61 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-alinda-cream text-alinda-ink">
+      <div className="flex items-center justify-between border-b border-alinda-line bg-white px-4 py-4 lg:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-alinda-ink text-white"><ShieldCheck size={19} /></div>
+          <div><p className="font-semibold tracking-tight">ALINDA</p><p className="text-[11px] text-alinda-muted">Süper Admin</p></div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(true)}
+          aria-label="Yönetim menüsünü aç"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-alinda-line bg-white"
+        >
+          <Menu size={20} />
+        </button>
+      </div>
+
+      {mobileNavOpen ? (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            type="button"
+            aria-label="Menüyü kapat"
+            onClick={() => setMobileNavOpen(false)}
+            className="absolute inset-0 bg-alinda-ink/30 backdrop-blur-sm"
+          />
+          <aside className="relative flex h-full w-[82%] max-w-sm flex-col border-r border-alinda-line bg-white p-5 shadow-elevated">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-alinda-ink text-white"><ShieldCheck size={19} /></div>
+                <div><p className="font-semibold tracking-tight">ALINDA</p><p className="text-[11px] text-alinda-muted">Süper Admin</p></div>
+              </div>
+              <button type="button" onClick={() => setMobileNavOpen(false)} aria-label="Menüyü kapat" className="rounded-full p-2 text-alinda-muted hover:bg-alinda-cream"><X size={20} /></button>
+            </div>
+
+            <div className="mt-7 rounded-[22px] bg-alinda-ink p-5 text-white">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/50">Yönetim merkezi</p>
+              <p className="mt-2 text-lg font-semibold">ALINDA'yı yönetin.</p>
+              <p className="mt-2 text-xs leading-5 text-white/60">Dashboard, işletmeler, abonelikler ve diğer yönetim araçları.</p>
+            </div>
+
+            <nav className="mt-6 space-y-1">
+              <a onClick={() => setMobileNavOpen(false)} href="/admin/dashboard" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><LayoutDashboard size={18} /> Dashboard</a>
+              <a onClick={() => setMobileNavOpen(false)} href="/admin/whatsapp" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><MessageCircle size={18} /> WhatsApp Merkezi</a>
+              <a onClick={() => setMobileNavOpen(false)} href="/admin/activity-logs" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Activity size={18} /> Aktivite Logları</a>
+              <a onClick={() => setMobileNavOpen(false)} href="/admin/ai-secretary" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Bot size={18} /> AI Sekreter</a>
+              <a onClick={() => setMobileNavOpen(false)} href="/admin/coupons" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Ticket size={18} /> Kuponlar</a>
+              <a onClick={() => setMobileNavOpen(false)} href="/admin/announcements" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><Megaphone size={18} /> Duyurular</a>
+              <div className="flex items-center gap-3 rounded-xl bg-alinda-cream px-3 py-3 text-sm font-medium"><Store size={18} /> İşletmeler</div>
+            </nav>
+
+            <div className="mt-auto">
+              <button onClick={() => signOut(getFirebaseAuth())} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"><LogOut size={17} /> Çıkış yap</button>
+            </div>
+          </aside>
+        </div>
+      ) : null}
+
       <div className="mx-auto flex min-h-screen max-w-[1500px]">
         <aside className="hidden w-72 shrink-0 border-r border-alinda-line bg-white p-6 lg:flex lg:flex-col">
           <div className="flex items-center gap-3">
