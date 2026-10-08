@@ -1,6 +1,5 @@
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import type { Business, Service, Specialist } from "@/types/business";
-import { getFirebaseDb } from "@/lib/firebase/client";
+import { getAdminDb } from "@/lib/firebase/admin";
 import { getBusinessBySlug } from "@/lib/mock/businesses";
 
 function parseServices(rawServices: unknown): Service[] {
@@ -68,7 +67,7 @@ const demoSpecialists: Specialist[] = [
 
 async function getBusinessServices(businessId: string, embedded: unknown): Promise<Service[]> {
   try {
-    const snapshot = await getDocs(collection(getFirebaseDb(), "businesses", businessId, "services"));
+    const snapshot = await getAdminDb().collection("businesses").doc(businessId).collection("services").get();
     if (!snapshot.empty) {
       return snapshot.docs.flatMap((item) => parseServices([{ id: item.id, ...item.data() }]));
     }
@@ -80,7 +79,7 @@ async function getBusinessServices(businessId: string, embedded: unknown): Promi
 
 async function getBusinessSpecialists(businessId: string, services: Service[], embedded: unknown): Promise<Specialist[]> {
   try {
-    const snapshot = await getDocs(collection(getFirebaseDb(), "businesses", businessId, "specialists"));
+    const snapshot = await getAdminDb().collection("businesses").doc(businessId).collection("specialists").get();
     if (!snapshot.empty) {
       return snapshot.docs.flatMap((item) => parseSpecialists([{ id: item.id, ...item.data() }]));
     }
@@ -96,13 +95,13 @@ async function getBusinessSpecialists(businessId: string, services: Service[], e
 }
 
 export async function getPublicBusiness(slug: string): Promise<Business | undefined> {
-  if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) return getBusinessBySlug(slug);
-
   try {
-    const snapshot = await getDoc(doc(getFirebaseDb(), "businesses", slug));
-    if (!snapshot.exists()) return undefined;
-    const data = snapshot.data();
+    const snapshot = await getAdminDb().collection("businesses").doc(slug).get();
+    if (!snapshot.exists) return undefined;
+
+    const data = snapshot.data() || {};
     if (data.active === false || data.accessEnabled === false) return undefined;
+
     const services = await getBusinessServices(snapshot.id, data.services);
     const specialists = await getBusinessSpecialists(snapshot.id, services, data.specialists);
 
@@ -126,7 +125,8 @@ export async function getPublicBusiness(slug: string): Promise<Business | undefi
       services,
       specialists
     };
-  } catch {
+  } catch (error) {
+    console.error("Public business load failed", error);
     return getBusinessBySlug(slug);
   }
 }
