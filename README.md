@@ -450,6 +450,118 @@ tamamlanmalıdır.
 
 ---
 
+# 🤖 WhatsApp AI Sekreter — Çalışma Biçimi
+
+ALINDA Pro planındaki WhatsApp AI Sekreteri, işletmenin WhatsApp numarasına gelen her mesaja otomatik cevap veren kontrolsüz bir bot olarak çalışmaz. **AI, müşteri bazında izinli şekilde devreye girer.**
+
+## AI kullanım izni
+
+Bir kişi işletmenin WhatsApp numarasına ilk kez yazdığında sistem önce sabit bir izin mesajı gönderir:
+
+    Merhaba 👋 Hoş geldiniz!
+    Randevu, müsaitlik ve randevu işlemlerinizde AI Asistanımızdan yardım almak ister misiniz?
+
+    🤖 AI Asistanı Kullan
+    👤 İşletmeyle Görüşeceğim
+
+Müşteri AI'ı kabul ederse yalnızca o WhatsApp numarası için AI aktifleşir.
+
+Müşteri reddederse AI o müşteri için kapalı kalır. İşletme ekibi normal şekilde cevap verebilir.
+
+## AI'ı sonradan tekrar açma
+
+AI kapatıldığında müşteriye:
+
+    Tamamdır 👍 Bundan sonraki mesajlarınızı işletme ekibimiz yanıtlayacaktır.
+
+    🤖 Dilediğiniz zaman "Asistanı aç" yazarak AI Asistanı tekrar kullanabilirsiniz.
+
+mesajı gönderilir.
+
+Müşteri daha sonra:
+
+- Asistanı aç
+- AI'ı aç
+- AI asistanla konuşmak istiyorum
+- Asistanla devam edelim
+
+gibi ifadeler kullandığında AI tekrar aktifleşir.
+
+Benzer şekilde müşteri "Asistanı kapat", "İnsanla görüşmek istiyorum" veya "Yetkiliyle görüşmek istiyorum" dediğinde AI o müşteri için kapatılır.
+
+## İşletme 10 dakika cevap vermezse
+
+Pro müşteride AI kapalı olsa bile müşteri mesajı işletme tarafından **10 dakika boyunca yanıtlanmazsa**, sistem otomatik olarak bir yardım teklifi gönderebilir:
+
+    👋 İşletme ekibimiz şu anda yoğun olabilir ve mesajınıza henüz yanıt veremedi.
+
+    🤖 Dilerseniz AI Asistanımız müsaitlik ve randevu konusunda size hemen yardımcı olabilir.
+    "Asistanla devam et" veya "Asistanı aç" yazabilirsiniz.
+
+AI müşterinin onayı olmadan sessizce konuşmaya başlamaz. Müşteri kabul ederse AI devreye girer.
+
+Bu teklif aynı konuşmada tekrar tekrar gönderilmez. Teklif gönderildiği kayıt altına alınır.
+
+## AI'ın yapabildiği işlemler
+
+AI aktif olan müşteriler için:
+
+- Hizmet ve fiyat bilgisi
+- Gerçek müsaitlik sorgulama
+- Uzman seçimi
+- Randevu hazırlama
+- Müşteri onayı sonrası gerçek randevu oluşturma
+- Randevu referansıyla sorgulama
+- Randevu iptali için onay alma
+- Müşteri onayı sonrası gerçek iptal
+- Doğal Türkçe konuşma
+
+desteklenir.
+
+AI randevuyu veya iptali doğrudan kendi başına yazmaz. Gemini önce doğal dili yorumlar; gerçek uygunluk ve değişiklik işlemleri ALINDA'nın deterministic Firestore akışından geçer.
+
+## Şahsi + işletme numarası kullanımı
+
+İşletme sahibi aynı WhatsApp numarasını şahsi görüşmeler için de kullanıyorsa AI'ın herkese cevap vermemesi için müşteri bazlı AI izni kullanılır.
+
+AI kapalı bir kişinin mesajları AI tarafından işlenmez.
+
+Önerilen kullanım, işletme için ayrı bir WhatsApp Business numarasıdır. Ancak aynı numara kullanılıyorsa müşteri bazlı izin ve insan desteğine dönüş komutları AI'ın kapsamını sınırlar.
+
+## Starter / Pro farkı
+
+### Starter
+
+- WhatsApp randevu bildirimleri
+- WhatsApp üzerinden manuel müşteri iletişimi
+- Temel WhatsApp bağlantısı
+
+AI WhatsApp Sekreteri Starter'da aktif değildir.
+
+### Pro
+
+Starter özelliklerine ek olarak:
+
+- AI WhatsApp Sekreteri
+- Müşteri bazlı AI kullanım izni
+- "Asistanı aç" / "Asistanı kapat" komutları
+- Gerçek müsaitlik kontrolü
+- WhatsApp üzerinden randevu oluşturma
+- Randevu sorgulama
+- Randevu iptali
+- İşletme 10 dakika cevap vermezse AI yardım teklifi
+- 24 saat önce WhatsApp randevu hatırlatması
+
+## AI güvenlik prensibi
+
+1. Müşteri AI'ı kabul etmeden AI sekreter konuşmaz.
+2. AI kapatılmış müşterinin normal mesajları AI'a gönderilmez.
+3. AI emin olmadığı işlemlerde bilgi uydurmaz.
+4. Hizmet, uzman, fiyat ve uygunluk gerçek işletme verisinden alınır.
+5. Gerçek randevu işlemleri Firestore transaction akışından geçer.
+6. Müşteri istediğinde insan desteğine geri dönülebilir.
+7. AI API kullanılamazsa sistem kontrollü fallback davranışı uygular.
+
 # 💰 Güncel Fiyatlandırma
 
 Landing page'de güncel planlar:
@@ -576,7 +688,7 @@ Super Admin için merkezi WhatsApp görünümü bulunmaktadır. İşletmelerin W
 - Firebase App Hosting
 - GitHub Actions
 - Meta WhatsApp Business Platform
-- OpenAI Responses API
+- Google Gemini API
 - Lucide React
 
 ---
@@ -609,8 +721,8 @@ Meta / WhatsApp:
 
 AI:
 
-    OPENAI_API_KEY
-    OPENAI_SECRETARY_MODEL
+    GEMINI_API_KEY
+    GEMINI_SECRETARY_MODEL
 
 Cron:
 
@@ -701,6 +813,9 @@ Secret değerleri repository içine yazılmamalıdır.
 - [x] Duplicate protection
 - [x] Deterministic secretary
 - [x] AI intent katmanı
+- [x] Müşteri bazlı AI izin sistemi
+- [x] AI kapat/aç komutları
+- [x] 10 dakika cevap gelmezse AI yardım teklifi
 - [x] Randevu sorgulama
 - [x] Randevu iptal
 - [x] Pro günlük özet altyapısı
@@ -910,7 +1025,7 @@ Her faz **tek tek uygulanacak ve test edilecek**. Yeni sektör özellikleri mevc
 | Logo / branding | 🟢 Hazır |
 | WhatsApp altyapısı | 🟢 Kod hazır / Meta production bekliyor |
 | WhatsApp secretary | 🟢 Deterministic akış hazır |
-| AI WhatsApp secretary | 🟡 Kod entegre / gerçek API + WhatsApp E2E test bekliyor |
+| AI WhatsApp secretary | 🟡 İzin + 10 dk fallback + Gemini kodu entegre / gerçek API + WhatsApp E2E test bekliyor |
 | WhatsApp sorgulama | 🟢 Kod hazır |
 | WhatsApp iptal | 🟢 Kod hazır |
 | Pro günlük özet | 🟡 Kod hazır / template + secret + gerçek test bekliyor |
