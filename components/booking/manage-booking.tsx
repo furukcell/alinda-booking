@@ -192,7 +192,6 @@ export function ManageBooking({ businessId }: { businessId: string }) {
         Randevum var
       </button>
 
-}
       {open && createPortal(dialog, document.body)}
     </>
   );
