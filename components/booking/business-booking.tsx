@@ -696,7 +696,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <div className="mt-5 overflow-hidden rounded-[20px] border" style={{ borderColor: line }}>
                   <iframe
                     title={business.name + " konumu"}
-                    src={"https://maps.google.com/maps?q=" + encodeURIComponent(String(business.latitude) + "," + String(business.longitude)) + "&z=16&output=embed"}
+                    src={"https://www.openstreetmap.org/export/embed.html?bbox=" + (Number(business.longitude) - 0.01) + "," + (Number(business.latitude) - 0.01) + "," + (Number(business.longitude) + 0.01) + "," + (Number(business.latitude) + 0.01) + "&layer=mapnik&marker=" + String(business.latitude) + "," + String(business.longitude)}
                     className="h-56 w-full border-0"
                     loading="lazy"
                   />
