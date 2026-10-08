@@ -2,7 +2,7 @@
 
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { ArrowLeft, Check, Loader2, MessageCircle, Settings2, Unplug } from "lucide-react";
+import { ArrowLeft, Check, Loader2, MessageCircle, Settings2, Unplug, MapPinned } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -27,6 +27,8 @@ type BusinessForm = {
   city: string;
   district: string;
   address: string;
+  latitude: string;
+  longitude: string;
   phone: string;
   whatsappNotificationPhone: string;
   initials: string;
@@ -42,6 +44,8 @@ const emptyForm: BusinessForm = {
   city: "",
   district: "",
   address: "",
+  latitude: "",
+  longitude: "",
   phone: "",
   whatsappNotificationPhone: "",
   initials: "",
@@ -99,6 +103,8 @@ export default function BusinessSettingsPage() {
             city: data.city ?? "",
             district: data.district ?? "",
             address: data.address ?? "",
+            latitude: typeof data.latitude === "number" ? String(data.latitude) : "",
+            longitude: typeof data.longitude === "number" ? String(data.longitude) : "",
             phone: data.phone ?? "",
             whatsappNotificationPhone: data.whatsappNotificationPhone ?? data.phone ?? "",
             initials: data.initials ?? "",
@@ -332,6 +338,8 @@ export default function BusinessSettingsPage() {
         city: form.city.trim(),
         district: form.district.trim(),
         address: form.address.trim(),
+        latitude: form.latitude ? Number(form.latitude) : null,
+        longitude: form.longitude ? Number(form.longitude) : null,
         phone: form.phone.trim(),
         whatsappNotificationPhone: form.whatsappNotificationPhone.trim(),
         initials: form.initials.trim().slice(0, 3).toUpperCase(),
@@ -404,7 +412,58 @@ export default function BusinessSettingsPage() {
                 <Field label="İlçe" value={form.district} onChange={(value) => updateField("district", value)} required />
                 <Field label="Telefon" value={form.phone} onChange={(value) => updateField("phone", value)} />
                 <Field label="WhatsApp bildirim telefonu" value={form.whatsappNotificationPhone} onChange={(value) => updateField("whatsappNotificationPhone", value)} hint="Yeni randevu bildirimlerinin gönderileceği salon/işletme telefonu." />
-                <div className="sm:col-span-2"><Field label="Adres" value={form.address} onChange={(value) => updateField("address", value)} /></div>
+                <div className="sm:col-span-2">
+                  <Field label="Adres" value={form.address} onChange={(value) => updateField("address", value)} hint="Müşterilerin randevu sayfasında göreceği açık adres." />
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const query = [form.address, form.district, form.city].filter(Boolean).join(", ");
+                        if (!query) return;
+                        setError("");
+                        try {
+                          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=tr&q=${encodeURIComponent(query)}`, {
+                            headers: { Accept: "application/json" }
+                          });
+                          const results = await response.json();
+                          if (!results?.[0]) throw new Error("Konum bulunamadı.");
+                          updateField("latitude", String(results[0].lat));
+                          updateField("longitude", String(results[0].lon));
+                          setSaved(false);
+                        } catch (error) {
+                          setError(error instanceof Error ? error.message : "Konum haritada bulunamadı.");
+                        }
+                      }}
+                      className="inline-flex items-center gap-2 rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white"
+                    >
+                      <MapPinned size={16} /> Haritada konumu bul
+                    </button>
+                    {form.latitude && form.longitude && (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.latitude + "," + form.longitude)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-xl border border-alinda-line px-4 py-2.5 text-sm font-semibold"
+                      >
+                        Google Maps'te aç
+                      </a>
+                    )}
+                  </div>
+                  {form.latitude && form.longitude && (
+                    <div className="mt-4 overflow-hidden rounded-[20px] border border-alinda-line">
+                      <iframe
+                        title="İşletme konumu"
+                        src={`https://maps.google.com/maps?q=${encodeURIComponent(form.latitude + "," + form.longitude)}&z=16&output=embed`}
+                        className="h-64 w-full border-0"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <Field label="Enlem" value={form.latitude} onChange={(value) => updateField("latitude", value)} hint="Örn. 37.2153" />
+                    <Field label="Boylam" value={form.longitude} onChange={(value) => updateField("longitude", value)} hint="Örn. 28.3636" />
+                  </div>
+                </div>
               </div>
             </section>
 
