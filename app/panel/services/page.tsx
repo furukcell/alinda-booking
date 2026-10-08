@@ -28,16 +28,18 @@ export default function ServicesPage() {
     setLoading(true);
     setError("");
     try {
-      const id = await getOwnedBusinessId(uid);
-      setBusinessId(id);
-      if (!id) {
-        setServices([]);
-        setError("Bu kullanıcıya bağlı bir işletme bulunamadı.");
-        return;
-      }
-      const snapshot = await getDocs(collection(getFirebaseDb(), "businesses", id, "services"));
-      setServices(snapshot.docs.map((item) => {
-        const data = item.data();
+      const user = getFirebaseAuth().currentUser;
+      const token = await user?.getIdToken();
+      if (!token) throw new Error("Oturum doğrulanamadı.");
+      const response = await fetch("/api/panel/resources?type=services", {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Hizmetler alınamadı.");
+      setBusinessId(result.businessId);
+      setServices((result.items || []).map((item: any) => {
+        const data = item;
         return {
           id: item.id,
           name: typeof data.name === "string" ? data.name : "",
