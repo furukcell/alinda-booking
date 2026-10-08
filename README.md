@@ -565,6 +565,92 @@ Starter özelliklerine ek olarak:
 6. Müşteri istediğinde insan desteğine geri dönülebilir.
 7. AI API kullanılamazsa sistem kontrollü fallback davranışı uygular.
 
+# 🤖 ALINDA AI — İşletme Sahibi WhatsApp Asistanı
+
+Yeni hedef mimari: **ALINDA AI web sitesinde veya panel içinde chatbot olarak çalışmayacaktır.** İşletme sahibiyle ayrı bir WhatsApp sohbeti üzerinden çalışacaktır.
+
+## Planlanan ALINDA AI numarası
+
+ALINDA AI için işletmelerden bağımsız, merkezi **tek bir WhatsApp Business numarası** kullanılacaktır.
+
+WhatsApp'ta bu numaranın:
+
+- Görünen adı: **ALINDA AI**
+- Profil fotoğrafı: **ALINDA logosu / marka ikonu**
+- Kullanım amacı: İşletme sahiplerinin dijital AI sekreteri
+
+olacaktır.
+
+Aynı ALINDA AI numarası birden fazla Pro işletme tarafından kullanılabilir. İşletme sahibi mesaj gönderdiğinde sistem WhatsApp numarasından ilgili işletmeyi eşleştirerek yalnızca o işletmenin Firestore verilerine erişmelidir.
+
+### İşletme sahibinin göreceği sohbet
+
+    🤖 ALINDA AI
+
+    İşletme:
+    Bugün kaç randevum var?
+
+    ALINDA AI:
+    Bugün 12 randevunuz var.
+    Tahmini ciro: 8.450 TL.
+
+Yeni randevu oluştuğunda:
+
+    🔔 Yeni Randevu
+    👤 Zeynep Yılmaz
+    💇 Saç Kesimi
+    👩 Ayşe
+    🕐 14:30
+    💰 650 TL
+
+Sabah günlük özet de aynı **ALINDA AI** sohbetinden gönderilecektir.
+
+## ALINDA AI numarası için yapılacaklar
+
+- [ ] ALINDA AI için ayrı, SMS/arama ile doğrulanabilir gerçek GSM numarası almak.
+- [ ] Meta Business / WhatsApp Business Platform'a ALINDA AI numarasını eklemek.
+- [ ] ALINDA AI için ayrı Phone Number ID oluşturmak/doğrulamak.
+- [ ] ALINDA AI profil adını **ALINDA AI** olarak ayarlamak.
+- [ ] Profil fotoğrafını ALINDA logo/ikonuyla ayarlamak.
+- [ ] ALINDA AI WABA/webhook yapılandırmasını production'a almak.
+- [ ] Gerekli Meta izinleri ve onaylı template'leri tamamlamak.
+- [ ] ALINDA AI numarasından gelen işletme sahibi mesajlarını işletme hesabıyla eşleştirmek.
+- [ ] Aynı telefon numarasının iki farklı işletmeye erişmesini kesin olarak engellemek.
+
+## Kod tarafında yapılacak ALINDA AI işleri
+
+- [ ] İşletme sahibi WhatsApp kimliği için ayrı owner mapping/veri modeli oluşturmak.
+- [ ] ALINDA AI numarası ile işletmelerin müşteri WhatsApp numaralarını birbirinden ayırmak.
+- [ ] Owner mesajları için ayrı webhook routing oluşturmak.
+- [ ] Owner → business doğrulaması ve tenant izolasyonu eklemek.
+- [ ] Owner AI sohbet geçmişini ayrı koleksiyonda tutmak.
+- [ ] Gemini Flash-Lite ile owner AI tool setini oluşturmak.
+- [ ] `get_today_summary` gibi basit veri sorgularını mümkün olduğunca Gemini'siz çalıştırmak.
+- [ ] Randevu oluşturma / iptal / sorgulama tool'larını owner tarafına güvenli şekilde açmak.
+- [ ] Yeni randevu bildirimlerini ALINDA AI numarasından owner'a yönlendirmek.
+- [ ] Günlük özeti ALINDA AI numarasından owner'a yönlendirmek.
+- [ ] Owner AI mesaj kotası: **aylık 500 AI mesajı / Pro işletme**.
+- [ ] Otomatik bildirimleri AI mesaj kotasından düşürmemek.
+- [ ] Kota sayaçlarını işletme bazında tutmak.
+- [ ] Kota aşımında kontrollü fallback mesajı vermek.
+- [ ] Owner AI için audit/log kayıtları oluşturmak.
+- [ ] Meta webhook duplicate ve delivery status kontrollerini tamamlamak.
+- [ ] Gerçek Meta + Gemini credentials ile uçtan uca production testi yapmak.
+
+## Önemli ayrım
+
+    🏪 İşletmenin WhatsApp numarası
+             ↓
+        Müşteriler / müşteri AI
+
+    🤖 ALINDA AI numarası
+             ↓
+        İşletme sahibi / işletme AI
+
+Web sitesine chatbot eklenmeyecektir. İşletme paneli de AI sohbet arayüzü olmayacaktır. WhatsApp, işletme sahibinin AI sekreter arayüzüdür.
+
+---
+
 # 💰 Güncel Fiyatlandırma
 
 Landing page'de güncel planlar:
