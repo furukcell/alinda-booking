@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CirclePlus, Edit3, Megaphone, Trash2, X } from "lucide-react";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { waitForFirebaseUser } from "@/lib/firebase/auth-ready";
 
 type Announcement={id:string;title:string;message:string;type:"info"|"success"|"warning";businessId:string|null;active:boolean;startDate:string|null;endDate:string|null;createdAt:string|null};
 type Business={id:string;name:string};
 const empty={title:"",message:"",type:"info" as Announcement["type"],businessId:"",startDate:"",endDate:""};
 export default function AdminAnnouncementsPage(){const[items,setItems]=useState<Announcement[]>([]),[businesses,setBusinesses]=useState<Business[]>([]),[form,setForm]=useState(empty),[editing,setEditing]=useState<Announcement|null>(null),[showForm,setShowForm]=useState(false),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState(""),[success,setSuccess]=useState("");
-async function authFetch(url:string,options:RequestInit={}){const user=getFirebaseAuth().currentUser;if(!user){window.location.href="/login";throw new Error("Oturum bulunamadı.")}const token=await user.getIdToken();return fetch(url,{...options,headers:{...(options.headers||{}),Authorization:`Bearer ${token}`,"Content-Type":"application/json"}})}
+async function authFetch(url:string,options:RequestInit={}){const user=await waitForFirebaseUser();if(!user){window.location.href="/login";throw new Error("Oturum bulunamadı.")}const token=await user.getIdToken();return fetch(url,{...options,headers:{...(options.headers||{}),Authorization:`Bearer ${token}`,"Content-Type":"application/json"}})}
 async function load(){setLoading(true);try{const[a,b]=await Promise.all([authFetch("/api/admin/announcements"),authFetch("/api/admin/businesses")]);const ad=await a.json(),bd=await b.json();if(!a.ok)throw new Error(ad.error);if(!b.ok)throw new Error(bd.error);setItems(ad.announcements||[]);setBusinesses((bd.businesses||[]).map((x:Business)=>({id:x.id,name:x.name})))}catch(e){setError(e instanceof Error?e.message:"Veriler alınamadı.")}finally{setLoading(false)}}
 useEffect(()=>{void load()},[]);function create(){setEditing(null);setForm(empty);setShowForm(true);setError("");setSuccess("")}function edit(x:Announcement){setEditing(x);setForm({title:x.title,message:x.message,type:x.type,businessId:x.businessId||"",startDate:x.startDate||"",endDate:x.endDate||""});setShowForm(true)}
 async function save(){if(!form.title.trim()||!form.message.trim()){setError("Başlık ve mesaj zorunlu.");return}setSaving(true);try{const r=await authFetch("/api/admin/announcements",{method:editing?"PATCH":"POST",body:JSON.stringify(editing?{...form,id:editing.id}:form)}),d=await r.json();if(!r.ok)throw new Error(d.error);setShowForm(false);setSuccess(editing?"Duyuru güncellendi.":"Duyuru oluşturuldu.");await load()}catch(e){setError(e instanceof Error?e.message:"Kaydedilemedi.")}finally{setSaving(false)}}
