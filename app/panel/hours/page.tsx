@@ -59,7 +59,7 @@ export default function HoursPage() {
       const savedById = new Map<string, Record<string, unknown>>(
         (Array.isArray(result.items) ? result.items : [])
           .filter((item: unknown): item is Record<string, unknown> => Boolean(item) && typeof item === "object")
-          .map((item) => [typeof item.id === "string" ? item.id : "", item] as const)
+          .map((item: Record<string, unknown>) => [typeof item.id === "string" ? item.id : "", item] as const)
           .filter(([id]) => Boolean(id))
       );
       setDays(defaultDays.map((day) => {
