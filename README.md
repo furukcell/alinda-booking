@@ -979,6 +979,20 @@ Super Admin şifresi güvenlik nedeniyle repository içinde tutulmaz.
 
 ---
 
+## 🗺️ Public Randevu Haritası
+
+Public randevu sayfasındaki işletme konumu haritası güncellendi.
+
+- [x] İşletme latitude / longitude bilgilerinin public booking'e aktarılması
+- [x] Randevu sayfasında işletme adresinin gösterilmesi
+- [x] Randevu sayfasında gömülü harita gösterimi
+- [x] Harita üzerinde işletme konumunun işaretlenmesi
+- [x] Haritadan Google Maps yol tarifi bağlantısı
+- [x] Harita için API anahtarı gerektirmeyen OpenStreetMap embed kullanımı
+- [x] Mobil uyumlu harita yüksekliği ve taşma kontrolü
+
+İşletme konumu, panelde **İşletme Ayarları → İletişim ve adres → Haritada konumu bul** üzerinden adres aranarak latitude / longitude olarak kaydedilir.
+
 ## Son Durum
 
 **ALINDA artık yalnızca bir booking prototipi değildir.**
