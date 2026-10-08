@@ -423,7 +423,7 @@ export function BusinessBooking({ business }: { business: Business }) {
           </div>
         </header>
 
-        <div className="px-5 pb-20 pt-7 sm:px-8">
+        <div className="px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-7 sm:px-8 sm:pb-20">
           <section className="rounded-[26px] border p-5 sm:p-6" style={{ borderColor: line, background: rosePale }}>
             <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
               <div>
@@ -457,7 +457,7 @@ export function BusinessBooking({ business }: { business: Business }) {
               {business.services.map((item) => {
                 const active = item.id === selectedService;
                 return (
-                  <button key={item.id} onClick={() => chooseService(item.id)} className="min-w-[190px] snap-start sm:min-w-[220px] rounded-[22px] border p-4 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff", boxShadow: active ? "0 10px 30px rgba(216,137,130,0.12)" : "0 3px 14px rgba(45,38,37,0.035)" }}>
+                  <button key={item.id} onClick={() => chooseService(item.id)} className="min-h-[132px] min-w-[78vw] snap-start touch-manipulation rounded-[22px] border p-4 text-left transition active:scale-[0.99] sm:min-w-[220px]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff", boxShadow: active ? "0 10px 30px rgba(216,137,130,0.12)" : "0 3px 14px rgba(45,38,37,0.035)" }}>
                     <div className="flex items-start justify-between gap-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-[14px]" style={{ background: active ? "#fff" : rosePale, color: roseDark }}><Sparkles size={17} /></span>
                       {active && <Check size={18} style={{ color: roseDark }} />}
@@ -470,7 +470,7 @@ export function BusinessBooking({ business }: { business: Business }) {
             </div>
           </section>
 
-          <section className="mt-9">
+          <section className="mt-9 scroll-mt-24">
             <div className="flex items-end justify-between gap-3">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>02 / UZMAN</p>
@@ -484,7 +484,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 {specialists.map((item: Specialist) => {
                   const active = item.id === specialist?.id;
                   return (
-                    <button key={item.id} onClick={() => { setSelectedSpecialist(item.id); setSelectedTime(""); }} className="flex min-h-[82px] items-center gap-3 rounded-[22px] border p-3 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff" }}>
+                    <button key={item.id} onClick={() => { setSelectedSpecialist(item.id); setSelectedTime(""); }} className="flex min-h-[88px] touch-manipulation items-center gap-3 rounded-[22px] border p-3 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff" }}>
                       {item.photoUrl ? (
                         <img src={item.photoUrl} alt={item.name} className="h-16 w-16 shrink-0 rounded-[18px] object-cover" />
                       ) : (
@@ -508,7 +508,7 @@ export function BusinessBooking({ business }: { business: Business }) {
             )}
           </section>
 
-          <section className="mt-9" id="alinda-calendar">
+          <section className="mt-9 scroll-mt-24" id="alinda-calendar">
             <div className="flex items-end justify-between gap-3">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>03 / TAKVİM</p>
@@ -538,7 +538,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                   </button>
                 </div>
 
-                <div className="mt-4 grid grid-cols-7 gap-1.5">
+                <div className="mt-4 grid grid-cols-7 gap-1.5 sm:gap-2">
                   {["P", "S", "Ç", "P", "C", "C", "P"].map((day, index) => (
                     <span key={"day-" + index} className="pb-1 text-center text-[10px] font-bold" style={{ color: muted }}>{day}</span>
                   ))}
@@ -549,7 +549,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                   {activeMonthDates.map((date) => {
                     const active = date.id === selectedDate;
                     return (
-                      <button key={date.id} onClick={() => chooseDate(date.id)} disabled={loadingDates || !selectableDateIds.has(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-35" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
+                      <button key={date.id} onClick={() => chooseDate(date.id)} disabled={loadingDates || !selectableDateIds.has(date.id)} className="min-h-[52px] touch-manipulation rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-35" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
                         <span className="block text-[9px] font-semibold uppercase" style={{ color: active ? "rgba(255,255,255,.72)" : muted }}>{date.label}</span>
                         <span className="mt-0.5 block text-sm font-bold">{Number(date.id.slice(8))}</span>
                         {active && <span className="mt-1 block text-[8px] font-bold uppercase tracking-wide text-white/90">Seçildi</span>}
@@ -561,7 +561,7 @@ export function BusinessBooking({ business }: { business: Business }) {
             )}
           </section>
 
-          <section className="mt-9" id="alinda-hours">
+          <section className="mt-9 scroll-mt-24" id="alinda-hours">
             <div className="flex items-end justify-between gap-3">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>04 / SAAT</p>
@@ -594,7 +594,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                   const booked = slot.status === "booked";
                   const active = slot.time === selectedTime;
                   return (
-                    <button key={slot.time} disabled={booked} onClick={() => { setSelectedTime(slot.time); setError(""); setTimeout(() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); }} className="relative rounded-[17px] border px-3 py-4 text-center transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-75" style={{ borderColor: active ? rose : booked ? bookedPinkBorder : availableGreenBorder, background: active ? roseSoft : booked ? bookedPink : availableGreen, color: booked ? bookedPinkText : active ? roseDark : availableGreenText, boxShadow: active ? "0 8px 20px rgba(216,137,130,0.12)" : "none" }}>
+                    <button key={slot.time} disabled={booked} onClick={() => { setSelectedTime(slot.time); setError(""); setTimeout(() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); }} className="relative min-h-[54px] touch-manipulation rounded-[17px] border px-3 py-4 text-center transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-75" style={{ borderColor: active ? rose : booked ? bookedPinkBorder : availableGreenBorder, background: active ? roseSoft : booked ? bookedPink : availableGreen, color: booked ? bookedPinkText : active ? roseDark : availableGreenText, boxShadow: active ? "0 8px 20px rgba(216,137,130,0.12)" : "none" }}>
                       <span className="flex items-center justify-center gap-1.5 text-sm font-bold"><Clock3 size={14} />{slot.time}</span>
                       <span className="mt-1 block text-[10px] font-semibold">{booked ? "Dolu" : active ? "Seçildi" : "Müsait"}</span>
                     </button>
@@ -605,13 +605,13 @@ export function BusinessBooking({ business }: { business: Business }) {
           </section>
 
           {selectedTime && specialist && service && (
-            <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 px-4 py-3 shadow-[0_-10px_30px_rgba(45,38,37,0.10)] backdrop-blur-xl sm:hidden">
+            <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 px-4 pt-3 shadow-[0_-10px_30px_rgba(45,38,37,0.10)] backdrop-blur-xl sm:hidden" style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))", borderColor: line }}>
               <div className="mx-auto flex max-w-[920px] items-center gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[11px] font-semibold" style={{ color: muted }}>{service.name} · {selectedDateInfo?.dateLabel}</p>
                   <p className="mt-0.5 text-sm font-bold">{selectedTime} · {specialist.name}</p>
                 </div>
-                <button type="button" onClick={() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" })} className="shrink-0 rounded-[15px] px-4 py-3 text-xs font-bold text-white shadow-[0_8px_20px_rgba(216,137,130,0.20)]" style={{ background: rose }}>Bilgileri gir</button>
+                <button type="button" onClick={() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" })} className="min-h-12 shrink-0 touch-manipulation rounded-[15px] px-4 py-3 text-xs font-bold text-white shadow-[0_8px_20px_rgba(216,137,130,0.20)]" style={{ background: rose }}>Bilgileri gir</button>
               </div>
             </div>
           )}
@@ -631,18 +631,18 @@ export function BusinessBooking({ business }: { business: Business }) {
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <label className="block text-sm font-bold">
                   <span className="flex items-center gap-2"><UserRound size={15} /> Ad Soyad</span>
-                  <input value={name} onChange={(event) => setName(event.target.value)} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-sm outline-none" style={{ borderColor: line }} placeholder="Adınız ve soyadınız" />
+                  <input value={name} onChange={(event) => setName(event.target.value)} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-base outline-none" style={{ borderColor: line }} placeholder="Adınız ve soyadınız" />
                 </label>
                 <label className="block text-sm font-bold">
                   <span className="flex items-center gap-2"><Phone size={15} /> Telefon</span>
-                  <input value={phone} onChange={(event) => setPhone(formatTurkishPhone(event.target.value))} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-sm outline-none" style={{ borderColor: line }} placeholder="05xx xxx xx xx" inputMode="tel" autoComplete="tel" maxLength={14} />
+                  <input value={phone} onChange={(event) => setPhone(formatTurkishPhone(event.target.value))} className="mt-2 h-14 w-full rounded-[18px] border bg-white px-4 text-base outline-none" style={{ borderColor: line }} placeholder="05xx xxx xx xx" inputMode="tel" autoComplete="tel" maxLength={14} />
                 </label>
               </div>
               <div className="mt-4 rounded-[18px] border bg-white p-4" style={{ borderColor: line }}>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
                   <label className="block flex-1 text-sm font-bold">
                     <span>🎟️ İndirim kuponu</span>
-                    <input value={couponCode} onChange={(event) => { setCouponCode(event.target.value.toUpperCase()); setCoupon(null); setCouponError(""); }} className="mt-2 h-12 w-full rounded-[15px] border bg-white px-4 text-sm font-mono uppercase outline-none" style={{ borderColor: line }} placeholder="KUPON KODU" />
+                    <input value={couponCode} onChange={(event) => { setCouponCode(event.target.value.toUpperCase()); setCoupon(null); setCouponError(""); }} className="mt-2 h-12 w-full rounded-[15px] border bg-white px-4 text-base font-mono uppercase outline-none" style={{ borderColor: line }} placeholder="KUPON KODU" />
                   </label>
                   <button type="button" onClick={() => void applyCoupon()} disabled={!couponCode.trim() || couponLoading} className="h-12 rounded-[15px] border px-5 text-sm font-bold disabled:opacity-40" style={{ borderColor: rose, color: roseDark }}>
                     {couponLoading ? "Kontrol…" : "Uygula"}
