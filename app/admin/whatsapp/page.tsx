@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, MessageCircle, RefreshCw, ShieldCheck, XCircle } from "lucide-react";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { waitForFirebaseUser } from "@/lib/firebase/auth-ready";
 
 type Row = { id: string; name: string; ownerEmail: string; plan: "starter" | "pro"; accessEnabled: boolean; connected: boolean; displayPhoneNumber: string; verifiedName: string; phoneNumberId: string; wabaId: string; dailySummaryEnabled: boolean };
 
@@ -14,7 +14,7 @@ export default function AdminWhatsAppPage() {
   async function load() {
     setLoading(true); setError("");
     try {
-      const user = getFirebaseAuth().currentUser;
+      const user = await waitForFirebaseUser();
       if (!user) throw new Error("Oturum bulunamadı.");
       const token = await user.getIdToken();
       const response = await fetch("/api/admin/whatsapp", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
