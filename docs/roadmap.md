@@ -147,7 +147,7 @@ Bu faz, mevcut güzellik merkezi ürününün kullanılabilir ve satışa hazır
 - [ ] Yeni randevu bildirimi production testi
 - [ ] Onay bildirimi production testi
 - [ ] İptal bildirimi production testi
-- [ ] Yaklaşan randevu hatırlatması
+- [x] Yaklaşan randevu hatırlatması (24 saat önce, Pro + WhatsApp izinli müşteri)
 - [ ] Meta template / secret / webhook production kontrolü
 - [ ] Pro günlük özet gerçek işletme testi
 
