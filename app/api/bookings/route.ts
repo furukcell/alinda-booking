@@ -73,12 +73,15 @@ export async function POST(request: NextRequest) {
     const specialistRef = businessRef.collection("specialists").doc(specialistId);
     const hoursRef = businessRef.collection("hours").doc(
       new Date(`${date}T12:00:00`).getDay() === 0 ? "sunday" :
-      ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date(`${date}T12:00:00").getDay()]
+      ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date(`${date}T12:00:00`).getDay()]
     );
     const bookingRef = businessRef.collection("bookings").doc(generateReferenceNo());
-    const couponQuery = couponCode
-      ? db.collection("coupons").where("code", "==", couponCode).limit(1).get()
-      : Promise.resolve(null);
+    let couponRef = null as FirebaseFirestore.DocumentReference | null;
+    if (couponCode) {
+      const couponQuery = await db.collection("coupons").where("code", "==", couponCode).limit(1).get();
+      if (couponQuery.empty) throw new Error("COUPON_INVALID");
+      couponRef = couponQuery.docs[0].ref;
+    }
 
     const transactionResult = await db.runTransaction(async (transaction) => {
       const [businessSnap, serviceSnap, specialistSnap, hoursSnap, couponSnap] = await Promise.all([
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
         transaction.get(serviceRef),
         transaction.get(specialistRef),
         transaction.get(hoursRef),
-        couponQuery
+        couponRef ? transaction.get(couponRef) : Promise.resolve(null)
       ]);
 
       if (!businessSnap.exists || businessSnap.data()?.active === false || businessSnap.data()?.accessEnabled === false) {
@@ -136,8 +139,8 @@ export async function POST(request: NextRequest) {
       let totalPrice = Number(service.price || 0);
 
       if (couponCode) {
-        if (!couponSnap || couponSnap.empty) throw new Error("COUPON_INVALID");
-        const couponDoc = couponSnap.docs[0];
+        if (!couponSnap || !couponSnap.exists) throw new Error("COUPON_INVALID");
+        const couponDoc = couponSnap;
         const coupon = couponDoc.data();
         if (coupon.active === false || (coupon.businessId && coupon.businessId !== businessId)) throw new Error("COUPON_INVALID");
         const today = todayInIstanbul();
