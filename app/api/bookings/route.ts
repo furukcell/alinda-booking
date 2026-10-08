@@ -71,10 +71,8 @@ export async function POST(request: NextRequest) {
     const businessRef = db.collection("businesses").doc(businessId);
     const serviceRef = businessRef.collection("services").doc(serviceId);
     const specialistRef = businessRef.collection("specialists").doc(specialistId);
-    const hoursRef = businessRef.collection("hours").doc(
-      new Date(`${date}T12:00:00`).getDay() === 0 ? "sunday" :
-      ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date(`${date}T12:00:00`).getDay()]
-    );
+    const dayId = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date(`${date}T12:00:00`).getDay()];
+    const hoursRef = businessRef.collection("hours").doc(dayId);
     const bookingRef = businessRef.collection("bookings").doc(generateReferenceNo());
     let couponRef: DocumentReference | null = null;
     if (couponCode) {
@@ -104,7 +102,6 @@ export async function POST(request: NextRequest) {
       const requestedTime = minutes(time);
       if (!Number.isFinite(requestedTime) || requestedTime % 30 !== 0) throw new Error("INVALID_TIME");
 
-      const dayId = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date(`${date}T12:00:00").getDay()];
       const businessHours = hoursSnap.exists ? hoursSnap.data() || {} : { enabled: false };
       const specialistDay = specialist.schedule?.[dayId];
       const working = specialistDay || businessHours;
