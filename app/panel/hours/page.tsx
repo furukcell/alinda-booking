@@ -1,7 +1,7 @@
 "use client";
 
 import { collection, doc, getDocs, serverTimestamp, setDoc } from "firebase/firestore";
-import { ArrowLeft, Clock3, Save } from "lucide-react";
+import { ArrowLeft, Clock3, Loader2, Save } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
@@ -119,7 +119,7 @@ export default function HoursPage() {
     <main className="min-h-screen bg-alinda-cream">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:py-10">
         <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-alinda-muted hover:text-alinda-ink"><ArrowLeft size={16} /> Dashboard</Link>
-        <header className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-alinda-ink text-white"><Clock3 size={19} /></div><h1 className="text-3xl font-semibold tracking-tight">Çalışma Saatleri</h1></div><p className="mt-3 text-sm text-alinda-muted">Müşterilerinizin randevu alabileceği gün ve saatleri belirleyin.</p></div><button type="button" onClick={() => void saveHours()} disabled={saving || loading || !businessId} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 sm:w-auto"><Save size={16} />{saving ? "Kaydediliyor…" : "Kaydet"}</button></header>
+        <header className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-alinda-ink text-white"><Clock3 size={19} /></div><h1 className="text-3xl font-semibold tracking-tight">Çalışma Saatleri</h1></div><p className="mt-3 text-sm text-alinda-muted">Müşterilerinizin randevu alabileceği gün ve saatleri belirleyin.</p></div><button type="button" onClick={() => void saveHours()} disabled={saving || loading || !businessId} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-alinda-ink px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 sm:w-auto"><Save size={16} />{saving && <Loader2 size={16} className="animate-spin" />}{saving ? "Kaydediliyor…" : "Kaydet"}</button></header>
 
         {error && <div role="alert" className="mt-6 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-sm text-alinda-danger">{error}</div>}
         {saved && <div role="status" className="mt-6 rounded-xl border border-[#CFE2D5] bg-[#EEF7F0] px-4 py-3 text-sm text-alinda-success">Çalışma saatleri kaydedildi.</div>}
@@ -132,7 +132,7 @@ export default function HoursPage() {
             </div>
           </div>)}
         </section>
-        <button type="button" onClick={() => void saveHours()} disabled={saving || loading || !businessId} className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-alinda-ink text-sm font-semibold text-white disabled:opacity-50 sm:hidden"><Save size={16} />{saving ? "Kaydediliyor…" : "Çalışma saatlerini kaydet"}</button>
+        <button type="button" onClick={() => void saveHours()} disabled={saving || loading || !businessId} className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-alinda-ink text-sm font-semibold text-white disabled:opacity-50 sm:hidden"><Save size={16} />{saving && <Loader2 size={16} className="animate-spin" />}{saving ? "Kaydediliyor…" : "Çalışma saatlerini kaydet"}</button>
       </div>
     </main>
   );
