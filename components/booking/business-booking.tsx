@@ -457,7 +457,7 @@ export function BusinessBooking({ business }: { business: Business }) {
               {business.services.map((item) => {
                 const active = item.id === selectedService;
                 return (
-                  <button key={item.id} onClick={() => chooseService(item.id)} className="min-w-[220px] rounded-[22px] border p-4 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff", boxShadow: active ? "0 10px 30px rgba(216,137,130,0.12)" : "0 3px 14px rgba(45,38,37,0.035)" }}>
+                  <button key={item.id} onClick={() => chooseService(item.id)} className="min-w-[190px] sm:min-w-[220px] rounded-[22px] border p-4 text-left transition active:scale-[0.99]" style={{ borderColor: active ? rose : line, background: active ? roseSoft : "#fff", boxShadow: active ? "0 10px 30px rgba(216,137,130,0.12)" : "0 3px 14px rgba(45,38,37,0.035)" }}>
                     <div className="flex items-start justify-between gap-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-[14px]" style={{ background: active ? "#fff" : rosePale, color: roseDark }}><Sparkles size={17} /></span>
                       {active && <Check size={18} style={{ color: roseDark }} />}
@@ -604,6 +604,17 @@ export function BusinessBooking({ business }: { business: Business }) {
             )}
           </section>
 
+          {selectedTime && specialist && service && (
+            <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 px-4 py-3 shadow-[0_-10px_30px_rgba(45,38,37,0.10)] backdrop-blur-xl sm:hidden">
+              <div className="mx-auto flex max-w-[920px] items-center gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[11px] font-semibold" style={{ color: muted }}>{service.name} · {selectedDateInfo?.dateLabel}</p>
+                  <p className="mt-0.5 text-sm font-bold">{selectedTime} · {specialist.name}</p>
+                </div>
+                <button type="button" onClick={() => document.getElementById("alinda-booking-form")?.scrollIntoView({ behavior: "smooth", block: "center" })} className="shrink-0 rounded-[15px] px-4 py-3 text-xs font-bold text-white shadow-[0_8px_20px_rgba(216,137,130,0.20)]" style={{ background: rose }}>Bilgileri gir</button>
+              </div>
+            </div>
+          )}
           {selectedTime && specialist && service && (
             <section id="alinda-booking-form" className="mt-8 rounded-[28px] border p-5 sm:p-7" style={{ borderColor: rose, background: rosePale }}>
               <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: line }}>
