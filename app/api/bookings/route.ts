@@ -53,9 +53,10 @@ export async function POST(request: NextRequest) {
     const customerPhone = clean(body.customerPhone);
     const couponCode = clean(body.couponCode).toUpperCase();
     const whatsappOptIn = body.whatsappOptIn === true;
+    const privacyAccepted = body.privacyAccepted === true;
 
-    if (!businessId || !serviceId || !specialistId || !validDate(date) || !validTime(time) || !customerName || !customerPhone) {
-      return NextResponse.json({ error: "Randevu bilgileri eksik veya geçersiz." }, { status: 400 });
+    if (!businessId || !serviceId || !specialistId || !validDate(date) || !validTime(time) || !customerName || !customerPhone || !privacyAccepted) {
+      return NextResponse.json({ error: privacyAccepted ? "Randevu bilgileri eksik veya geçersiz." : "Randevu oluşturmak için Gizlilik ve KVKK metnini kabul etmeniz gerekir." }, { status: 400 });
     }
 
     if (date < todayInIstanbul()) {
@@ -180,6 +181,8 @@ export async function POST(request: NextRequest) {
         date,
         time,
         whatsappOptIn,
+        privacyAccepted: true,
+        privacyConsentAt: new Date(),
         status: "pending",
         slotId: slotRefs[0].id,
         createdAt: new Date()
