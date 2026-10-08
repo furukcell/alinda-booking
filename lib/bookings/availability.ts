@@ -67,7 +67,7 @@ export function getNextDates(count = 30): AvailableDate[] {
   });
 }
 
-async function getWorkingDay(businessId: string, dayId: string): Promise<WorkingDay> {
+export async function getWorkingDay(businessId: string, dayId: string): Promise<WorkingDay> {
   const fallback = defaultHours[dayId];
   const snapshot = await getDoc(doc(getFirebaseDb(), "businesses", businessId, "hours", dayId));
   if (!snapshot.exists()) return fallback;
@@ -78,6 +78,31 @@ async function getWorkingDay(businessId: string, dayId: string): Promise<Working
     open: typeof data.open === "string" ? data.open : fallback.open,
     close: typeof data.close === "string" ? data.close : fallback.close
   };
+}
+
+
+export async function getSelectableDateIds(
+  businessId: string,
+  dates: AvailableDate[],
+  specialist: Specialist
+): Promise<Set<string>> {
+  const uniqueDayIds = Array.from(new Set(dates.map((date) => date.dayId)));
+  const businessDays = new Map<string, WorkingDay>();
+
+  await Promise.all(uniqueDayIds.map(async (dayId) => {
+    businessDays.set(dayId, await getWorkingDay(businessId, dayId));
+  }));
+
+  return new Set(
+    dates
+      .filter((date) => {
+        if (specialist.timeOffDates?.includes(date.id)) return false;
+        const specialistDay = specialist.schedule?.[date.dayId];
+        const workingDay = specialistDay ?? businessDays.get(date.dayId);
+        return workingDay?.enabled === true;
+      })
+      .map((date) => date.id)
+  );
 }
 
 export async function getDailySlots(
