@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
+  CalendarPlus,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -30,6 +31,25 @@ const bookedPinkText = "#B96A70";
 const text = "#2D2625";
 const muted = "#8F817E";
 const line = "#F0DFDC";
+
+function escapeIcsText(value: string) {
+  return value.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+}
+
+function toIcsDate(dateId: string, time: string) {
+  return dateId.replace(/-/g, "") + "T" + time.replace(":", "") + "00";
+}
+
+function addMinutesToTime(dateId: string, time: string, minutes: number) {
+  const value = new Date(dateId + "T" + time + ":00");
+  value.setMinutes(value.getMinutes() + minutes);
+  const yyyy = value.getFullYear();
+  const mm = String(value.getMonth() + 1).padStart(2, "0");
+  const dd = String(value.getDate()).padStart(2, "0");
+  const hh = String(value.getHours()).padStart(2, "0");
+  const min = String(value.getMinutes()).padStart(2, "0");
+  return { dateId: yyyy + "-" + mm + "-" + dd, time: hh + ":" + min };
+}
 
 function formatTurkishPhone(value: string) {
   let digits = value.replace(/\D/g, "");
@@ -319,6 +339,51 @@ export function BusinessBooking({ business }: { business: Business }) {
     setSelectedSpecialist(first?.id ?? "");
   }
 
+  function addToCalendar() {
+    if (!service || !specialist || !selectedDateInfo || !selectedTime) return;
+    const end = addMinutesToTime(selectedDateInfo.id, selectedTime, service.durationMinutes);
+    const ics = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//ALINDA Booking//TR//EN",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      "UID:" + confirmedReference + "@alinda.booking",
+      "DTSTAMP:" + toIcsDate(new Date().toISOString().slice(0, 10), new Date().toISOString().slice(11, 16)),
+      "DTSTART;TZID=Europe/Istanbul:" + toIcsDate(selectedDateInfo.id, selectedTime),
+      "DTEND;TZID=Europe/Istanbul:" + toIcsDate(end.dateId, end.time),
+      "SUMMARY:" + escapeIcsText(service.name + " · " + business.name),
+      "DESCRIPTION:" + escapeIcsText("Randevu referansı: " + confirmedReference + " · Uzman: " + specialist.name),
+      "LOCATION:" + escapeIcsText(business.address),
+      "END:VEVENT",
+      "END:VCALENDAR"
+    ].join("\r\n");
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "alinda-randevu-" + confirmedReference + ".ics";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function openGoogleCalendar() {
+    if (!service || !specialist || !selectedDateInfo || !selectedTime) return;
+    const end = addMinutesToTime(selectedDateInfo.id, selectedTime, service.durationMinutes);
+    const start = toIcsDate(selectedDateInfo.id, selectedTime);
+    const finish = toIcsDate(end.dateId, end.time);
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: service.name + " · " + business.name,
+      dates: start + "/" + finish,
+      details: "Randevu referansı: " + confirmedReference + " · Uzman: " + specialist.name,
+      location: business.address,
+    });
+    window.open("https://calendar.google.com/calendar/render?" + params.toString(), "_blank", "noopener,noreferrer");
+  }
+
   function chooseDate(id: string, scroll = true) {
     if (!selectableDateIds.has(id)) return;
     setSelectedDate(id);
@@ -395,7 +460,11 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <span className="text-sm font-bold">{selectedTime}</span>
               </div>
             </div>
-            <div className="mt-6 flex flex-col items-center gap-3"><ManageBooking businessId={business.id} /><button onClick={() => { setConfirmed(false); setConfirmedReference(""); setSelectedTime(""); setName(""); setPhone(""); setPrivacyAccepted(false); }} className="text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>Yeni randevu oluştur</button></div>
+            <div className="mt-6 grid gap-2 sm:grid-cols-2">
+              <button type="button" onClick={addToCalendar} className="flex min-h-12 items-center justify-center gap-2 rounded-[16px] border bg-white px-4 py-3 text-sm font-bold" style={{ borderColor: rose, color: roseDark }}><CalendarPlus size={16} /> Takvime ekle (.ics)</button>
+              <button type="button" onClick={openGoogleCalendar} className="flex min-h-12 items-center justify-center gap-2 rounded-[16px] px-4 py-3 text-sm font-bold text-white" style={{ background: rose }}>Google Takvim</button>
+            </div>
+            <div className="mt-3 flex flex-col items-center gap-3"><ManageBooking businessId={business.id} /><button onClick={() => { setConfirmed(false); setConfirmedReference(""); setSelectedTime(""); setName(""); setPhone(""); setPrivacyAccepted(false); }} className="text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>Yeni randevu oluştur</button></div>
           </section>
         </div>
         <BookingFooter />
