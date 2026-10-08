@@ -47,6 +47,58 @@ Bu dosya ALINDA'nın mevcut durumunu ve bundan sonraki geliştirme sırasını t
 - [x] WhatsApp Merkezi
 - [x] Tek Super Admin modeli
 
+
+## FAZ 0 — MVP Stabilizasyonu & Satışa Hazırlık ✅
+
+Bu faz, mevcut güzellik merkezi ürününün kullanılabilir ve satışa hazır hale getirilmesi için tamamlandı.
+
+### Public Booking
+- [x] Telefon formatlama ve Türkiye mobil numarası doğrulaması
+- [x] KVKK / gizlilik onayı ve consent kaydı
+- [x] Randevu başarı ekranı + referans numarası
+- [x] Randevum var / randevu sorgulama
+- [x] Müşteri randevu iptali
+- [x] Hizmet / uzman boş durumları
+- [x] Uygun olmayan tarihlerin takvimde engellenmesi
+- [x] Slot çakışması için son anda transaction kontrolü
+- [x] Loading / hata / submit UX iyileştirmeleri
+- [x] Mobil booking akışının dokunmatik kullanım için iyileştirilmesi
+- [x] Sticky mobil booking CTA
+- [x] Randevu başarı ekranında .ics takvim ekleme
+- [x] Google Takvim bağlantısı
+- [x] İşletme adresi + koordinat + public harita
+- [x] Google Maps yönlendirmesi
+- [x] QR kod ile randevu sayfası paylaşımı
+
+### İşletme Dashboard
+- [x] İşletme onboarding / kurulum adımları
+- [x] Randevu linki kopyalama
+- [x] Public randevu sayfasını açma
+- [x] Mobil dashboard menüsü
+- [x] Bugünkü toplam / bekleyen / onaylanan randevu özeti
+- [x] Bugünkü tahmini ciro
+- [x] Sıradaki randevu kartı
+- [x] Hizmet / uzman / randevu özetleri
+- [x] Mobil paylaşım (Web Share API) + fallback link kopyalama
+
+### Ticari Yönetim
+- [x] Starter / Pro plan modeli
+- [x] Aylık / yıllık plan seçimi
+- [x] Manuel ödeme durumu yönetimi
+- [x] Manuel abonelik başlatma
+- [x] Abonelik süresi bitse bile otomatik erişim kesmeme kuralı
+- [x] Super Admin'in panel + public booking erişimini manuel kapatabilmesi
+- [x] Aktivite logları
+- [x] Kupon sistemi
+- [x] Duyuru sistemi
+
+### Build / Kalite
+- [x] GitHub Actions production build kontrolü
+- [x] Kritik dashboard / booking değişikliklerinde build doğrulaması
+- [x] TypeScript hatalarının build sırasında yakalanması ve düzeltilmesi
+
+> **Not:** QR görüntüsü şu an harici QR servisinden üretilmektedir. Production hardening aşamasında QR üretiminin kendi altyapısına alınması değerlendirilecek.
+
 # 🚧 Bundan Sonra Yapılacaklar
 
 ## FAZ 1 — Sektör Altyapısı
@@ -173,9 +225,11 @@ Randevu motoru ortak kalacak; sektör özellikleri modüler olacak.
 
 ## 🎯 Çalışma Sırası
 
-    Mevcut sistem
+    FAZ 0 — MVP stabilizasyonu ✅
          ↓
-    Build / deployment stabilizasyonu
+    Randevu yönetimi + onboarding + production hardening
+         ↓
+    WhatsApp / ödeme / güvenlik production hazırlığı
          ↓
     FAZ 1 — Sektör altyapısı
          ↓
