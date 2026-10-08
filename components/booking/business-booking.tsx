@@ -274,6 +274,30 @@ export function BusinessBooking({ business }: { business: Business }) {
     }
   }
 
+  if (business.services.length === 0) {
+    return (
+      <main className="min-h-screen px-4 py-8" style={{ background: rosePale, color: text }}>
+        <div className="mx-auto flex min-h-[70vh] max-w-xl items-center justify-center">
+          <section className="w-full rounded-[30px] border bg-white p-8 text-center shadow-[0_18px_60px_rgba(185,104,98,0.10)] sm:p-10" style={{ borderColor: line }}>
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full" style={{ background: roseSoft, color: roseDark }}>
+              <Sparkles size={28} />
+            </div>
+            <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: roseDark }}>Online randevu</p>
+            <h1 className="mt-2 text-2xl font-bold">Henüz randevu alınamıyor.</h1>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6" style={{ color: muted }}>
+              {business.name} henüz online randevu için hizmet tanımlamamış. Lütfen işletmeyle iletişime geçin.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {business.phone && <a href={\`tel:\${business.phone}\`} className="rounded-full border bg-white px-5 py-3 text-sm font-bold" style={{ borderColor: line, color: roseDark }}>İşletmeyi ara</a>}
+              <ManageBooking businessId={business.id} />
+            </div>
+          </section>
+        </div>
+        <BookingFooter />
+      </main>
+    );
+  }
+
   if (confirmed && service && specialist && selectedDateInfo) {
     return (
       <main className="min-h-screen px-4 py-8" style={{ background: rosePale, color: text }}>
@@ -417,7 +441,11 @@ export function BusinessBooking({ business }: { business: Business }) {
                 })}
               </div>
             ) : (
-              <div className="mt-4 rounded-[22px] border p-6 text-center text-sm" style={{ borderColor: line, background: rosePale, color: muted }}>Bu hizmet için henüz uzman tanımlanmamış.</div>
+              <div className="mt-4 rounded-[22px] border p-6 text-center" style={{ borderColor: line, background: rosePale }}>
+                <p className="text-sm font-bold">Bu hizmet için henüz uzman tanımlanmamış.</p>
+                <p className="mt-1 text-xs leading-5" style={{ color: muted }}>Lütfen başka bir hizmet seçin veya işletmeyle iletişime geçin.</p>
+                {business.phone && <a href={\`tel:\${business.phone}\`} className="mt-4 inline-flex rounded-full border bg-white px-4 py-2 text-xs font-bold" style={{ borderColor: line, color: roseDark }}>İşletmeyi ara</a>}
+              </div>
             )}
           </section>
 
