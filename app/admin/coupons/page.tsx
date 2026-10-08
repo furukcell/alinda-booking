@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, CirclePlus, Edit3, Ticket, Trash2, X } from "lucide-react";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { waitForFirebaseUser } from "@/lib/firebase/auth-ready";
 
 type Coupon = {
   id: string; code: string; name: string; type: "percent" | "fixed"; value: number;
@@ -27,7 +27,7 @@ export default function AdminCouponsPage() {
   const [success, setSuccess] = useState("");
 
   async function authFetch(url: string, options: RequestInit = {}) {
-    const user = getFirebaseAuth().currentUser;
+    const user = await waitForFirebaseUser();
     if (!user) { window.location.href = "/login"; throw new Error("Oturum bulunamadı."); }
     const token = await user.getIdToken();
     return fetch(url, { ...options, headers: { ...(options.headers || {}), Authorization: `Bearer ${token}`, "Content-Type": "application/json" } });
