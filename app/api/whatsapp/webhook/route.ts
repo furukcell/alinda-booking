@@ -4,6 +4,22 @@ import { getAdminDb } from "@/lib/firebase/admin";
 import { handleSecretaryMessage, sendSecretaryReply } from "@/lib/whatsapp/secretary";
 import { interpretBusinessMessage, getSecretaryHistory, loadSecretaryCatalog } from "@/lib/whatsapp/ai-secretary";
 import { getWhatsAppConnection } from "@/lib/whatsapp/server";
+import {
+  aiDisabledMessage,
+  aiEnabledMessage,
+  initialAssistantMessage,
+  isAssistantNo,
+  isAssistantYes,
+  isContinueWithAssistant,
+  isDisableAssistantCommand,
+  isEnableAssistantCommand,
+  markInbound,
+  markInitialPromptSent,
+  disableAi,
+  enableAi,
+  getAiPreference,
+  markOutbound
+} from "@/lib/whatsapp/ai-access";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -53,6 +69,46 @@ export async function POST(request: Request) {
           const incomingText = String(message.text.body).trim();
           const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
           const customerName = typeof contacts[0]?.profile?.name === "string" ? contacts[0].profile.name : "WhatsApp müşterisi";
+          await markInbound(businessRef.id, phone, incomingText);
+          const preference = await getAiPreference(businessRef.id, phone);
+
+          if (!preference) {
+            await markInitialPromptSent(businessRef.id, phone);
+            await sendSecretaryReply(businessRef.id, phone, initialAssistantMessage);
+            await markOutbound(businessRef.id, phone);
+            continue;
+          }
+
+          if (isEnableAssistantCommand(incomingText) || isContinueWithAssistant(incomingText)) {
+            await enableAi(businessRef.id, phone);
+            await sendSecretaryReply(businessRef.id, phone, aiEnabledMessage);
+            await markOutbound(businessRef.id, phone);
+            continue;
+          }
+
+          if (isDisableAssistantCommand(incomingText)) {
+            await disableAi(businessRef.id, phone);
+            await sendSecretaryReply(businessRef.id, phone, aiDisabledMessage);
+            await markOutbound(businessRef.id, phone);
+            continue;
+          }
+
+          if (!preference.aiEnabled && (isAssistantYes(incomingText) || isContinueWithAssistant(incomingText))) {
+            await enableAi(businessRef.id, phone);
+            await sendSecretaryReply(businessRef.id, phone, aiEnabledMessage);
+            await markOutbound(businessRef.id, phone);
+            continue;
+          }
+
+          if (!preference.aiEnabled && isAssistantNo(incomingText)) {
+            await disableAi(businessRef.id, phone);
+            await sendSecretaryReply(businessRef.id, phone, aiDisabledMessage);
+            await markOutbound(businessRef.id, phone);
+            continue;
+          }
+
+          if (!preference.aiEnabled) continue;
+
           const history = await getSecretaryHistory(businessRef.id, phone);
           const aiReply = await interpretBusinessMessage({
             businessId: businessRef.id,
@@ -66,6 +122,7 @@ export async function POST(request: Request) {
           }).catch(() => null);
           const reply = aiReply || await handleSecretaryMessage(businessRef.id, phone, incomingText, customerName);
           await sendSecretaryReply(businessRef.id, String(message.from), reply);
+          await markOutbound(businessRef.id, phone);
         }
       }
     }
