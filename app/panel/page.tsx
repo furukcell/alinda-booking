@@ -107,8 +107,8 @@ export default function PanelPage() {
       setServiceCount(servicesSnapshot.size);
       setSpecialistCount(specialistsSnapshot.size);
       setCustomerCount(new Set(parsedBookings.map((item) => item.customerName.trim()).filter(Boolean)).size);
-    } catch {
-      setError("İşletme paneli verileri yüklenemedi. Firebase bağlantısını ve sahiplik bilgisini kontrol edin.");
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "İşletme paneli verileri yüklenemedi.");
     } finally {
       setLoading(false);
     }
