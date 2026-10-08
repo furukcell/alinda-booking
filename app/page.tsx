@@ -80,8 +80,11 @@ export default function Home() {
     <main className="min-h-screen overflow-hidden bg-alinda-cream text-alinda-ink">
       <header className="sticky top-0 z-30 border-b border-alinda-line/80 bg-alinda-cream/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center" aria-label="ALINDA ana sayfa">
+          <Link href="/" className="flex items-center gap-2.5" aria-label="ALINDA Booking ana sayfa">
             <Image src="/alinda-logo.png" alt="ALINDA" width={40} height={40} className="h-10 w-10 object-contain" priority />
+            <span className="text-[17px] font-semibold tracking-[-0.02em] text-alinda-accent">
+              ALINDA <span className="font-medium text-alinda-ink/75">Booking</span>
+            </span>
           </Link>
           <nav className="flex items-center gap-1 sm:gap-3" aria-label="Ana navigasyon">
             <a href="#neden-alinda" className="hidden rounded-full px-3 py-2 text-sm font-medium text-alinda-muted transition hover:text-alinda-ink sm:inline-flex">Neden ALINDA?</a>
