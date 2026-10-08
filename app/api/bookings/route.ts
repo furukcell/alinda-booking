@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 
 function clean(value: unknown) {
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date(`${date}T12:00:00`).getDay()]
     );
     const bookingRef = businessRef.collection("bookings").doc(generateReferenceNo());
-    let couponRef = null as FirebaseFirestore.DocumentReference | null;
+    let couponRef: DocumentReference | null = null;
     if (couponCode) {
       const couponQuery = await db.collection("coupons").where("code", "==", couponCode).limit(1).get();
       if (couponQuery.empty) throw new Error("COUPON_INVALID");
