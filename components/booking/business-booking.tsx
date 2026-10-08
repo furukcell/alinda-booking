@@ -444,7 +444,7 @@ export function BusinessBooking({ business }: { business: Business }) {
               <div className="mt-4 rounded-[22px] border p-6 text-center" style={{ borderColor: line, background: rosePale }}>
                 <p className="text-sm font-bold">Bu hizmet için henüz uzman tanımlanmamış.</p>
                 <p className="mt-1 text-xs leading-5" style={{ color: muted }}>Lütfen başka bir hizmet seçin veya işletmeyle iletişime geçin.</p>
-                {business.phone && <a href={\`tel:\${business.phone}\`} className="mt-4 inline-flex rounded-full border bg-white px-4 py-2 text-xs font-bold" style={{ borderColor: line, color: roseDark }}>İşletmeyi ara</a>}
+                {business.phone && <a href={"tel:" + business.phone} className="mt-4 inline-flex rounded-full border bg-white px-4 py-2 text-xs font-bold" style={{ borderColor: line, color: roseDark }}>İşletmeyi ara</a>}
               </div>
             )}
           </section>
