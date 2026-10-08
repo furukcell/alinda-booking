@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Activity, ArrowLeft, CheckCircle2, CircleDollarSign, Eye, ShieldOff, Store, UserPlus, Trash2 } from "lucide-react";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { waitForFirebaseUser } from "@/lib/firebase/auth-ready";
 
 type Log = {
   id: string;
@@ -41,7 +41,7 @@ export default function AdminActivityLogsPage() {
   useEffect(() => {
     async function load() {
       try {
-        const user = getFirebaseAuth().currentUser;
+        const user = await waitForFirebaseUser();
         if (!user) {
           window.location.href = "/login";
           return;
