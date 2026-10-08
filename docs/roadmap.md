@@ -1,177 +1,194 @@
 # ALINDA Booking — Product Roadmap
 
-This roadmap is the working implementation plan for taking ALINDA from the current MVP to a production-ready booking platform.
+Bu dosya ALINDA'nın mevcut durumunu ve bundan sonraki geliştirme sırasını takip etmek için kullanılır.
 
-## Current Status
+> **Temel prensip:** Yeni özellikler mevcut randevu motorunu bozmayacak. Her faz tamamlandıktan sonra build ve mevcut işletme akışları kontrol edilecek.
 
-- [x] Firebase project created
-- [x] Blaze billing enabled
-- [x] Firebase Authentication — Email/Password
-- [x] Firestore database
-- [x] Firestore security rules published
-- [x] Firebase Storage bucket
-- [x] Storage security rules published
-- [x] Business demo data
-- [x] Services persistence
-- [x] Working hours persistence
-- [x] Public booking flow persistence
-- [x] Booking conflict protection
-- [x] Dynamic availability
-- [x] Landing/demo page
-- [ ] Production deployment — intentionally postponed
+## ✅ Şu Ana Kadar Yapılanlar
 
----
+### Core & Multi-Tenant
+- [x] Next.js / React / TypeScript altyapısı
+- [x] Firebase Authentication
+- [x] Firestore + Storage
+- [x] Firebase App Hosting
+- [x] GitHub Actions build
+- [x] Multi-tenant business yapısı
+- [x] Owner → business çözümleme
+- [x] İşletme slug sistemi
+- [x] Tenant izolasyonu için Firestore Rules
+- [x] Public booking akışı
+- [x] Hizmet / uzman / çalışma saati yönetimi
+- [x] Slot ve çakışma koruması
+- [x] Randevu yönetimi
+- [x] İşletme ayarları ve branding
+- [x] Logo yönetimi
+- [x] İşletme adresi + koordinat + Google Maps konumu
 
-## Phase 10 — Panel Hardening & Business Management
+### WhatsApp & AI
+- [x] Meta WhatsApp Embedded Signup altyapısı
+- [x] WhatsApp webhook
+- [x] Token encryption
+- [x] Randevu bildirimleri
+- [x] Deterministic WhatsApp randevu sekreteri
+- [x] Randevu sorgulama / iptal
+- [x] AI intent katmanı
+- [x] Pro günlük özet altyapısı
 
-**Goal:** Make the business panel reliable enough for real businesses.
+### Super Admin
+- [x] İşletme oluşturma / düzenleme / silme
+- [x] Owner Auth hesabı oluşturma
+- [x] Plan yönetimi
+- [x] Manuel abonelik yönetimi
+- [x] Manuel erişim açma / kapatma
+- [x] Aktivite logları
+- [x] AI Sekreter / yönetim istatistikleri
+- [x] Kupon sistemi
+- [x] Duyuru sistemi
+- [x] WhatsApp Merkezi
+- [x] Tek Super Admin modeli
 
-- [x] Review dashboard structure and navigation
-- [x] Business profile editing
-- [x] Business contact/address/category editing
-- [ ] Service create/edit/delete UX polish
-- [ ] Working hours UX polish
-- [x] Loading, empty and error states
-- [x] Toast/feedback states
-- [x] Owner-only access verification across every panel route
-- [ ] Mobile responsive panel review
+# 🚧 Bundan Sonra Yapılacaklar
 
-### Phase 10 — First implementation
+## FAZ 1 — Sektör Altyapısı
 
-- Added `/panel/settings` for editing the signed-in owner's business profile.
-- Added business name, slug, category, description, city, district, address, phone and initials editing.
-- Added primary and soft brand color editing.
-- Added loading, save, success and error feedback states.
-- Writes are protected by the existing Firestore owner rule on `businesses/{businessId}`.
+**Amaç:** Mevcut sistemi bozmadan ALINDA'yı sektör bağımsız hale getirmek.
 
-## Phase 11 — Appointment Management
+- [ ] Business modeline industry alanı ekle
+- [ ] Theme alanı için altyapı oluştur
+- [ ] Super Admin işletme oluşturma ekranına sektör seçimi ekle
+- [ ] İşletme düzenleme ekranına sektör seçimi ekle
+- [ ] Eski işletmelerde industry yoksa otomatik beauty kabul et
+- [ ] Mevcut güzellik merkezi tasarımını beauty default olarak koru
+- [ ] Sektör bilgisini public booking'e taşı
+- [ ] Build + tenant regression testi
 
-**Goal:** Turn incoming bookings into a usable appointment management workflow.
+**İlk sektörler:**
+- Güzellik Merkezi
+- Kuaför
+- Berber
+- Veteriner
+- Diş Kliniği
+- Özel Doktor
+- Psikolog
+- Fizyoterapist
+- Spa / Masaj
+- Nail Studio
+- Estetik Merkezi
+- Diğer
 
-- [x] Appointment list refinement
-- [x] Appointment detail view
-- [ ] Pending / confirmed / rejected / cancelled statuses
-- [ ] Confirm appointment
-- [ ] Reject appointment
-- [ ] Cancel appointment
-- [x] Date filtering
-- [x] Status filtering
-- [x] Customer search
-- [x] Appointment history
-- [x] Empty states and operational feedback
+## FAZ 2 — Theme Engine
 
-## Phase 12 — Business Profile & Media
+**Amaç:** Aynı booking motorunu kullanırken her sektörün kendine uygun görünmesini sağlamak.
 
-**Goal:** Give each business a professional public identity.
+- [ ] Tema token yapısı
+- [ ] Renk sistemi
+- [ ] Tipografi seçenekleri
+- [ ] Header / hero varyasyonları
+- [ ] Hizmet kartı varyasyonları
+- [ ] Uzman kartı varyasyonları
+- [ ] Booking form varyasyonları
+- [ ] Mobil tema kontrolü
+- [ ] İşletme bazlı tema seçimi
 
-- [ ] Business profile editor
-- [ ] Logo upload
-- [ ] Cover image upload
-- [ ] Storage upload UI
-- [ ] Image preview / replace / delete
-- [ ] Social media fields
-- [ ] Public profile presentation
-- [ ] Theme/color customization
-- [ ] Validate Storage rules against real upload flows
+**Kural:** beauty mevcut ALINDA görünümünü koruyacak.
 
-## Phase 13 — Customer Booking Experience
+## FAZ 3 — İlk Sektör Temaları
 
-**Goal:** Make the public booking journey production-quality.
+- [ ] Kuaför
+- [ ] Berber
+- [ ] Veteriner
+- [ ] Diş Kliniği
 
-- [ ] Service selection UX polish
-- [ ] Date selection UX polish
-- [ ] Dynamic time selection UX polish
-- [ ] Customer information form validation
-- [ ] Booking confirmation screen
-- [ ] Booking reference / confirmation details
-- [ ] Prevent invalid or stale selections
-- [ ] Improve mobile booking experience
-- [ ] Error recovery for slot conflicts
+Her biri için:
+- [ ] Renk paleti
+- [ ] Public booking düzeni
+- [ ] Sektöre uygun metinler
+- [ ] Mobil görünüm
+- [ ] Demo işletme
+- [ ] E2E booking testi
 
-## Phase 14 — Security & Edge Cases
+## FAZ 4 — Sağlık Sektörü
 
-**Goal:** Harden the multi-tenant system before production.
+- [ ] Özel Doktor
+- [ ] Psikolog
+- [ ] Fizyoterapist
+- [ ] Diyetisyen
+- [ ] Göz kliniği
+- [ ] Klinik
 
-- [ ] Full Firestore Rules review
-- [ ] Full Storage Rules review
-- [ ] Verify tenant isolation
-- [ ] Verify unauthorized business access is blocked
-- [ ] Verify booking creation shape validation
-- [ ] Verify slot collision protection
-- [ ] Handle deleted/disabled services safely
-- [ ] Handle closed days and past times
-- [ ] Review public data exposure
-- [ ] Consider separating public business data from internal tenant data
-- [ ] Add App Check when appropriate for production
+Gerektiğinde sektör bazlı randevu alanları opsiyonel olarak eklenecek.
 
-## Phase 15 — Premium UI & UX Polish
+> Sağlık tarafında gereksiz hassas sağlık verisi ilk aşamada toplanmayacak.
 
-**Goal:** Make ALINDA feel like a polished commercial SaaS product.
+## FAZ 5 — Hizmet / Araç Odaklı Sektörler
 
-- [ ] Responsive review across desktop/tablet/mobile
-- [ ] Skeleton loading states
-- [ ] Smooth page transitions
-- [ ] Micro-interactions
-- [ ] Modal/drawer polish
-- [ ] Form validation polish
-- [ ] Typography and spacing consistency
-- [ ] Empty/error/success state design
-- [ ] Accessibility review
-- [ ] Final visual consistency pass
+- [ ] Oto Servis
+- [ ] Lastikçi
+- [ ] Oto Yıkama
+- [ ] Oto Detailing
+- [ ] Oto Ekspertiz
 
-## Phase 16 — Firebase Integration & End-to-End Verification
+Gerekirse:
+- [ ] Araç bilgisi
+- [ ] Marka / model
+- [ ] Plaka
+- [ ] Hizmet türü
+- [ ] Servis personeli
 
-**Goal:** Verify the complete production data flow before deployment.
+gibi opsiyonel alanlar eklenecek.
 
-- [ ] Connect local development environment with `.env.local`
-- [ ] Verify Firebase Web SDK configuration
-- [ ] Verify Authentication login/logout
-- [ ] Verify Firestore reads/writes
-- [ ] Verify Storage upload/delete
-- [ ] Verify booking creation
-- [ ] Verify slot conflict protection
-- [ ] Verify panel permissions
-- [ ] Verify public booking availability
-- [ ] Run end-to-end manual test scenarios
-- [ ] Fix all discovered production blockers
+## FAZ 6 — Sektöre Özel Modüller
 
-## Phase 17 — Production Deployment
+Randevu motoru ortak kalacak; sektör özellikleri modüler olacak.
 
-**Goal:** Put ALINDA online after the product is ready.
+**Veteriner**
+- [ ] Hayvan profili
+- [ ] Hayvan türü / ırkı
 
-- [ ] Create Firebase App Hosting backend
-- [ ] Connect `furukcell/alinda-booking` GitHub repository
-- [ ] Connect `main` as live branch
-- [ ] Configure environment variables/secrets
-- [ ] Configure production Firebase settings
-- [ ] First deployment
-- [ ] Verify live URL
-- [ ] Verify public booking page in production
-- [ ] Verify `/login` and `/panel` in production
-- [ ] Verify Firebase services from the deployed app
-- [ ] Configure custom domain when ready
-- [ ] Add production monitoring/log review
+**Oto servis**
+- [ ] Araç profili
 
-## Phase 18 — Sales-Ready Release
+**Doktor**
+- [ ] Uzmanlık / muayene türü
 
-**Goal:** Make ALINDA ready for demonstrations and first paying businesses.
+**Pilates / spor**
+- [ ] Ders
+- [ ] Grup kapasitesi
 
-- [ ] Final landing page polish
-- [ ] Demo business data polish
-- [ ] Sales/demo flow verification
-- [ ] Pricing presentation
-- [ ] Onboarding flow
-- [ ] Business setup checklist
-- [ ] Customer-facing booking link sharing
-- [ ] Production launch checklist
-- [ ] First real-business pilot
+## FAZ 7 — Ticari Ölçekleme
 
----
+- [ ] Sektör bazlı onboarding
+- [ ] Sektör bazlı hazır hizmet önerileri
+- [ ] Hazır tema + içerik şablonları
+- [ ] İşletme kurulum sihirbazı
+- [ ] Custom domain
+- [ ] Online ödeme
+- [ ] Otomatik abonelik tahsilatı
+- [ ] İlk gerçek işletme pilotları
+- [ ] Production E2E
+- [ ] Security audit
+- [ ] Monitoring / operasyon
 
-## Working Order
+> Manuel abonelik sistemi zaten mevcut. Bu fazdaki ödeme maddeleri online ödeme ve otomatik tahsilat içindir.
 
-We will work **one phase at a time** and only mark an item complete after it has been implemented and verified.
+## 🎯 Çalışma Sırası
 
-**Current next step:** Phase 11 — Appointment detail view and appointment history.
+    Mevcut sistem
+         ↓
+    Build / deployment stabilizasyonu
+         ↓
+    FAZ 1 — Sektör altyapısı
+         ↓
+    FAZ 2 — Theme Engine
+         ↓
+    FAZ 3 — Kuaför / Berber / Veteriner / Diş
+         ↓
+    FAZ 4 — Sağlık
+         ↓
+    FAZ 5 — Otomotiv
+         ↓
+    FAZ 6 — Sektöre özel modüller
+         ↓
+    FAZ 7 — Ticari ölçekleme
 
-**Deployment policy:** Production deployment is intentionally postponed until the core product, security, UX and end-to-end Firebase flow have been verified.
+**Her faz ayrı ayrı uygulanacak ve test edilecek.**
