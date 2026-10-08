@@ -7,7 +7,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { getFirebaseAuth, getFirebaseDb, getFirebaseStorage } from "@/lib/firebase/client";
+import { getFirebaseAuth, getFirebaseStorage } from "@/lib/firebase/client";
 
 declare global {
   interface Window {
