@@ -24,6 +24,7 @@ type DashboardBooking = {
   time: string;
   customerName: string;
   serviceName: string;
+  specialistName: string;
   status: "pending" | "confirmed" | "cancelled";
   serviceDurationMinutes: number;
   servicePrice: number;
