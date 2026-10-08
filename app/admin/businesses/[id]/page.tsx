@@ -203,7 +203,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
               }}
               className={`rounded-full px-4 py-2 text-xs font-semibold ${data.accessEnabled ? "bg-white text-alinda-ink" : "bg-[#B96862] text-white"} disabled:opacity-50`}
             >
-              {accessBusy ? "İşleniyor…" : data.accessEnabled ? "Erişimi kes" : "Erişimi aç"}
+              {accessBusy && <Loader2 size={15} className="mr-2 inline animate-spin" />}{accessBusy ? "İşleniyor…" : data.accessEnabled ? "Erişimi kes" : "Erişimi aç"}
             </button>
           </div>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
