@@ -625,13 +625,13 @@ export function BusinessBooking({ business }: { business: Business }) {
               {business.latitude && business.longitude && (
                 <div className="mt-5 overflow-hidden rounded-[20px] border" style={{ borderColor: line }}>
                   <iframe
-                    title={`${business.name} konumu`}
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(business.latitude + "," + business.longitude)}&z=16&output=embed`}
+                    title={business.name + " konumu"}
+                    src={"https://maps.google.com/maps?q=" + encodeURIComponent(String(business.latitude) + "," + String(business.longitude)) + "&z=16&output=embed"}
                     className="h-56 w-full border-0"
                     loading="lazy"
                   />
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.latitude + "," + business.longitude)}`}
+                    href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(String(business.latitude) + "," + String(business.longitude))}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center justify-center gap-2 border-t bg-white px-4 py-3 text-xs font-bold"
