@@ -51,10 +51,15 @@ export async function POST(request: Request) {
           const contacts = Array.isArray(value?.contacts) ? value.contacts : [];
           const name = typeof contacts[0]?.profile?.name === "string" ? contacts[0].profile.name : "WhatsApp müşterisi";
           let incomingText = String(message.text.body).trim();
-          const ai = await interpretBusinessMessage(businessRef.id, incomingText).catch(() => null);
+          const history = await (await import("@/lib/whatsapp/ai-secretary")).getSecretaryHistory(businessRef.id, String(message.from));
+          const ai = await interpretBusinessMessage(businessRef.id, incomingText, history).catch(() => null);
           if (ai?.intent === "book" && ai.serviceId && ai.date && ai.time) {
             const service = (await getAdminDb().collection(businessRef.path + "/services").doc(ai.serviceId).get()).data();
             if (service?.name) incomingText = String(service.name) + " " + ai.date + " " + ai.time;
+          } else if (ai?.intent === "lookup" && ai.referenceNo) {
+            incomingText = "randevum " + ai.referenceNo;
+          } else if (ai?.intent === "cancel" && ai.referenceNo) {
+            incomingText = "randevu iptal " + ai.referenceNo;
           }
           const refMatch = incomingText.toUpperCase().match(/(?:^|\\s)([A-Z0-9]{5})(?:$|\\s)/)?.[1];
           let reply: string;
@@ -72,7 +77,7 @@ export async function POST(request: Request) {
             reply = prepared.message;
             if (prepared.state) await conversationRef.set(prepared.state);
           } else {
-            reply = await handleSecretaryMessage(businessRef.id, String(message.from), incomingText, name);
+            reply = ai?.reply || await handleSecretaryMessage(businessRef.id, String(message.from), incomingText, name);
           }
           await sendSecretaryReply(businessRef.id, String(message.from), reply);
         }
