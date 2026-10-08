@@ -68,6 +68,7 @@ export function BusinessBooking({ business }: { business: Business }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [coupon, setCoupon] = useState<{ couponId: string; code: string; discount: number; total: number } | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
@@ -216,7 +217,8 @@ export function BusinessBooking({ business }: { business: Business }) {
         whatsappOptIn,
         date: selectedDateInfo.id,
         time: selectedTime,
-        couponCode: coupon?.code || couponCode.trim().toUpperCase()
+        couponCode: coupon?.code || couponCode.trim().toUpperCase(),
+        privacyAccepted
       });
 
       setConfirmedReference(bookingRef.id);
@@ -297,7 +299,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <span className="text-sm font-bold">{selectedTime}</span>
               </div>
             </div>
-            <button onClick={() => { setConfirmed(false); setConfirmedReference(""); setSelectedTime(""); setName(""); setPhone(""); }} className="mt-6 text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>
+            <button onClick={() => { setConfirmed(false); setConfirmedReference(""); setSelectedTime(""); setName(""); setPhone(""); setPrivacyAccepted(false); }} className="mt-6 text-sm font-bold underline underline-offset-4" style={{ color: roseDark }}>
               Yeni randevu oluştur
             </button>
           </section>
@@ -547,6 +549,19 @@ export function BusinessBooking({ business }: { business: Business }) {
               <label className="mt-4 flex items-start gap-3 rounded-[17px] border bg-white px-4 py-3 text-xs leading-5" style={{ borderColor: line }}>
                 <input
                   type="checkbox"
+                  checked={privacyAccepted}
+                  onChange={(event) => setPrivacyAccepted(event.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#D88982]"
+                />
+                <span>
+                  <span className="font-semibold">Kişisel verilerimin işlenmesine ilişkin <a href="/gizlilik" target="_blank" rel="noreferrer" className="underline underline-offset-2" style={{ color: roseDark }}>Gizlilik ve KVKK metnini</a> okudum ve kabul ediyorum.</span>
+                  <span className="mt-0.5 block" style={{ color: muted }}>Randevu oluşturabilmek için bu onay gereklidir.</span>
+                </span>
+              </label>
+
+              <label className="mt-3 flex items-start gap-3 rounded-[17px] border bg-white px-4 py-3 text-xs leading-5" style={{ borderColor: line }}>
+                <input
+                  type="checkbox"
                   checked={whatsappOptIn}
                   onChange={(event) => setWhatsappOptIn(event.target.checked)}
                   className="mt-0.5 h-4 w-4 shrink-0 accent-[#D88982]"
@@ -559,7 +574,7 @@ export function BusinessBooking({ business }: { business: Business }) {
 
               {error && <div role="alert" className="mt-4 rounded-[17px] border px-4 py-3 text-sm" style={{ borderColor: "#E9C5C2", background: "#FFF0EE", color: "#A54D47" }}>{error}</div>}
 
-              <button onClick={() => void confirmBooking()} disabled={!name.trim() || !phone.trim() || saving} className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-[18px] text-sm font-bold text-white shadow-[0_10px_24px_rgba(216,137,130,0.22)] disabled:cursor-not-allowed disabled:opacity-40" style={{ background: rose }}>
+              <button onClick={() => void confirmBooking()} disabled={!name.trim() || !phone.trim() || !privacyAccepted || saving} className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-[18px] text-sm font-bold text-white shadow-[0_10px_24px_rgba(216,137,130,0.22)] disabled:cursor-not-allowed disabled:opacity-40" style={{ background: rose }}>
                 {saving ? "Randevu oluşturuluyor…" : "Randevuyu Al"}<ChevronRight size={17} />
               </button>
 
