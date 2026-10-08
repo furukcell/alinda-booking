@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Activity, ArrowRight, CalendarDays, CircleDollarSign, Plus, Store, TrendingUp, Users } from "lucide-react";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { waitForFirebaseUser } from "@/lib/firebase/auth-ready";
 
 type Stats = {
   businesses: number;
@@ -39,7 +39,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        const user = getFirebaseAuth().currentUser;
+        const user = await waitForFirebaseUser();
         if (!user) {
           window.location.href = "/login";
           return;
