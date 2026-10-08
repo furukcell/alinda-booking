@@ -86,12 +86,12 @@ export default function PanelPage() {
   }, []);
 
   const pendingCount = useMemo(() => bookings.filter((item) => item.status === "pending").length, [bookings]);
-  const bookingUrl = typeof window !== "undefined" ? window.location.origin + "/" + business.slug : "/" + business.slug;
-  const setupSteps = [
+  const bookingUrl = business ? (typeof window !== "undefined" ? window.location.origin + "/" + business.slug : "/" + business.slug) : "";
+  const setupSteps = business ? [
     { label: "En az bir hizmet ekleyin", done: serviceCount > 0, href: "/panel/services" },
     { label: "En az bir uzman ekleyin", done: specialistCount > 0, href: "/panel/specialists" },
     { label: "Randevu sayfanızı kontrol edin", done: true, href: "/" + business.slug },
-  ];
+  ] : [];
   const setupDone = setupSteps.filter((item) => item.done).length;
 
   async function copyBookingLink() {
