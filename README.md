@@ -779,76 +779,69 @@ Secret değerleri repository içine yazılmamalıdır.
 
 ---
 
-# 🟡 Sırada Ne Var?
+# 🗺️ Sırada Ne Var?
 
-## 1. Multi-Tenant Uçtan Uca Test
+Detaylı yol haritası: `docs/roadmap.md`
 
-- [ ] Super Admin'den ikinci işletme oluştur
-- [ ] Yeni owner ile login ol
-- [ ] Panelin doğru işletmeyi açtığını doğrula
-- [ ] Hizmet oluştur
-- [ ] Uzman oluştur
-- [ ] Çalışma saatleri oluştur
-- [ ] Public booking oluştur
-- [ ] Randevu al
-- [ ] Başka işletmenin verisine erişilemediğini doğrula
+ALINDA'nın bir sonraki büyük hedefi, mevcut randevu motorunu bozmadan sistemi farklı sektörlere açmaktır.
 
-## 2. WhatsApp Production
+## FAZ 1 — Sektör Altyapısı
+- [ ] Business modeline sektör (industry) desteği
+- [ ] Theme altyapısı
+- [ ] Super Admin'de sektör seçimi
+- [ ] Eski işletmeler için geriye dönük uyumluluk (default: beauty)
+- [ ] Public booking'e sektör bilgisinin aktarılması
+- [ ] Build + tenant regression testi
 
-- [ ] Meta production izinleri / App Review
-- [ ] Approved templates
-- [ ] App Hosting environment ve secret ayarları
-- [ ] Webhook doğrulaması
-- [ ] Gerçek WhatsApp mesaj testi
-- [ ] AI doğal dil randevu testi
-- [ ] Sorgulama testi
-- [ ] İptal testi
-- [ ] Onay/iptal bildirim testi
+## FAZ 2 — Theme Engine
+- [ ] Sektör bazlı renk / tipografi / layout sistemi
+- [ ] Header, hero, hizmet, uzman ve booking bileşeni varyasyonları
+- [ ] İşletme bazlı tema seçimi
+- [ ] Mevcut beauty tasarımını koruma
 
-## 3. Pro Günlük Özet
+## FAZ 3 — İlk Yeni Sektörler
+- [ ] Kuaför
+- [ ] Berber
+- [ ] Veteriner
+- [ ] Diş Kliniği
 
-- [ ] Meta template oluştur
-- [ ] WHATSAPP_DAILY_SUMMARY_TEMPLATE ekle
-- [ ] CRON_SECRET ekle
-- [ ] GitHub ALINDA_CRON_SECRET ekle
-- [ ] Pro test işletmesi hazırla
-- [ ] Gerçek WhatsApp gönderimini test et
-- [ ] Cron çalışmasını doğrula
+## FAZ 4 — Sağlık Sektörü
+- [ ] Özel Doktor
+- [ ] Psikolog
+- [ ] Fizyoterapist
+- [ ] Diyetisyen
+- [ ] Göz Kliniği / Klinik
 
-## 4. Security Audit
+## FAZ 5 — Otomotiv
+- [ ] Oto Servis
+- [ ] Lastikçi
+- [ ] Oto Yıkama
+- [ ] Oto Detailing
+- [ ] Oto Ekspertiz
 
-- [ ] Firestore Rules tam audit
-- [ ] Storage Rules tam audit
-- [ ] Tenant isolation testi
-- [ ] Public data leakage testi
-- [ ] Admin API yetki testi
-- [ ] Webhook güvenlik testi
-- [ ] Randevu veri doğrulama testi
-- [ ] Rate limiting / abuse protection değerlendirmesi
-- [ ] Gerekirse App Check
+## FAZ 6 — Sektöre Özel Modüller
+- [ ] Veteriner: hayvan profili
+- [ ] Oto servis: araç profili
+- [ ] Doktor: uzmanlık / muayene türü
+- [ ] Spor / Pilates: ders ve grup kapasitesi
 
-## 5. Production E2E
-
-- [ ] GitHub Actions build
-- [ ] App Hosting rollout
-- [ ] Login
-- [ ] Panel
-- [ ] Public booking
-- [ ] Randevu onay/iptal
-- [ ] WhatsApp
-- [ ] Mobil test
-- [ ] Monitoring
-
-## 6. Ticari Sistem
-
+## FAZ 7 — Ticari Ölçekleme
+- [ ] Sektör bazlı onboarding
+- [ ] Hazır hizmet / tema şablonları
+- [ ] Kurulum sihirbazı
 - [ ] Custom domain
-- [ ] Ödeme sistemi
-- [ ] Abonelik sistemi
-- [ ] Otomatik plan yönetimi
-- [ ] İşletme onboarding
-- [ ] İlk gerçek işletme pilotu
+- [ ] Online ödeme
+- [ ] Otomatik abonelik tahsilatı
+- [ ] İlk gerçek işletme pilotları
+- [ ] Production E2E
+- [ ] Security audit
+- [ ] Monitoring / operasyon
 
----
+> **Önemli:** Manuel abonelik ve erişim yönetimi zaten mevcut. Roadmap'teki ödeme maddeleri online ödeme ve otomatik tahsilat anlamına gelir.
+
+### Çalışma prensibi
+
+Her faz **tek tek uygulanacak ve test edilecek**. Yeni sektör özellikleri mevcut güzellik merkezi işletmesini ve mevcut booking motorunu bozmamalıdır.
 
 # 🚧 Şimdilik Kapsam Dışı
 
