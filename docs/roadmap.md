@@ -70,6 +70,20 @@ Bu faz, mevcut güzellik merkezi ürününün kullanılabilir ve satışa hazır
 - [x] Google Maps yönlendirmesi
 - [x] QR kod ile randevu sayfası paylaşımı
 
+### Randevular V2
+- [x] Tarih filtresi
+- [x] Durum filtresi
+- [x] Müşteri adı / telefon araması
+- [x] Referans numarasıyla hızlı arama
+- [x] Randevu detay modalı
+- [x] Onaylama / iptal işlemleri
+- [x] Randevu durumuna göre görsel ayrım
+- [x] Hizmet / uzman / süre / ücret bilgileri
+- [x] WhatsApp izin bilgisi
+- [x] Mobil uyumlu randevu listesi
+- [x] Randevu listesinde tarih + saat doğru sıralama
+- [x] Liste satırlarında geçersiz iç içe buton yapısının düzeltilmesi
+
 ### İşletme Dashboard
 - [x] İşletme onboarding / kurulum adımları
 - [x] Randevu linki kopyalama
@@ -100,6 +114,67 @@ Bu faz, mevcut güzellik merkezi ürününün kullanılabilir ve satışa hazır
 > **Not:** QR görüntüsü şu an harici QR servisinden üretilmektedir. Production hardening aşamasında QR üretiminin kendi altyapısına alınması değerlendirilecek.
 
 # 🚧 Bundan Sonra Yapılacaklar
+
+> **Sektör genişletme şu an kapsam dışıdır.** Kuaför, berber, veteriner, sağlık vb. sektör çalışmaları şimdilik park edilmiştir. Öncelik mevcut güzellik merkezi ürününü satışa ve production kullanımına hazırlamaktır.
+
+## AKTİF SIRA — Mevcut Ürün
+
+### 1. Randevular V2 ✅
+- [x] Randevu listesi, filtreler, detay ve durum işlemleri
+
+### 2. İşletme Onboarding
+- [ ] İlk giriş kurulum sihirbazı
+- [ ] İşletme bilgileri
+- [ ] Hizmet ekleme
+- [ ] Uzman ekleme
+- [ ] Çalışma saatleri
+- [ ] Randevu sayfası kontrolü
+- [ ] QR / paylaşım adımı
+- [ ] Kurulum tamamlandı durumu
+
+### 3. Müşteri Yönetimi
+- [ ] Müşteri listesi
+- [ ] Telefon / iletişim aksiyonu
+- [ ] Randevu geçmişi
+- [ ] Toplam harcama
+- [ ] Son randevu
+- [ ] Müşteri detay ekranı
+
+### 4. Bildirimler & WhatsApp Production
+- [ ] Yeni randevu bildirimi production testi
+- [ ] Onay bildirimi production testi
+- [ ] İptal bildirimi production testi
+- [ ] Yaklaşan randevu hatırlatması
+- [ ] Meta template / secret / webhook production kontrolü
+- [ ] Pro günlük özet gerçek işletme testi
+
+### 5. Production Güvenlik & Kalite
+- [ ] Firestore Rules audit
+- [ ] API authentication / authorization audit
+- [ ] Tenant isolation testi
+- [ ] Public booking abuse / rate limit kontrolü
+- [ ] Yetkisiz booking erişimi testi
+- [ ] Production E2E test senaryoları
+- [ ] Monitoring / error tracking
+
+### 6. Ödeme & Abonelik
+- [x] IBAN + manuel abonelik aktivasyonu
+- [ ] Online ödeme
+- [ ] Otomatik abonelik tahsilatı
+- [ ] Başarısız ödeme akışı
+- [ ] Yenileme / faturalandırma
+
+### 7. Satışa Hazır Production Paketi
+- [ ] Demo işletme son kontrolü
+- [ ] Demo owner hesabı
+- [ ] Satış landing page son polish
+- [ ] Satış WhatsApp mesajları
+- [ ] QR tanıtım materyali
+- [ ] Gerçek işletme pilotu
+
+## PARK EDİLDİ — Sektör Genişletme
+
+Aşağıdaki eski roadmap maddeleri silinmedi; ancak **şu an yapılmayacaktır**. Mevcut ürün satışa ve production kullanıma hazırlandıktan sonra tekrar değerlendirilecek.
 
 ## FAZ 1 — Sektör Altyapısı
 
@@ -225,24 +300,20 @@ Randevu motoru ortak kalacak; sektör özellikleri modüler olacak.
 
 ## 🎯 Çalışma Sırası
 
-    FAZ 0 — MVP stabilizasyonu ✅
+    Randevular V2 ✅
          ↓
-    Randevu yönetimi + onboarding + production hardening
+    İşletme onboarding
          ↓
-    WhatsApp / ödeme / güvenlik production hazırlığı
+    Müşteri yönetimi
          ↓
-    FAZ 1 — Sektör altyapısı
+    Bildirimler + WhatsApp production
          ↓
-    FAZ 2 — Theme Engine
+    Güvenlik + E2E + monitoring
          ↓
-    FAZ 3 — Kuaför / Berber / Veteriner / Diş
+    Ödeme / otomatik abonelik
          ↓
-    FAZ 4 — Sağlık
+    Satışa hazır production paketi
          ↓
-    FAZ 5 — Otomotiv
-         ↓
-    FAZ 6 — Sektöre özel modüller
-         ↓
-    FAZ 7 — Ticari ölçekleme
+    Sektör genişletme (parkta)
 
 **Her faz ayrı ayrı uygulanacak ve test edilecek.**
