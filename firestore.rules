@@ -103,7 +103,7 @@ service cloud.firestore {
         allow create: if false;
         allow get: if true;
         allow list: if false;
-        allow update, delete: if isSuperAdmin() || isOwner(businessId);
+        allow update, delete: if isSuperAdmin() || ownerAccessEnabled(businessId);
       }
     }
   }
