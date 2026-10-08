@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, CheckCircle2, ExternalLink, KeyRound, MessageCircle, Scissors, Store, UserRound, Users, XCircle } from "lucide-react";
+import { ArrowLeft, CalendarDays, CheckCircle2, ExternalLink, KeyRound, Loader2, MessageCircle, Scissors, Store, UserRound, Users, XCircle } from "lucide-react";
 import { getFirebaseAuth } from "@/lib/firebase/client";
 
 type Detail = {
@@ -252,13 +252,13 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
               <strong className="text-alinda-ink">Aboneliği başlat</strong> butonu başlangıç tarihinden itibaren seçilen aylık/yıllık dönemi hesaplar, ödemeyi "ödendi" yapar ve işletme erişimini açar.
             </div>
             <button type="button" onClick={() => void updateSubscription(true)} disabled={subscriptionBusy} className="h-11 shrink-0 rounded-full bg-alinda-ink px-5 text-sm font-semibold text-white disabled:opacity-50">
-              {subscriptionBusy ? "Başlatılıyor…" : "Aboneliği başlat"}
+              {subscriptionBusy && <Loader2 size={16} className="mr-2 inline animate-spin" />}{subscriptionBusy ? "Başlatılıyor…" : "Aboneliği başlat"}
             </button>
           </div>
 
           <div className="mt-3 flex justify-end">
             <button type="button" onClick={() => void updateSubscription(false)} disabled={subscriptionBusy} className="h-10 rounded-xl border border-alinda-line px-4 text-xs font-semibold disabled:opacity-50">
-              {subscriptionBusy ? "Kaydediliyor…" : "Sadece bilgileri kaydet"}
+              {subscriptionBusy && <Loader2 size={15} className="mr-2 inline animate-spin" />}{subscriptionBusy ? "Kaydediliyor…" : "Sadece bilgileri kaydet"}
             </button>
           </div>
         </section>
