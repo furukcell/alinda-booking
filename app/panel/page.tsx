@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Clock3, Scissors, Settings2, Store, Users } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Clock3, Menu, Scissors, Settings2, Store, Users, X } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useMemo, useState } from "react";
@@ -44,6 +44,7 @@ export default function PanelPage() {
   const [customerCount, setCustomerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   async function loadDashboard(uid: string) {
     setLoading(true);
@@ -141,6 +142,65 @@ export default function PanelPage() {
         </aside>
 
         <section className="min-w-0 flex-1 px-4 py-5 sm:px-6 lg:px-10 lg:py-8">
+          <div className="mb-5 flex items-center justify-between lg:hidden">
+            <div className="flex min-w-0 items-center gap-3">
+              {business.logoUrl ? (
+                <img src={business.logoUrl} alt={business.name} className="h-10 w-10 rounded-xl object-contain" />
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-alinda-accent-soft text-sm font-semibold text-alinda-accent">{business.initials}</div>
+              )}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">{business.name}</p>
+                <p className="text-[10px] text-alinda-muted">İşletme paneli</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              aria-label={mobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen((value) => !value)}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-alinda-line bg-white text-alinda-ink shadow-sm"
+            >
+              {mobileMenuOpen ? <X size={21} /> : <Menu size={21} />}
+            </button>
+          </div>
+
+          {mobileMenuOpen && (
+            <div className="mb-5 rounded-2xl border border-alinda-line bg-white p-3 shadow-card lg:hidden">
+              <div className="mb-3 rounded-xl bg-alinda-cream px-3 py-2.5">
+                <p className="text-xs text-alinda-muted">İşletme</p>
+                <p className="mt-0.5 text-sm font-semibold">{business.name}</p>
+              </div>
+              <nav className="space-y-1">
+                {nav.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${item.href === "/panel" ? "bg-alinda-ink text-white" : "text-alinda-muted hover:bg-alinda-cream hover:text-alinda-ink"}`}
+                    >
+                      <Icon size={18} />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+              <Link
+                href={`/${business.slug}`}
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-3 flex items-center justify-between rounded-xl border border-alinda-line px-3 py-3 text-sm font-medium"
+              >
+                <span>Randevu sayfası</span>
+                <ArrowUpRight size={16} />
+              </Link>
+              <div className="mt-2">
+                <LogoutButton />
+              </div>
+            </div>
+          )}
+
           <header className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-alinda-accent">Genel Bakış</p>
