@@ -90,15 +90,15 @@ service cloud.firestore {
       }
 
       match /bookings/{bookingId} {
-        allow create: if validBookingCreate(businessId) && publicBookingEnabled(businessId);
+        // Public bookings are created only through the validated server API.
+        allow create: if false;
         allow get, list: if isSuperAdmin() || ownerAccessEnabled(businessId);
         allow update, delete: if isSuperAdmin() || ownerAccessEnabled(businessId);
       }
 
       match /slots/{slotId} {
-        allow create: if validSlotCreate(businessId, slotId)
-          && publicBookingEnabled(businessId)
-          && !exists(/databases/$(database)/documents/businesses/$(businessId)/slots/$(slotId));
+        // Slot locks are created atomically by the validated server booking API.
+        allow create: if false;
         allow get: if true;
         allow list: if false;
         allow update, delete: if isSuperAdmin() || isOwner(businessId);
