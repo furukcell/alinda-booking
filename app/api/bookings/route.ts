@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
       if (couponCode) {
         if (!couponSnap || !couponSnap.exists) throw new Error("COUPON_INVALID");
         const couponDoc = couponSnap;
-        const coupon = couponDoc.data();
+        const coupon = couponDoc.data() || {};
         if (coupon.active === false || (coupon.businessId && coupon.businessId !== businessId)) throw new Error("COUPON_INVALID");
         const today = todayInIstanbul();
         if ((coupon.startDate && today < coupon.startDate) || (coupon.endDate && today > coupon.endDate)) throw new Error("COUPON_INVALID");
