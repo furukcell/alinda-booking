@@ -7,7 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
-import { getOwnedBusinessId } from "@/lib/businesses/owner";
+
 
 type BusinessInfo = {
   id: string;
@@ -51,9 +51,20 @@ export default function PanelPage() {
     setError("");
 
     try {
-      const businessId = await getOwnedBusinessId(uid);
-      if (!businessId) throw new Error("NO_BUSINESS");
+      const auth = getFirebaseAuth();
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) throw new Error("NO_AUTH");
 
+      const ownerResponse = await fetch("/api/panel/business", {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      const ownerData = await ownerResponse.json().catch(() => ({}));
+      if (!ownerResponse.ok || !ownerData.businessId) {
+        throw new Error(ownerData.error || "NO_BUSINESS");
+      }
+
+      const businessId = ownerData.businessId;
       const db = getFirebaseDb();
       const [businessSnapshot, bookingsSnapshot, servicesSnapshot, specialistsSnapshot] = await Promise.all([
         getDoc(doc(db, "businesses", businessId)),
