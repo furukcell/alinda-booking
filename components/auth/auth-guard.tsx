@@ -4,7 +4,6 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
-import { collection, getDocs, limit, query, where } from "firebase/firestore";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -26,23 +25,25 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         }
 
         try {
-          const snapshot = await getDocs(
-            query(collection(getFirebaseDb(), "businesses"), where("ownerId", "==", nextUser.uid), limit(1))
-          );
-          if (snapshot.empty) {
-            setChecking(false);
-            return;
-          }
-          const business = snapshot.docs[0].data();
-          if (business.accessEnabled === false) {
+          const token = await nextUser.getIdToken();
+          const response = await fetch("/api/panel/business", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (response.status === 403) {
             setChecking(false);
             router.replace("/access-suspended");
             return;
           }
-          if (business.onboardingCompleted === false && pathname !== "/panel/onboarding") {
-            setChecking(false);
-            router.replace("/panel/onboarding");
-            return;
+
+          if (response.ok) {
+            const payload = await response.json();
+            const business = payload.business;
+            if (business?.onboardingCompleted === false && pathname !== "/panel/onboarding") {
+              setChecking(false);
+              router.replace("/panel/onboarding");
+              return;
+            }
           }
         } catch {
           // Keep the normal authenticated panel flow if the access check cannot be read.
