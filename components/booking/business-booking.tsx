@@ -15,7 +15,7 @@ import {
 import type { Business, Specialist } from "@/types/business";
 import { createBooking } from "@/lib/bookings/create";
 import { ManageBooking } from "@/components/booking/manage-booking";
-import { getDailySlots, getNextDates, type AvailableDate, type BookingSlot } from "@/lib/bookings/availability";
+import { getDailySlots, getNextDates, getSelectableDateIds, type AvailableDate, type BookingSlot } from "@/lib/bookings/availability";
 
 const rose = "#D88982";
 const roseDark = "#B96862";
@@ -78,6 +78,8 @@ export function BusinessBooking({ business }: { business: Business }) {
   const [closeTime, setCloseTime] = useState("");
   const [loadingSlots, setLoadingSlots] = useState(true);
   const [selectedTime, setSelectedTime] = useState("");
+  const [selectableDateIds, setSelectableDateIds] = useState<Set<string>>(new Set());
+  const [loadingDates, setLoadingDates] = useState(true);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
@@ -147,6 +149,36 @@ export function BusinessBooking({ business }: { business: Business }) {
     setCoupon(null);
     setCouponError("");
   }, [selectedService, specialists]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadSelectableDates() {
+      if (!specialist) {
+        setSelectableDateIds(new Set());
+        setLoadingDates(false);
+        return;
+      }
+      setLoadingDates(true);
+      try {
+        const ids = await getSelectableDateIds(business.id, dates, specialist);
+        if (cancelled) return;
+        setSelectableDateIds(ids);
+        if (!ids.has(selectedDate)) {
+          const firstAvailable = dates.find((date) => ids.has(date.id));
+          if (firstAvailable) {
+            setSelectedDate(firstAvailable.id);
+            setSelectedMonth(firstAvailable.id.slice(0, 7));
+          }
+        }
+      } catch {
+        if (!cancelled) setSelectableDateIds(new Set());
+      } finally {
+        if (!cancelled) setLoadingDates(false);
+      }
+    }
+    void loadSelectableDates();
+    return () => { cancelled = true; };
+  }, [business.id, dates, specialist]);
 
   useEffect(() => {
     let cancelled = false;
@@ -265,6 +297,7 @@ export function BusinessBooking({ business }: { business: Business }) {
   }
 
   function chooseDate(id: string, scroll = true) {
+    if (!selectableDateIds.has(id)) return;
     setSelectedDate(id);
     setSelectedMonth(id.slice(0, 7));
     setSelectedTime("");
@@ -490,7 +523,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                   {activeMonthDates.map((date) => {
                     const active = date.id === selectedDate;
                     return (
-                      <button key={date.id} onClick={() => chooseDate(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
+                      <button key={date.id} onClick={() = disabled={loadingDates || !selectableDateIds.has(date.id)}> chooseDate(date.id)} className="rounded-[15px] border px-1 py-2.5 text-center transition active:scale-95" style={{ borderColor: active ? rose : line, background: active ? rose : "#fff", color: active ? "#fff" : text }}>
                         <span className="block text-[9px] font-semibold uppercase" style={{ color: active ? "rgba(255,255,255,.72)" : muted }}>{date.label}</span>
                         <span className="mt-0.5 block text-sm font-bold">{Number(date.id.slice(8))}</span>
                         {active && <span className="mt-1 block text-[8px] font-bold uppercase tracking-wide text-white/90">Seçildi</span>}
