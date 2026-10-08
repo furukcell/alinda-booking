@@ -34,6 +34,8 @@ export type Business = {
   city: string;
   district: string;
   address: string;
+  latitude?: number;
+  longitude?: number;
   phone: string;
   initials: string;
   logoUrl?: string;
