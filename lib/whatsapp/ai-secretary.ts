@@ -302,7 +302,7 @@ export async function interpretSecretaryMessage(input: {
         today:todayIstanbul(),
         services:input.services,
         specialists:input.specialists
-      })]} }],
+      })}]}],
       systemInstruction:{parts:[{text:"Türkçe WhatsApp randevu niyetini JSON olarak çıkar. intent book, lookup, cancel, help veya unknown olabilir. Tarih YYYY-MM-DD, saat HH:MM. Sadece JSON."}]},
       generationConfig:{temperature:0.1,maxOutputTokens:300,responseMimeType:"application/json"}
     })
