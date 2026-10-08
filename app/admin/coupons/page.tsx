@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, CirclePlus, Edit3, Ticket, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, CirclePlus, Edit3, Loader2, Ticket, Trash2, X } from "lucide-react";
 import { waitForFirebaseUser } from "@/lib/firebase/auth-ready";
 
 type Coupon = {
