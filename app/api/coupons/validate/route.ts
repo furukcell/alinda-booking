@@ -13,6 +13,11 @@ export async function GET(request: NextRequest) {
     const subtotal = Number(request.nextUrl.searchParams.get("subtotal") || 0);
     if (!businessId || !code || !Number.isFinite(subtotal) || subtotal <= 0) return NextResponse.json({ error: "Kupon bilgileri geçersiz." }, { status: 400 });
 
+    const businessSnapshot = await getAdminDb().collection("businesses").doc(businessId).get();
+    if (!businessSnapshot.exists || businessSnapshot.data()?.active === false || businessSnapshot.data()?.accessEnabled === false) {
+      return NextResponse.json({ error: "Bu işletme şu anda online randevu almıyor." }, { status: 403 });
+    }
+
     const snapshot = await getAdminDb().collection("coupons").where("code", "==", code).limit(1).get();
     if (snapshot.empty) return NextResponse.json({ error: "Kupon kodu bulunamadı." }, { status: 404 });
     const doc = snapshot.docs[0];
