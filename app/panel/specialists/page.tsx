@@ -73,14 +73,14 @@ export default function SpecialistsPage() {
         };
       }));
 
-      setSpecialists(specialistSnapshot.docs.map((item) => {
-        const data = item.data();
+      setSpecialists((Array.isArray(specialistResult.items) ? specialistResult.items : []).map((item: any) => {
+        const data = item ?? {};
         return {
-          id: item.id,
+          id: typeof item.id === "string" ? item.id : "",
           name: typeof data.name === "string" ? data.name : "",
           title: typeof data.title === "string" ? data.title : "Uzman",
           photoUrl: typeof data.photoUrl === "string" ? data.photoUrl : "",
-          serviceIds: Array.isArray(data.serviceIds) ? data.serviceIds.filter((value): value is string => typeof value === "string") : [],
+          serviceIds: Array.isArray(data.serviceIds) ? data.serviceIds.filter((value: unknown): value is string => typeof value === "string") : [],
           schedule: Object.fromEntries(dayOptions.map(([dayId]) => {
             const value = data.schedule?.[dayId];
             return [dayId, {
@@ -88,9 +88,9 @@ export default function SpecialistsPage() {
               ...(value && typeof value === "object" ? value : {})
             }];
           })),
-          timeOffDates: Array.isArray(data.timeOffDates) ? data.timeOffDates.filter((value): value is string => typeof value === "string") : []
+          timeOffDates: Array.isArray(data.timeOffDates) ? data.timeOffDates.filter((value: unknown): value is string => typeof value === "string") : []
         };
-      }));
+      }).filter((item) => item.id));
     } catch {
       setError("Uzmanlar yüklenemedi. Firebase ve Firestore ayarlarınızı kontrol edin.");
     } finally {
