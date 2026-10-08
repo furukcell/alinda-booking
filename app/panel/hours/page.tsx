@@ -46,14 +46,17 @@ export default function HoursPage() {
     setLoading(true);
     setError("");
     try {
-      const id = await getOwnedBusinessId(uid);
-      setBusinessId(id);
-      if (!id) {
-        setError("Bu kullanıcıya bağlı bir işletme bulunamadı.");
-        return;
-      }
-      const snapshot = await getDocs(collection(getFirebaseDb(), "businesses", id, "hours"));
-      const savedById = new Map(snapshot.docs.map((item) => [item.id, item.data()]));
+      const user = getFirebaseAuth().currentUser;
+      const token = await user?.getIdToken();
+      if (!token) throw new Error("Oturum doğrulanamadı.");
+      const response = await fetch("/api/panel/resources?type=hours", {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Çalışma saatleri alınamadı.");
+      setBusinessId(result.businessId);
+      const savedById = new Map((result.items || []).map((item: any) => [item.id, item]));
       setDays(defaultDays.map((day) => {
         const data = savedById.get(day.id);
         return data ? {
