@@ -19,6 +19,13 @@ function validTime(value: string) {
   return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
+function normalizeTurkishPhone(value: string) {
+  let digits = value.replace(/\D/g, "");
+  if (digits.startsWith("90")) digits = "0" + digits.slice(2);
+  if (digits.length === 10 && digits.startsWith("5")) digits = "0" + digits;
+  return digits;
+}
+
 function todayInIstanbul() {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Istanbul",
@@ -50,7 +57,7 @@ export async function POST(request: NextRequest) {
     const date = clean(body.date);
     const time = clean(body.time);
     const customerName = clean(body.customerName);
-    const customerPhone = clean(body.customerPhone);
+    const customerPhone = normalizeTurkishPhone(clean(body.customerPhone));
     const couponCode = clean(body.couponCode).toUpperCase();
     const whatsappOptIn = body.whatsappOptIn === true;
     const privacyAccepted = body.privacyAccepted === true;
@@ -63,8 +70,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Geçmiş bir tarih için randevu alınamaz." }, { status: 400 });
     }
 
-    const digits = customerPhone.replace(/\D/g, "");
-    if (!(digits.length === 10 && digits.startsWith("5")) && !(digits.length === 11 && digits.startsWith("05")) && !(digits.length === 12 && digits.startsWith("905"))) {
+    if (!/^05\d{9}$/.test(customerPhone)) {
       return NextResponse.json({ error: "Geçerli bir Türkiye telefon numarası girin." }, { status: 400 });
     }
 
