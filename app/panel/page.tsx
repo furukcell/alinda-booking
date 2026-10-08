@@ -34,6 +34,7 @@ type DashboardBooking = {
 const nav = [
   { href: "/panel", label: "Genel Bakış", icon: Store },
   { href: "/panel/appointments", label: "Randevular", icon: CalendarDays },
+  { href: "/panel/customers", label: "Müşteriler", icon: Users },
   { href: "/panel/services", label: "Hizmetler", icon: Scissors },
   { href: "/panel/specialists", label: "Uzmanlar", icon: Users },
   { href: "/panel/hours", label: "Çalışma Saatleri", icon: Clock3 },
