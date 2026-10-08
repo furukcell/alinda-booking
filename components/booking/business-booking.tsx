@@ -104,6 +104,7 @@ export function BusinessBooking({ business }: { business: Business }) {
   const [phone, setPhone] = useState("");
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [coupon, setCoupon] = useState<{ couponId: string; code: string; discount: number; total: number } | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
@@ -171,6 +172,7 @@ export function BusinessBooking({ business }: { business: Business }) {
     setCoupon(null);
     setCouponError("");
     setPrivacyAccepted(false);
+    setTermsAccepted(false);
   }, [selectedService, specialists]);
 
   useEffect(() => {
@@ -286,7 +288,8 @@ export function BusinessBooking({ business }: { business: Business }) {
         date: selectedDateInfo.id,
         time: selectedTime,
         couponCode: coupon?.code || couponCode.trim().toUpperCase(),
-        privacyAccepted
+        privacyAccepted,
+        termsAccepted
       });
 
       setConfirmedReference(bookingRef.id);
@@ -335,6 +338,7 @@ export function BusinessBooking({ business }: { business: Business }) {
     setCoupon(null);
     setCouponError("");
     setPrivacyAccepted(false);
+    setTermsAccepted(false);
     const first = business.specialists.find((item) => item.serviceIds.includes(id));
     setSelectedSpecialist(first?.id ?? "");
   }
@@ -773,8 +777,21 @@ export function BusinessBooking({ business }: { business: Business }) {
                   className="mt-0.5 h-4 w-4 shrink-0 accent-[#D88982]"
                 />
                 <span>
-                  <span className="font-semibold">Kişisel verilerimin işlenmesine ilişkin <a href="/gizlilik" target="_blank" rel="noreferrer" className="underline underline-offset-2" style={{ color: roseDark }}>Gizlilik ve KVKK metnini</a> okudum ve kabul ediyorum.</span>
-                  <span className="mt-0.5 block" style={{ color: muted }}>Randevu oluşturabilmek için bu onay gereklidir.</span>
+                  <span className="font-semibold"><a href={"/" + business.slug + "/kvkk"} target="_blank" rel="noreferrer" className="underline underline-offset-2" style={{ color: roseDark }}>{business.name} KVKK Aydınlatma Metni</a>'ni okudum ve bilgi edindim.</span>
+                  <span className="mt-0.5 block" style={{ color: muted }}>Bu kutu, aydınlatma metninin tarafınıza sunulduğunu belirtir.</span>
+                </span>
+              </label>
+
+              <label className="mt-3 flex items-start gap-3 rounded-[17px] border bg-white px-4 py-3 text-xs leading-5" style={{ borderColor: line }}>
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(event) => setTermsAccepted(event.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#D88982]"
+                />
+                <span>
+                  <span className="font-semibold"><a href={"/" + business.slug + "/kosullar"} target="_blank" rel="noreferrer" className="underline underline-offset-2" style={{ color: roseDark }}>{business.name} Randevu ve Hizmet Koşulları</a>'nı kabul ediyorum.</span>
+                  <span className="mt-0.5 block" style={{ color: muted }}>Randevunun oluşturulması ve hizmetin sunulması için geçerlidir.</span>
                 </span>
               </label>
 
