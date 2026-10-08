@@ -187,6 +187,7 @@ Temel yapı:
         ├── slots
         ├── whatsappMessages
         ├── whatsappConversations
+        ├── whatsappAiPreferences/{phone}
         └── integrations/whatsapp
 
 İşletme sahibi ownerId üzerinden bulunur.
@@ -819,6 +820,9 @@ Secret değerleri repository içine yazılmamalıdır.
 - [x] Randevu sorgulama
 - [x] Randevu iptal
 - [x] Pro günlük özet altyapısı
+- [x] Pro müşteri bazlı AI izin sistemi
+- [x] Pro AI kapat / tekrar aç komutları
+- [x] Pro 10 dakika cevap gelmezse AI yardım teklifi
 
 ## Super Admin
 
