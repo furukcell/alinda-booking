@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     await businessRef.set({
       name, slug, category, description: "", city, district, address: "", phone, initials,
       primaryColor: "#B86F61", primaryColorSoft: "#F3E4E0", ownerId: ownerUid,
-      plan: "starter", active: true, billingCycle: "monthly", subscriptionStatus: "active", paymentStatus: "comped", subscriptionStartDate: new Date().toISOString().slice(0, 10), subscriptionEndDate: null, trialEndDate: null, whatsappDailySummaryEnabled: false, createdAt: new Date(),
+      plan: "starter", active: true, billingCycle: "monthly", subscriptionStatus: "active", paymentStatus: "comped", subscriptionStartDate: new Date().toISOString().slice(0, 10), subscriptionEndDate: null, trialEndDate: null, whatsappDailySummaryEnabled: false, onboardingCompleted: false, createdAt: new Date(),
     });
 
     await logAdminActivity({
