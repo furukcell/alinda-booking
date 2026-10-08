@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type { Business, Specialist } from "@/types/business";
 import { createBooking } from "@/lib/bookings/create";
+import { ManageBooking } from "@/components/booking/manage-booking";
 import { getDailySlots, getNextDates, type AvailableDate, type BookingSlot } from "@/lib/bookings/availability";
 
 const rose = "#D88982";
@@ -337,7 +338,7 @@ export function BusinessBooking({ business }: { business: Business }) {
                 <p className="mt-0.5 text-[10px]" style={{ color: muted }}>{business.category}</p>
               </div>
             </div>
-            <span className="rounded-full px-3 py-1.5 text-[11px] font-bold" style={{ background: roseSoft, color: roseDark }}>Online Randevu</span>
+            <div className="flex items-center gap-2"><ManageBooking businessId={business.id} /><span className="hidden rounded-full px-3 py-1.5 text-[11px] font-bold sm:inline" style={{ background: roseSoft, color: roseDark }}>Online Randevu</span></div>
           </div>
         </header>
 
