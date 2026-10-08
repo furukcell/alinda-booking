@@ -662,8 +662,8 @@ export function BusinessBooking({ business }: { business: Business }) {
 
               {error && <div role="alert" className="mt-4 rounded-[17px] border px-4 py-3 text-sm" style={{ borderColor: "#E9C5C2", background: "#FFF0EE", color: "#A54D47" }}>{error}</div>}
 
-              <button onClick={() => void confirmBooking()} disabled={!name.trim() || !/^05\\d{9}$/.test(phone.replace(/\\D/g, "")) || !privacyAccepted || saving} className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-[18px] text-sm font-bold text-white shadow-[0_10px_24px_rgba(216,137,130,0.22)] disabled:cursor-not-allowed disabled:opacity-40" style={{ background: rose }}>
-                {saving ? "Randevu oluşturuluyor…" : "Randevuyu Al"}<ChevronRight size={17} />
+              <button onClick={() => void confirmBooking()} disabled={!name.trim() || !/^05\d{9}$/.test(phone.replace(/\D/g, "")) || !privacyAccepted || saving} className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-[18px] text-sm font-bold text-white shadow-[0_10px_24px_rgba(216,137,130,0.22)] disabled:cursor-not-allowed disabled:opacity-40" style={{ background: rose }}>
+                {saving ? "Randevu oluşturuluyor…" : "Randevuyu Al"}{saving ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" /> : <ChevronRight size={17} />}
               </button>
 
               <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs" style={{ color: muted }}>
