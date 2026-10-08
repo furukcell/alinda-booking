@@ -211,6 +211,7 @@ export function getWhatsAppTemplateConfig() {
     customerConfirmedTemplate: process.env.WHATSAPP_CUSTOMER_CONFIRMED_TEMPLATE || "",
     customerCancelledTemplate: process.env.WHATSAPP_CUSTOMER_CANCELLED_TEMPLATE || "",
     dailySummaryTemplate: process.env.WHATSAPP_DAILY_SUMMARY_TEMPLATE || "",
+    customerReminderTemplate: process.env.WHATSAPP_CUSTOMER_REMINDER_TEMPLATE || "",
     language: process.env.WHATSAPP_TEMPLATE_LANGUAGE || "tr"
   };
 }
