@@ -18,7 +18,8 @@ import {
   disableAi,
   enableAi,
   getAiPreference,
-  markOutbound
+  markOutbound,
+  isProAiEligible
 } from "@/lib/whatsapp/ai-access";
 
 export async function GET(request: Request) {
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
         if (!businessRef) continue;
         const connection = await getWhatsAppConnection(businessRef.id);
         if (!connection) continue;
+        if (!(await isProAiEligible(businessRef.id))) continue;
         const catalog = await loadSecretaryCatalog(businessRef.id);
         for (const message of messages) {
           if (message?.type !== "text" || !message?.from || !message?.text?.body) continue;
