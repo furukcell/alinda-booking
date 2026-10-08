@@ -56,12 +56,14 @@ export default function HoursPage() {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Çalışma saatleri alınamadı.");
       setBusinessId(result.businessId);
-      const savedById = new Map<string, Record<string, unknown>>(
-        (Array.isArray(result.items) ? result.items : [])
-          .filter((item: unknown): item is Record<string, unknown> => Boolean(item) && typeof item === "object")
-          .map((item: Record<string, unknown>) => [typeof item.id === "string" ? item.id : "", item] as const)
-          .filter(([id]) => Boolean(id))
-      );
+      const savedById = new Map<string, Record<string, unknown>>();
+      const items: unknown[] = Array.isArray(result.items) ? result.items : [];
+      items.forEach((item: unknown) => {
+        if (!item || typeof item !== "object") return;
+        const record = item as Record<string, unknown>;
+        if (typeof record.id !== "string" || !record.id) return;
+        savedById.set(record.id, record);
+      });
       setDays(defaultDays.map((day) => {
         const data = savedById.get(day.id);
         return data ? {
