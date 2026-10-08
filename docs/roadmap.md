@@ -134,13 +134,14 @@ Bu faz, mevcut güzellik merkezi ürününün kullanılabilir ve satışa hazır
 - [x] Kurulum tamamlandı kaydı
 - [x] Onboarding tamamlanınca normal panele dönüş
 
-### 3. Müşteri Yönetimi
-- [ ] Müşteri listesi
-- [ ] Telefon / iletişim aksiyonu
-- [ ] Randevu geçmişi
-- [ ] Toplam harcama
-- [ ] Son randevu
-- [ ] Müşteri detay ekranı
+### 3. Müşteri Yönetimi ✅
+- [x] Müşteri listesi
+- [x] Telefon / iletişim aksiyonu
+- [x] Randevu geçmişi
+- [x] Toplam harcama
+- [x] Son randevu
+- [x] Müşteri detay ekranı
+- [x] Ad / telefon araması
 
 ### 4. Bildirimler & WhatsApp Production
 - [ ] Yeni randevu bildirimi production testi
@@ -306,7 +307,7 @@ Randevu motoru ortak kalacak; sektör özellikleri modüler olacak.
          ↓
     İşletme onboarding ✅
          ↓
-    Müşteri yönetimi
+    Müşteri yönetimi ✅
          ↓
     Bildirimler + WhatsApp production
          ↓
