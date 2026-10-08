@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { type DocumentData } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
+import { rateLimit, rateLimitResponse } from "@/lib/security/rate-limit";
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -52,6 +53,8 @@ function responseData(data: DocumentData) {
 }
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(request, "booking-manage-get", 20, 60000);
+  if (!limited.allowed) return rateLimitResponse(limited.retryAfterSeconds);
   try {
     const businessId = clean(request.nextUrl.searchParams.get("businessId"));
     const referenceNo = clean(request.nextUrl.searchParams.get("referenceNo")).toUpperCase();
@@ -89,6 +92,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request, "booking-manage-post", 10, 60000);
+  if (!limited.allowed) return rateLimitResponse(limited.retryAfterSeconds);
   try {
     const body = await request.json();
     const businessId = clean(body.businessId);
