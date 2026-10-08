@@ -213,7 +213,7 @@ export function BusinessBooking({ business }: { business: Business }) {
   }
 
   async function confirmBooking() {
-    if (!service || !specialist || !selectedDateInfo || !selectedTime || !name.trim() || !/^05\\d{9}$/.test(phone.replace(/\\D/g, "")) || saving) {
+    if (!service || !specialist || !selectedDateInfo || !selectedTime || !name.trim() || !/^05\d{9}$/.test(phone.replace(/\D/g, "")) || saving) {
       return;
     }
 
@@ -288,7 +288,7 @@ export function BusinessBooking({ business }: { business: Business }) {
               {business.name} henüz online randevu için hizmet tanımlamamış. Lütfen işletmeyle iletişime geçin.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
-              {business.phone && <a href={\`tel:\${business.phone}\`} className="rounded-full border bg-white px-5 py-3 text-sm font-bold" style={{ borderColor: line, color: roseDark }}>İşletmeyi ara</a>}
+              {business.phone && <a href={"tel:" + business.phone} className="rounded-full border bg-white px-5 py-3 text-sm font-bold" style={{ borderColor: line, color: roseDark }}>İşletmeyi ara</a>}
               <ManageBooking businessId={business.id} />
             </div>
           </section>
