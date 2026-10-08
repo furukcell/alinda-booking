@@ -1,6 +1,6 @@
 "use client";
 
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { ArrowRight, CalendarDays, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
@@ -41,6 +41,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -66,6 +68,25 @@ export default function LoginPage() {
     }
   }
 
+  async function handlePasswordReset() {
+    setError("");
+    setResetSent(false);
+    if (!email.trim()) {
+      setError("Şifre sıfırlamak için önce e-posta adresinizi girin.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(getFirebaseAuth(), email.trim());
+      setResetSent(true);
+    } catch (authError) {
+      const code = authError instanceof Error && "code" in authError ? String((authError as { code?: string }).code) : undefined;
+      setError(code === "auth/invalid-email" ? "Geçerli bir e-posta adresi girin." : "Şifre sıfırlama e-postası gönderilemedi. E-posta adresinizi kontrol edip tekrar deneyin.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-alinda-cream px-4 py-8 sm:px-6">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center">
@@ -77,10 +98,10 @@ export default function LoginPage() {
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-alinda-cream text-alinda-ink">
             <CalendarDays size={21} />
           </div>
-          <h1 className="mt-6 text-2xl font-semibold tracking-tight">İşletme paneline giriş</h1>
-          <p className="mt-2 text-sm leading-6 text-alinda-muted">Randevularınızı ve işletmenizi yönetmek için hesabınızla giriş yapın.</p>
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight">{resetMode ? "Şifrenizi sıfırlayın" : "İşletme paneline giriş"}</h1>
+          <p className="mt-2 text-sm leading-6 text-alinda-muted">{resetMode ? "E-posta adresinize güvenli bir şifre sıfırlama bağlantısı göndereceğiz." : "Randevularınızı ve işletmenizi yönetmek için hesabınızla giriş yapın."}</p>
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-4">
+          <form onSubmit={resetMode ? (event) => { event.preventDefault(); void handlePasswordReset(); } : handleSubmit} className="mt-7 space-y-4">
             <label className="block">
               <span className="mb-2 block text-sm font-medium">E-posta</span>
               <input
@@ -118,7 +139,7 @@ export default function LoginPage() {
               </span>
             </label>
 
-            {error ? (
+            {resetSent ? <div className="rounded-xl border border-alinda-line bg-alinda-cream px-4 py-3 text-sm">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Gelen kutunuzu ve spam klasörünü kontrol edin.</div> : null}\n\n            {error ? (
               <div role="alert" className="rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-sm text-alinda-danger">
                 {error}
               </div>
@@ -129,10 +150,10 @@ export default function LoginPage() {
               disabled={loading}
               className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-alinda-ink px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? "Giriş yapılıyor…" : "Giriş yap"}
+              {loading ? (resetMode ? "E-posta gönderiliyor…" : "Giriş yapılıyor…") : (resetMode ? "Şifre sıfırlama bağlantısı gönder" : "Giriş yap")}
               {!loading ? <ArrowRight size={17} /> : null}
             </button>
-          </form>
+          </form>\n\n          <div className="mt-5 text-center text-sm">\n            <button type="button" onClick={() => { setResetMode((mode) => !mode); setError(""); setResetSent(false); }} className="font-medium underline underline-offset-4">\n              {resetMode ? "Giriş ekranına dön" : "Şifremi unuttum"}\n            </button>\n          </div>
         </section>
 
         <p className="mt-5 text-center text-xs leading-5 text-alinda-muted">
