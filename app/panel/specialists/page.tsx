@@ -1,13 +1,12 @@
 "use client";
 
 import { onAuthStateChanged } from "firebase/auth";
-import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp, updateDoc } from "firebase/firestore";
+
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { ArrowLeft, Check, ImagePlus, Loader2, Pencil, Plus, Trash2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getFirebaseAuth, getFirebaseDb, getFirebaseStorage } from "@/lib/firebase/client";
-import { getOwnedBusinessId } from "@/lib/businesses/owner";
 import type { Service, Specialist } from "@/types/business";
 
 const dayOptions = [
@@ -170,18 +169,19 @@ export default function SpecialistsPage() {
         photoUrl,
         schedule: form.schedule,
         timeOffDates: form.timeOffDates,
-        updatedAt: serverTimestamp()
       };
 
-      const specialistsRef = collection(getFirebaseDb(), "businesses", businessId, "specialists");
-
-      if (editingId) {
-        await updateDoc(doc(specialistsRef, editingId), payload);
-        setSuccess("Uzman güncellendi.");
-      } else {
-        await addDoc(specialistsRef, { ...payload, createdAt: serverTimestamp() });
-        setSuccess("Uzman eklendi.");
-      }
+      const user = getFirebaseAuth().currentUser;
+      const token = await user?.getIdToken();
+      if (!token) throw new Error("Oturum doğrulanamadı.");
+      const response = await fetch("/api/panel/resources", {
+        method: editingId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ type: "specialists", ...(editingId ? { id: editingId } : {}), data: payload })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw Object.assign(new Error(result.error || "Uzman kaydedilemedi."), { code: result.code || "server/write-failed" });
+      setSuccess(editingId ? "Uzman güncellendi." : "Uzman eklendi.");
 
       resetForm();
       const user = getFirebaseAuth().currentUser;
@@ -200,7 +200,15 @@ export default function SpecialistsPage() {
     if (!businessId || !deletingId || deleting) return;
     setDeleting(true);
     try {
-      await deleteDoc(doc(getFirebaseDb(), "businesses", businessId, "specialists", deletingId));
+      const token = await getFirebaseAuth().currentUser?.getIdToken();
+      if (!token) throw new Error("Oturum doğrulanamadı.");
+      const response = await fetch("/api/panel/resources", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ type: "specialists", id: deletingId })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Uzman silinemedi.");
       setSpecialists((items) => items.filter((item) => item.id !== deletingId));
       setDeletingId(null);
       setSuccess("Uzman silindi.");
