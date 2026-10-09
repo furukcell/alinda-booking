@@ -1,6 +1,6 @@
 "use client";
 
-import { collection, doc, getDocs, query, where, writeBatch } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { ArrowLeft, CalendarDays, Check, Loader2, Search, X, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -8,11 +8,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 import { getOwnedBusinessId } from "@/lib/businesses/owner";
 import type { Booking } from "@/types/booking";
-
-function minutes(value: string) { const [hours, mins] = value.split(":").map(Number); return hours * 60 + mins; }
-function timeFromMinutes(value: number) { return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`; }
-function getSlotId(date: string, time: string, specialistId: string) { return `${date}_${time}_${specialistId}`.replace(/[^a-zA-Z0-9_-]/g, "-"); }
-function getSlotTimes(booking: Booking) { const duration = Math.max(30, Math.ceil((booking.serviceDurationMinutes || 30) / 30) * 30); const start = minutes(booking.time); return Array.from({ length: duration / 30 }, (_, index) => timeFromMinutes(start + index * 30)); }
 
 export default function AppointmentsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -84,18 +79,19 @@ export default function AppointmentsPage() {
     setUpdatingId(booking.id); setError(""); setSuccess("");
     try {
       const user = getFirebaseAuth().currentUser; if (!user) throw new Error("AUTH");
-      const businessId = await getOwnedBusinessId(user.uid); if (!businessId) throw new Error("NO_BUSINESS");
-      const db = getFirebaseDb(); const batch = writeBatch(db);
-      batch.update(doc(db, "businesses", businessId, "bookings", booking.id), { status: "cancelled" });
-      for (const time of getSlotTimes(booking)) {
-        batch.delete(doc(db, "businesses", businessId, "slots", getSlotId(booking.date, time, booking.specialistId)));
-      }
-      await batch.commit();
+      const token = await user.getIdToken();
+      const response = await fetch("/api/panel/appointments/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ bookingId: booking.id }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Randevu iptal edilemedi.");
       void sendStatusWhatsApp(booking.id);
       setBookings((current) => current.map((item) => item.id === booking.id ? { ...item, status: "cancelled" } : item));
       setSuccess("Randevu iptal edildi ve saatleri yeniden açıldı.");
       setSelectedBooking(null);
-    } catch { setError("Randevu iptal edilemedi. Lütfen tekrar deneyin."); }
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "Randevu iptal edilemedi. Lütfen tekrar deneyin."); }
     finally { setUpdatingId(""); }
   }
 
