@@ -226,7 +226,7 @@ export default function Home() {
                 {
                   name: "Pro",
                   oldPrice: "₺2.000",
-                  price: "₺1.000",
+                  price: "₺999",
                   suffix: "/ ay",
                   badge: "PRO",
                   description: "AI destekli WhatsApp sekreteri ve işletme özetleriyle randevu işini daha da otomatikleştirin.",
@@ -247,7 +247,7 @@ export default function Home() {
                   price: "₺10.000",
                   suffix: "/ yıl",
                   badge: "EN AVANTAJLI",
-                  description: "Pro özelliklerinin 12 aylık kullanımı. Aylık Pro'ya göre 2.000 TL daha avantajlı.",
+                  description: "Pro özelliklerinin 12 aylık kullanımı. Aylık Pro'ya göre 1.988 TL daha avantajlı.",
                   features: [...planFeatures, "AI destekli WhatsApp randevu sekreteri", "WhatsApp üzerinden randevu sorgulama ve iptal", "Günlük WhatsApp randevu özeti", "Doğal dil ile randevu talebi anlama"],
                 },
               ].map((plan) => (
