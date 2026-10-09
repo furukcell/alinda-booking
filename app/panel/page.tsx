@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Check, Clock3, Copy, ExternalLink, Menu, QrCode, Scissors, Settings2, Share2, Store, Users, X } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Check, Clock3, Copy, ExternalLink, Megaphone, Menu, QrCode, Scissors, Settings2, Share2, Store, Users, X } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useMemo, useState } from "react";
@@ -17,6 +17,8 @@ type BusinessInfo = {
   initials: string;
   logoUrl?: string;
 };
+
+type PanelAnnouncement = { id: string; title: string; message: string; type: "info" | "success" | "warning"; startDate: string | null; endDate: string | null };
 
 type DashboardBooking = {
   id: string;
@@ -44,6 +46,7 @@ const nav = [
 export default function PanelPage() {
   const [business, setBusiness] = useState<BusinessInfo | null>(null);
   const [bookings, setBookings] = useState<DashboardBooking[]>([]);
+  const [announcements, setAnnouncements] = useState<PanelAnnouncement[]>([]);
   const [serviceCount, setServiceCount] = useState(0);
   const [specialistCount, setSpecialistCount] = useState(0);
   const [customerCount, setCustomerCount] = useState(0);
@@ -71,6 +74,12 @@ export default function PanelPage() {
       if (!response.ok) throw new Error(result.error || "İşletme paneli verileri yüklenemedi.");
 
       setBusiness(result.business);
+      const announcementsResponse = await fetch("/api/panel/announcements", {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      const announcementsResult = await announcementsResponse.json().catch(() => ({}));
+      setAnnouncements(announcementsResponse.ok && Array.isArray(announcementsResult.announcements) ? announcementsResult.announcements : []);
       setBookings(Array.isArray(result.bookings) ? result.bookings : []);
       setServiceCount(typeof result.serviceCount === "number" ? result.serviceCount : 0);
       setSpecialistCount(typeof result.specialistCount === "number" ? result.specialistCount : 0);
@@ -261,6 +270,27 @@ export default function PanelPage() {
           </header>
 
           {error && <div role="alert" className="mt-6 rounded-xl border border-[#E8CACA] bg-[#FBEEEE] px-4 py-3 text-sm text-alinda-danger">{error}</div>}
+
+          {announcements.length > 0 && (
+            <section aria-labelledby="panel-announcements-title" className="mt-6 rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-alinda-accent-soft text-alinda-accent"><Megaphone size={19} /></div>
+                <div>
+                  <h2 id="panel-announcements-title" className="font-semibold">ALINDA duyuruları</h2>
+                  <p className="mt-1 text-xs text-alinda-muted">Yönetimden gelen güncel bilgilendirmeler</p>
+                </div>
+              </div>
+              <div className="mt-4 space-y-3">
+                {announcements.map((announcement) => (
+                  <article key={announcement.id} className={"rounded-2xl border p-4 " + (announcement.type === "warning" ? "border-[#E8D8B4] bg-[#FFF9EC]" : announcement.type === "success" ? "border-[#CBE8D4] bg-[#F0F8F2]" : "border-alinda-line bg-alinda-cream/50")}>
+                    <h3 className="text-sm font-semibold">{announcement.title}</h3>
+                    <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-alinda-muted">{announcement.message}</p>
+                    {(announcement.startDate || announcement.endDate) && <p className="mt-2 text-[11px] text-alinda-muted">{announcement.startDate ? "Başlangıç: " + announcement.startDate : ""}{announcement.startDate && announcement.endDate ? " · " : ""}{announcement.endDate ? "Bitiş: " + announcement.endDate : ""}</p>}
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
 
           <section className="mt-6 rounded-[24px] border border-alinda-line bg-white p-5 shadow-card sm:p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
