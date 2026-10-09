@@ -1,0 +1,10 @@
+# ALINDA Booking - Firebase App Hosting environment
+env:
+  - variable: GEMINI_API_KEY
+    secret: GEMINI_API_KEY
+    availability:
+      - RUNTIME
+  - variable: GEMINI_SECRETARY_MODEL
+    value: gemini-2.5-flash-lite
+    availability:
+      - RUNTIME
