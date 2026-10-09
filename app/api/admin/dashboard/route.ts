@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
       if (active) {
         activeCount += 1;
-        estimatedMrr += billingCycle === "annual" ? (plan === "pro" ? 10000 : 4999) / 12 : (plan === "pro" ? 1000 : 499);
+        estimatedMrr += billingCycle === "annual" ? (plan === "pro" ? 10000 : 4999) / 12 : (plan === "pro" ? 999 : 499);
       }
       if (plan === "pro") proCount += 1;
       else starterCount += 1;
