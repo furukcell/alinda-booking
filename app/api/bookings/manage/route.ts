@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { type DocumentData } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { rateLimit, rateLimitResponse } from "@/lib/security/rate-limit";
+import { createBusinessNotification } from "@/lib/notifications/business";
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -39,6 +40,7 @@ function getSlotId(date: string, time: string, specialistId: string) {
 function responseData(data: DocumentData) {
   return {
     referenceNo: data.referenceNo || "",
+    customerName: data.customerName || "",
     serviceName: data.serviceName || "",
     specialistName: data.specialistName || "",
     customerName: data.customerName || "",
@@ -141,6 +143,28 @@ export async function POST(request: NextRequest) {
 
       return { ...responseData(booking), status: "cancelled", alreadyCancelled: false };
     });
+
+    if (result.status === "cancelled" && !result.alreadyCancelled) {
+      try {
+        await createBusinessNotification(businessId, {
+          type: "booking_cancelled",
+          title: "Müşteri randevusunu iptal etti",
+          message: `${result.customerName || "Müşteri"} · ${referenceNo} referanslı randevuyu iptal etti.`,
+          bookingId: referenceNo,
+          referenceNo,
+          details: {
+            customerName: result.customerName || "",
+            serviceName: result.serviceName,
+            specialistName: result.specialistName,
+            date: result.date,
+            time: result.time,
+            cancelledBy: "customer",
+          },
+        });
+      } catch (notificationError) {
+        console.error("Customer cancellation notification failed", notificationError);
+      }
+    }
 
     return NextResponse.json({ ok: true, booking: result });
   } catch (error) {
