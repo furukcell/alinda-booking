@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Check, Clock3, Copy, ExternalLink, Megaphone, Menu, QrCode, Scissors, Settings2, Share2, Store, Users, X } from "lucide-react";
+import { ArrowUpRight, Bell, CalendarDays, Check, Clock3, Copy, ExternalLink, Megaphone, Menu, QrCode, Scissors, Settings2, Share2, Store, Users, X } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useMemo, useState } from "react";
@@ -36,6 +36,7 @@ type DashboardBooking = {
 const nav = [
   { href: "/panel", label: "Genel Bakış", icon: Store },
   { href: "/panel/appointments", label: "Randevular", icon: CalendarDays },
+  { href: "/panel/notifications", label: "Bildirimler", icon: Bell },
   { href: "/panel/customers", label: "Müşteriler", icon: Users },
   { href: "/panel/services", label: "Hizmetler", icon: Scissors },
   { href: "/panel/specialists", label: "Uzmanlar", icon: Users },
