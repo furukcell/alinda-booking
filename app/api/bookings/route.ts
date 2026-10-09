@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { rateLimit, rateLimitResponse } from "@/lib/security/rate-limit";
+import { createBusinessNotification } from "@/lib/notifications/business";
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -200,8 +201,28 @@ export async function POST(request: NextRequest) {
         createdAt: new Date()
       });
 
-      return { referenceNo: bookingRef.id, discount, totalPrice };
+      return { referenceNo: bookingRef.id, discount, totalPrice, serviceName: service.name || "", specialistName: specialist.name || "" };
     });
+
+    try {
+      await createBusinessNotification(businessId, {
+        type: "booking_created",
+        title: "Yeni randevu oluşturuldu",
+        message: `${customerName} · ${clean(transactionResult.referenceNo)} referanslı randevu oluşturdu.`,
+        bookingId: transactionResult.referenceNo,
+        referenceNo: transactionResult.referenceNo,
+        details: {
+          customerName,
+          serviceName: transactionResult.serviceName,
+          specialistName: transactionResult.specialistName,
+          date,
+          time,
+          totalPrice: transactionResult.totalPrice,
+        },
+      });
+    } catch (notificationError) {
+      console.error("Booking notification record failed", notificationError);
+    }
 
     return NextResponse.json({ ok: true, ...transactionResult });
   } catch (error) {
