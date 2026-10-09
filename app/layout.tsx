@@ -5,7 +5,12 @@ import { PwaRegister } from "@/components/pwa/pwa-register";
 export const metadata: Metadata = {
   title: "ALINDA Booking",
   description: "Premium online appointment booking for modern businesses",
-  applicationName: "ALINDA",
+  applicationName: "ALINDA Booking",
+  icons: {
+    icon: [{ url: "/alinda-logo.png", type: "image/png" }],
+    shortcut: ["/alinda-logo.png"],
+    apple: [{ url: "/alinda-logo.png", type: "image/png" }]
+  },
   formatDetection: { telephone: false }
 };
 
