@@ -235,8 +235,8 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <SelectField label="Plan" value={subscription.plan} onChange={(value) => setSubscription({ ...subscription, plan: value as "starter" | "pro" })} options={[["starter", "Starter · ₺499/ay"], ["pro", "Pro · ₺750/ay"]]} />
-            <SelectField label="Faturalama" value={subscription.billingCycle} onChange={(value) => setSubscription({ ...subscription, billingCycle: value as "monthly" | "annual" })} options={[["monthly", "Aylık"], ["annual", "Yıllık · ₺4.999"]]} />
+            <SelectField label="Plan" value={subscription.plan} onChange={(value) => setSubscription({ ...subscription, plan: value as "starter" | "pro" })} options={[["starter", "Starter · ₺499/ay"], ["pro", "Pro · ₺1.000/ay"]]} />
+            <SelectField label="Faturalama" value={subscription.billingCycle} onChange={(value) => setSubscription({ ...subscription, billingCycle: value as "monthly" | "annual" })} options={[["monthly", "Aylık"], ["annual", "Yıllık · Starter ₺4.999 / Pro ₺10.000"]]} />
             <SelectField label="Ödeme durumu" value={subscription.paymentStatus} onChange={(value) => setSubscription({ ...subscription, paymentStatus: value as typeof subscription.paymentStatus })} options={[["paid", "Ödendi"], ["pending", "Bekliyor"], ["failed", "Başarısız"], ["comped", "Ücretsiz / manuel"]]} />
             <SelectField label="Abonelik durumu" value={subscription.subscriptionStatus} onChange={(value) => setSubscription({ ...subscription, subscriptionStatus: value as typeof subscription.subscriptionStatus })} options={[["active", "Aktif"], ["trialing", "Deneme"], ["past_due", "Gecikmiş"], ["cancelled", "İptal"], ["expired", "Süresi doldu"]]} />
           </div>
