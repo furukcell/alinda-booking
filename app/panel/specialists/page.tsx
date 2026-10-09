@@ -150,16 +150,19 @@ export default function SpecialistsPage() {
     setError("");
     setSuccess("");
 
+    let saveStage = "Firestore";
     try {
       let photoUrl = form.photoUrl;
 
       if (photoFile) {
+        saveStage = "Fotoğraf yükleme";
         const extension = photoFile.name.split(".").pop() || "jpg";
         const imageRef = ref(getFirebaseStorage(), "businesses/" + businessId + "/specialists/" + (editingId ?? crypto.randomUUID()) + "." + extension);
         await uploadBytes(imageRef, photoFile, { contentType: photoFile.type });
         photoUrl = await getDownloadURL(imageRef);
       }
 
+      saveStage = "Uzman kaydı";
       const payload = {
         name,
         title: form.title.trim() || "Uzman",
@@ -183,8 +186,11 @@ export default function SpecialistsPage() {
       resetForm();
       const user = getFirebaseAuth().currentUser;
       if (user) await loadData(user.uid);
-    } catch {
-      setError("Uzman kaydedilemedi. Fotoğraf, Firestore veya Storage kurallarını kontrol edin.");
+    } catch (caught) {
+      const error = caught as { code?: string; message?: string };
+      console.error("Specialist save failed", { stage: saveStage, code: error?.code, message: error?.message });
+      const reason = error?.code ? ` (${error.code})` : "";
+      setError(`${saveStage} başarısız oldu${reason}. ${error?.code === "permission-denied" || error?.code === "storage/unauthorized" ? "Firebase güvenlik kuralları erişimi engelledi." : "Bağlantıyı ve Firebase ayarlarını kontrol edin."}`);
     } finally {
       setSaving(false);
     }
