@@ -5,6 +5,7 @@ import {
   getWhatsAppTemplateConfig,
   sendWhatsAppTemplate
 } from "@/lib/whatsapp/server";
+import { createBusinessNotification } from "@/lib/notifications/business";
 
 export const dynamic = "force-dynamic";
 
@@ -110,9 +111,17 @@ export async function POST(request: Request) {
           [message]
         );
 
+        const sentAt = new Date();
         await businessDoc.ref.update({
-          whatsappDailySummarySentAt: new Date().toISOString(),
+          whatsappDailySummarySentAt: sentAt.toISOString(),
           whatsappDailySummaryDate: date
+        });
+        await createBusinessNotification(businessDoc.id, {
+          type: "daily_summary",
+          title: "Günlük iş özeti WhatsApp'a gönderildi",
+          message: message,
+          eventAt: sentAt,
+          details: { date, bookingCount: bookings.length, channel: "whatsapp" },
         });
         sent++;
       } catch (error) {
