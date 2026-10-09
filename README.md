@@ -295,6 +295,8 @@ Production kullanım için Meta tarafındaki gerekli izinler, onaylı template'l
 
 # 🤖 WhatsApp AI Randevu Sekreteri
 
+Gemini API entegrasyonu tamamlandı. `GEMINI_API_KEY` ve `GEMINI_SECRETARY_MODEL` yapılandırması üzerinden WhatsApp AI sekreterinin doğal dil anlama ve function-calling katmanı çalışacak şekilde kodlandı. Şu an kalan ana adım WhatsApp Business hesabı/numarasını bağlayıp gerçek mesajlarla uçtan uca test etmektir.
+
 AI katmanı WhatsApp üzerinden gelen doğal dil randevu taleplerini anlamlandırmak için eklendi.
 
 Örnek:
@@ -331,7 +333,7 @@ Akış:
 
 Yani AI yalnızca doğal dili anlamlandırır; gerçek randevu işlemi ALINDA'nın deterministic Firestore akışından geçer.
 
-AI kullanılamadığında mevcut deterministic secretary akışı kullanılabilir.
+AI kullanılamadığında mevcut deterministic secretary akışı kullanılabilir. Gemini entegrasyon kodu tamamdır; canlı WhatsApp akışının doğrulanması için WhatsApp Business bağlantısı gereklidir.
 
 ---
 
@@ -438,16 +440,7 @@ GitHub Actions cron ile günlük gönderim hazırlanmıştır.
 
 Türkiye saatine göre yaklaşık 08:00 hedeflenmektedir.
 
-Production için:
-
-- Meta günlük özet template'i
-- App Hosting WHATSAPP_DAILY_SUMMARY_TEMPLATE
-- CRON_SECRET
-- GitHub ALINDA_CRON_SECRET
-- Pro test işletmesi
-- Gerçek WhatsApp testi
-
-tamamlanmalıdır.
+Kod ve zamanlanmış gönderim altyapısı hazırdır. Gerçek gönderim için WhatsApp Business bağlantısı, Meta tarafındaki gerekli izin/template ayarları ve secret'lar doğrulanmalı; ardından uçtan uca test yapılmalıdır.
 
 ---
 
@@ -911,6 +904,10 @@ Secret değerleri repository içine yazılmamalıdır.
 - [x] Pro müşteri bazlı AI izin sistemi
 - [x] Pro AI kapat / tekrar aç komutları
 - [x] Pro 10 dakika cevap gelmezse AI yardım teklifi
+- [x] Gemini API entegrasyonu (`GEMINI_API_KEY`)
+- [x] Gemini model yapılandırması (`GEMINI_SECRETARY_MODEL`)
+- [x] Gemini function-calling ile WhatsApp AI sekreter akışı
+- [x] Gemini yanıt veremediğinde deterministic fallback
 
 ## Super Admin
 
@@ -1115,9 +1112,9 @@ Her faz **tek tek uygulanacak ve test edilecek**. Yeni sektör özellikleri mevc
 | Duyuru sistemi | 🟢 Hazır |
 | WhatsApp Merkezi | 🟢 Kodlandı / canlı doğrulama bekliyor |
 | Logo / branding | 🟢 Hazır |
-| WhatsApp altyapısı | 🟢 Kod hazır / Meta production bekliyor |
+| WhatsApp Business bağlantısı | 🟡 Meta WhatsApp Business hesabı/numarası bağlanacak; canlı uçtan uca test bundan sonra yapılacak |
 | WhatsApp secretary | 🟢 Deterministic akış hazır |
-| AI WhatsApp secretary | 🟡 İzin + 10 dk fallback + Gemini kodu entegre / gerçek API + WhatsApp E2E test bekliyor |
+| Gemini AI entegrasyonu | 🟢 Gemini API bağlantısı, model ayarı ve WhatsApp AI sekreter kod entegrasyonu tamamlandı |
 | WhatsApp sorgulama | 🟢 Kod hazır |
 | WhatsApp iptal | 🟢 Kod hazır |
 | Pro günlük özet | 🟡 Kod hazır / template + secret + gerçek test bekliyor |
@@ -1139,9 +1136,9 @@ Her faz **tek tek uygulanacak ve test edilecek**. Yeni sektör özellikleri mevc
              ↓
     3. Security audit
              ↓
-    4. WhatsApp Meta production
+    4. WhatsApp Business hesabı ve numarasını bağlama
              ↓
-    5. AI secretary gerçek WhatsApp testi
+    5. Gemini AI sekreterini gerçek WhatsApp üzerinden uçtan uca test etme
              ↓
     6. Pro günlük özet gerçek testi
              ↓
