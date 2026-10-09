@@ -661,7 +661,7 @@ Landing page'de güncel planlar:
 
 Temel online randevu ve işletme yönetimi.
 
-### Pro — 750 TL / ay
+### Pro — 1.000 TL / ay
 
 Starter özelliklerine ek olarak:
 
@@ -671,11 +671,11 @@ Starter özelliklerine ek olarak:
 - Doğal dil ile randevu talebi anlama
 - Günlük WhatsApp randevu özeti
 
-### Pro Yıllık — 7.500 TL / yıl
+### Pro Yıllık — 10.000 TL / yıl
 
 12 aylık Pro kullanımı.
 
-Aylık Pro'ya göre 3.750 TL daha avantajlı olarak sunulmaktadır.
+Aylık Pro'ya göre yıllık toplamda 2.000 TL daha avantajlı olarak sunulmaktadır.
 
 Ödeme ve otomatik abonelik tahsilatı henüz tamamlanmış değildir; plan bilgisi şu anda işletme üzerinde yönetilmektedir.
 
