@@ -184,7 +184,6 @@ export default function SpecialistsPage() {
       setSuccess(editingId ? "Uzman güncellendi." : "Uzman eklendi.");
 
       resetForm();
-      const user = getFirebaseAuth().currentUser;
       if (user) await loadData(user.uid);
     } catch (caught) {
       const error = caught as { code?: string; message?: string };
