@@ -225,7 +225,7 @@ export default function Home() {
                 },
                 {
                   name: "Pro",
-                  oldPrice: "₺1.500",
+                  oldPrice: "₺2.000",
                   price: "₺1.000",
                   suffix: "/ ay",
                   badge: "PRO",
@@ -243,7 +243,7 @@ export default function Home() {
                 },
                 {
                   name: "Pro Yıllık",
-                  oldPrice: "₺15.000",
+                  oldPrice: "₺20.000",
                   price: "₺10.000",
                   suffix: "/ yıl",
                   badge: "EN AVANTAJLI",
