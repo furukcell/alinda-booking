@@ -43,7 +43,6 @@ function responseData(data: DocumentData) {
     customerName: data.customerName || "",
     serviceName: data.serviceName || "",
     specialistName: data.specialistName || "",
-    customerName: data.customerName || "",
     date: data.date || "",
     time: data.time || "",
     serviceDurationMinutes: Number(data.serviceDurationMinutes || 0),
