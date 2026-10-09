@@ -661,7 +661,7 @@ Landing page'de güncel planlar:
 
 Temel online randevu ve işletme yönetimi.
 
-### Pro — 1.000 TL / ay
+### Pro — 999 TL / ay
 
 Starter özelliklerine ek olarak:
 
@@ -675,7 +675,7 @@ Starter özelliklerine ek olarak:
 
 12 aylık Pro kullanımı.
 
-Aylık Pro'ya göre yıllık toplamda 2.000 TL daha avantajlı olarak sunulmaktadır.
+Aylık Pro fiyatı 999 TL olduğunda, yıllık Pro planı 1.988 TL daha avantajlıdır.
 
 Ödeme ve otomatik abonelik tahsilatı henüz tamamlanmış değildir; plan bilgisi şu anda işletme üzerinde yönetilmektedir.
 
