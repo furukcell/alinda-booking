@@ -11,10 +11,9 @@ jobs:
     steps:
       - name: Send upcoming appointment reminders
         env:
-          ALINDA_APP_URL: ${{ secrets.ALINDA_APP_URL }}
           ALINDA_CRON_SECRET: ${{ secrets.ALINDA_CRON_SECRET }}
         run: |
-          test -n "$ALINDA_APP_URL"
           test -n "$ALINDA_CRON_SECRET"
-          curl --fail-with-body -sS -X POST "$ALINDA_APP_URL/api/whatsapp/reminder" \
+          curl --fail-with-body -sS -X POST \
+            "https://alinda-booking--alinda-booking-9e08d.europe-west4.hosted.app/api/whatsapp/reminder" \
             -H "Authorization: Bearer $ALINDA_CRON_SECRET"
