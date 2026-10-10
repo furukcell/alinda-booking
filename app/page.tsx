@@ -75,7 +75,7 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-alinda-accent-soft/70 blur-3xl" aria-hidden="true" />
         <div className="absolute -right-40 top-20 h-[500px] w-[500px] rounded-full bg-[#F1E8E5] blur-3xl" aria-hidden="true" />
-        <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] w-full max-w-[1800px] items-center gap-8 px-4 py-8 sm:gap-10 sm:px-6 sm:py-10 lg:grid-cols-[.72fr_1.28fr] lg:gap-6 lg:px-8 lg:py-8 xl:px-10">
+        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 px-4 pb-20 pt-14 sm:px-6 sm:pb-24 sm:pt-20 lg:grid-cols-[.82fr_1.18fr] lg:gap-8 lg:px-8 lg:py-20">
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-alinda-line bg-white/80 px-4 py-2 text-xs font-semibold text-alinda-muted shadow-card">
               <span className="h-2 w-2 rounded-full bg-alinda-accent" /> ALINDA Booking · FK Digital
