@@ -198,21 +198,21 @@ export default function Home() {
       </section>
 
       <section id="fiyatlar" className="scroll-mt-20 border-y border-alinda-line bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[.8fr_1.5fr] lg:items-start">
-            <div className="lg:sticky lg:top-24">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+          <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_1.2fr] lg:items-end">
+            <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-alinda-accent">Abonelikler</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">İşletmeniz için ihtiyacınız olan her şey.</h2>
-              <p className="mt-4 text-base leading-7 text-alinda-muted">Aylık ve yıllık planda aynı ALINDA Booking özelliklerinin tamamını kullanın. Yıllık planda daha avantajlı fiyatla devam edin.</p>
-              <div className="mt-7 rounded-2xl bg-alinda-cream p-5">
-                <p className="text-sm font-semibold">Abonelikle neler yapabilirsiniz?</p>
-                <ul className="mt-4 space-y-2.5 text-sm text-alinda-muted">
-                  {actionFeatures.map((item) => <li key={item.title} className="flex gap-2"><Check size={16} className="mt-0.5 shrink-0 text-[#4E8762]" />{item.title}</li>)}
-                </ul>
+            </div>
+            <div>
+              <p className="text-base leading-7 text-alinda-muted">Aylık ve yıllık planda aynı ALINDA Booking özelliklerinin tamamını kullanın. Yıllık planda daha avantajlı fiyatla devam edin.</p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {actionFeatures.map((item) => <div key={item.title} className="flex gap-2 rounded-xl bg-alinda-cream p-3 text-xs leading-5 text-alinda-muted"><Check size={16} className="mt-0.5 shrink-0 text-[#4E8762]" /><span>{item.title}</span></div>)}
               </div>
             </div>
+          </div>
 
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 {
                   name: "Starter",
@@ -269,7 +269,6 @@ export default function Home() {
                   <a href="https://wa.me/905421523805" target="_blank" rel="noreferrer" className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-alinda-accent px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:opacity-90">WhatsApp'tan bilgi al <MessageCircle size={16} /></a>
                 </div>
               ))}
-            </div>
           </div>
         </div>
       </section>
