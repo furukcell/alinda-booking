@@ -1,4 +1,5 @@
 import Image from "next/image";
+import BookingPreviewCarousel from "./components/booking-preview-carousel";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -51,30 +52,6 @@ const actionFeatures = [
   { title: "Müşteriye anında bilgi verin", text: "Randevu oluşturulduğunda işletme ve izin veren müşteri için WhatsApp bildirim altyapısını kullanın." },
 ];
 
-function BookingPreview() {
-  return (
-    <div className="relative mx-auto w-full max-w-[900px] lg:mr-[-12px] xl:mr-[-24px]">
-      <div className="absolute -right-2 top-8 z-10 rounded-2xl border border-alinda-line bg-white/95 px-4 py-3 shadow-elevated backdrop-blur sm:-right-5 sm:top-12">
-        <p className="text-[10px] font-semibold text-alinda-muted">Müşteriniz</p>
-        <p className="mt-1 text-xs font-bold">Böyle randevu alır.</p>
-      </div>
-      <div className="absolute -left-3 bottom-8 z-10 hidden rounded-2xl border border-alinda-line bg-white/95 px-4 py-3 shadow-card backdrop-blur sm:block">
-        <p className="text-xs font-semibold text-[#4E8762]">✓ Uygulama indirmeye gerek yok</p>
-      </div>
-      <div className="overflow-hidden rounded-[38px] border border-white/80 bg-white shadow-[0_30px_90px_rgba(45,38,37,0.18)]">
-        <Image
-          src="/alinda-salon-hero.png"
-          alt="ALINDA online randevu deneyimi"
-          width={1536}
-          height={1024}
-          priority
-          className="h-auto w-full object-cover"
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-alinda-cream text-alinda-ink">
@@ -98,7 +75,7 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-alinda-accent-soft/70 blur-3xl" aria-hidden="true" />
         <div className="absolute -right-40 top-20 h-[500px] w-[500px] rounded-full bg-[#F1E8E5] blur-3xl" aria-hidden="true" />
-        <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] w-full max-w-[1600px] items-center gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 lg:grid-cols-[.82fr_1.18fr] lg:gap-8 lg:px-10 lg:py-10 xl:px-14">
+        <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] w-full max-w-[1800px] items-center gap-8 px-4 py-8 sm:gap-10 sm:px-6 sm:py-10 lg:grid-cols-[.72fr_1.28fr] lg:gap-6 lg:px-8 lg:py-8 xl:px-10">
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-alinda-line bg-white/80 px-4 py-2 text-xs font-semibold text-alinda-muted shadow-card">
               <span className="h-2 w-2 rounded-full bg-alinda-accent" /> ALINDA Booking · FK Digital
@@ -119,7 +96,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <BookingPreview />
+          <BookingPreviewCarousel />
         </div>
       </section>
 
