@@ -35,7 +35,7 @@ function bookingDateTime(date: string, time: string) {
 }
 
 export async function POST(request: Request) {
-  const expected = process.env.CRON_SECRET;
+  const expected = process.env.CRON_SECRET || process.env.ALINDA_CRON_SECRET;
   const provided = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!expected || !provided || provided !== expected) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
