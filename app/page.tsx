@@ -221,7 +221,7 @@ export default function Home() {
                 {
                   name: "Pro Yıllık",
                   oldPrice: "₺20.000",
-                  price: "₺10.000",
+                  price: "₺9.999",
                   suffix: "/ yıl",
                   badge: "EN AVANTAJLI",
                   description: "Pro özelliklerinin 12 aylık kullanımı. Aylık Pro'ya göre 1.988 TL daha avantajlı.",
