@@ -240,3 +240,40 @@ export async function sendWhatsAppText(
     accessToken
   );
 }
+
+
+function formatWhatsAppAppointmentDate(date: string) {
+  const parsed = new Date(date + "T12:00:00");
+  return new Intl.DateTimeFormat("tr-TR", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Istanbul" }).format(parsed);
+}
+
+/** Sends booking notifications from the trusted server-side booking flow. */
+export async function notifyWhatsAppBookingCreated(businessId: string, bookingId: string): Promise<{ ownerSent: boolean; customerSent: boolean; errors: string[] }> {
+  const db = getAdminDb();
+  const bookingRef = db.doc("businesses/" + businessId + "/bookings/" + bookingId);
+  const [bookingSnapshot, businessSnapshot, connection] = await Promise.all([bookingRef.get(), db.doc("businesses/" + businessId).get(), getWhatsAppConnection(businessId)]);
+  if (!bookingSnapshot.exists || !businessSnapshot.exists || !connection) return { ownerSent: false, customerSent: false, errors: ["WHATSAPP_NOT_READY"] };
+  const booking = bookingSnapshot.data() || {};
+  if (booking.businessId !== businessId) return { ownerSent: false, customerSent: false, errors: ["BOOKING_BUSINESS_MISMATCH"] };
+  if (booking.whatsappNotificationSentAt) return { ownerSent: false, customerSent: false, errors: [] };
+  const business = businessSnapshot.data() || {};
+  const templates = getWhatsAppTemplateConfig();
+  const ownerPhone = typeof business.whatsappNotificationPhone === "string" && business.whatsappNotificationPhone ? business.whatsappNotificationPhone : typeof business.phone === "string" ? business.phone : "";
+  const common = [String(booking.customerName || ""), String(booking.serviceName || ""), String(booking.specialistName || ""), formatWhatsAppAppointmentDate(String(booking.date || "")), String(booking.time || "")];
+  let ownerSent = false, customerSent = false;
+  const errors: string[] = [];
+  if (ownerPhone && templates.ownerTemplate) {
+    try {
+      await sendWhatsAppTemplate(connection.phoneNumberId, connection.accessToken, ownerPhone, templates.ownerTemplate, templates.language, [...common, String(booking.customerPhone || "")]);
+      ownerSent = true;
+    } catch (error) { errors.push("OWNER_NOTIFICATION_FAILED:" + (error instanceof Error ? error.message : "unknown")); }
+  } else errors.push("OWNER_TEMPLATE_OR_PHONE_MISSING");
+  if (booking.whatsappOptIn === true && templates.customerTemplate && booking.customerPhone) {
+    try {
+      await sendWhatsAppTemplate(connection.phoneNumberId, connection.accessToken, String(booking.customerPhone), templates.customerTemplate, templates.language, [String(business.name || "ALINDA"), String(booking.serviceName || ""), String(booking.specialistName || ""), formatWhatsAppAppointmentDate(String(booking.date || "")), String(booking.time || "")]);
+      customerSent = true;
+    } catch (error) { errors.push("CUSTOMER_NOTIFICATION_FAILED:" + (error instanceof Error ? error.message : "unknown")); }
+  }
+  if (ownerSent || customerSent) await bookingRef.update({ whatsappNotificationSentAt: new Date().toISOString(), whatsappOwnerNotificationSent: ownerSent, whatsappCustomerNotificationSent: customerSent });
+  return { ownerSent, customerSent, errors };
+}

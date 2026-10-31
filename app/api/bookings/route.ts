@@ -3,6 +3,7 @@ import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { rateLimit, rateLimitResponse } from "@/lib/security/rate-limit";
 import { createBusinessNotification } from "@/lib/notifications/business";
+import { notifyWhatsAppBookingCreated } from "@/lib/whatsapp/server";
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -222,6 +223,13 @@ export async function POST(request: NextRequest) {
       });
     } catch (notificationError) {
       console.error("Booking notification record failed", notificationError);
+    }
+
+    try {
+      const result = await notifyWhatsAppBookingCreated(businessId, transactionResult.referenceNo);
+      if (result.errors.length) console.warn("WhatsApp booking notification incomplete", { businessId, bookingId: transactionResult.referenceNo, errors: result.errors });
+    } catch (whatsappError) {
+      console.error("WhatsApp booking notification failed", whatsappError);
     }
 
     return NextResponse.json({ ok: true, ...transactionResult });
