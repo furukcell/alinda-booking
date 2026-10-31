@@ -18,7 +18,7 @@ function formatDate(date: string) {
 export async function POST(request: Request) {
   try {
     const expected = process.env.CRON_SECRET || process.env.ALINDA_CRON_SECRET;
-    const provided = request.headers.get("authorization")?.replace(/^Bearer\\s+/i, "");
+    const provided = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
     if (!expected || !provided || provided !== expected) {
       return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
     }
