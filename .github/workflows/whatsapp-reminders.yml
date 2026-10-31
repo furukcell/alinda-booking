@@ -13,7 +13,10 @@ jobs:
         env:
           ALINDA_CRON_SECRET: ${{ secrets.ALINDA_CRON_SECRET }}
         run: |
-          test -n "$ALINDA_CRON_SECRET"
+          if [ -z "$ALINDA_CRON_SECRET" ]; then
+            echo "::warning::ALINDA_CRON_SECRET is not configured; WhatsApp scheduled task was skipped."
+            exit 0
+          fi
           curl --fail-with-body -sS -X POST \
             "https://alinda-booking--alinda-booking-9e0d8.europe-west4.hosted.app/api/whatsapp/reminder" \
             -H "Authorization: Bearer $ALINDA_CRON_SECRET"
