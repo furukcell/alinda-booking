@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { rateLimit, rateLimitResponse } from "@/lib/security/rate-limit";
-import { createBusinessNotification } from "@/lib/notifications/business";
+import { createBusinessNotification } from "@/lib/notifications/business";\nimport { notifyWhatsAppBookingCreated } from "@/lib/whatsapp/server";
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
       console.error("Booking notification record failed", notificationError);
     }
 
-    return NextResponse.json({ ok: true, ...transactionResult });
+    try {\n      const result = await notifyWhatsAppBookingCreated(businessId, transactionResult.referenceNo);\n      if (result.errors.length) console.warn("WhatsApp booking notification incomplete", { businessId, bookingId: transactionResult.referenceNo, errors: result.errors });\n    } catch (whatsappError) {\n      console.error("WhatsApp booking notification failed", whatsappError);\n    }\n\n    return NextResponse.json({ ok: true, ...transactionResult });
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
     const map: Record<string, { error: string; status: number }> = {
