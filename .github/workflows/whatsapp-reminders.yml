@@ -15,5 +15,5 @@ jobs:
         run: |
           test -n "$ALINDA_CRON_SECRET"
           curl --fail-with-body -sS -X POST \
-            "https://alinda-booking--alinda-booking-9e08d.europe-west4.hosted.app/api/whatsapp/reminder" \
+            "https://alinda-booking--alinda-booking-9e0d8.europe-west4.hosted.app/api/whatsapp/reminder" \
             -H "Authorization: Bearer $ALINDA_CRON_SECRET"
