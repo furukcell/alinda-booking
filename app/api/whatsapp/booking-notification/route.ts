@@ -17,6 +17,12 @@ function formatDate(date: string) {
 
 export async function POST(request: Request) {
   try {
+    const expected = process.env.CRON_SECRET || process.env.ALINDA_CRON_SECRET;
+    const provided = request.headers.get("authorization")?.replace(/^Bearer\\s+/i, "");
+    if (!expected || !provided || provided !== expected) {
+      return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
+    }
+
     const body = await request.json();
     const businessId = typeof body.businessId === "string" ? body.businessId : "";
     const bookingId = typeof body.bookingId === "string" ? body.bookingId : "";
